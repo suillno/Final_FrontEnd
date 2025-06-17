@@ -6,12 +6,15 @@ import {
   GameResult,
   platformBorderColors,
   platformIcons,
+  EsrbNumbers,
+  EsrbColors,
 } from "../types/types";
 import { apiGetGameList } from "../api/api";
 import Loader from "../components/common/Loader";
 import { Link, useOutletContext } from "react-router-dom";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import dayjs from "dayjs";
 
 // 레이아웃에서 Sidebar 상태값 가져오기 위한 Context 타입 정의
 interface LayoutContext {
@@ -66,6 +69,8 @@ const InfoSection = styled.div`
 
 // hover 시 표시될 오버레이 상세 정보 (이미지 위에 덮음)
 const Overlay = styled.div`
+  display: flex;
+  justify-content: space-between;
   position: absolute;
   top: 0;
   left: 0;
@@ -76,6 +81,7 @@ const Overlay = styled.div`
   transition: opacity 0.3s ease;
   padding: 1rem;
   color: white;
+  font-size: 0.8em;
   ${GameCard}:hover & {
     opacity: 1;
   }
@@ -138,34 +144,77 @@ const MainPage: React.FC = () => {
 
               {/* 항상 표시될 기본 게임 정보 */}
               <InfoSection>
-                <div className="flex justify-between items-center">
-                  {/* 왼쪽: 게임명 */}
-                  <div className="font-bold text-lg">{item.name}</div>
-                  {/* 오른쪽: 원형 평점 */}
-                  <div style={{ width: 50, height: 50 }}>
+                {/* 플랫폼 이름 표기 (아이콘 없이 텍스트로만) */}
+                <div className="flex gap-1 mb-1 flex-wrap">
+                  {item.parent_platforms.map((platform) => {
+                    const slug = platform.platform.slug;
+                    const platformName =
+                      platformIcons[slug] ?? platform.platform.name;
+                    return (
+                      <span
+                        key={slug}
+                        className="text-xs font-semibold px-2 py-0.5 rounded"
+                        style={{
+                          border: `1px solid ${
+                            platformBorderColors[slug] || "#ccc"
+                          }`,
+                          color: platformBorderColors[slug] || "#333",
+                        }}
+                      >
+                        {platformName}
+                      </span>
+                    );
+                  })}
+                </div>
+
+                {/* 게임 타이틀 */}
+                <div className="font-bold text-lg">{item.name}</div>
+
+                {/* 하단 출시일 + 평점 */}
+                <div className="flex justify-between items-center text-sm mt-1">
+                  <span>출시: {item.released ?? "미정"}</span>
+                  <div style={{ width: 45, height: 45 }}>
                     <CircularProgressbar
                       value={(item.rating / 5) * 100}
                       text={`${item.rating.toFixed(1)}`}
                       styles={buildStyles({
-                        textSize: "28px",
-                        pathColor: "#00bfff",
-                        textColor: "#red",
+                        textSize: "30px",
+                        pathColor: "red",
+                        textColor: "red",
                         trailColor: "#444",
                       })}
                     />
                   </div>
                 </div>
-
-                {/* 하단 출시일 */}
-                <div className="flex justify-between text-sm mt-1">
-                  <span>출시: {item.released ?? "미정"}</span>
-                </div>
               </InfoSection>
 
               {/* hover 시 상세정보 오버레이 표시 */}
               <Overlay>
-                <div>장르: {item.genres.map((g) => g.name).join(", ")}</div>
-                <div>추가정보 준비 가능</div>
+                <div>
+                  <div>장르: {item.genres.map((g) => g.name).join(", ")}</div>
+                  <div>유저수: {item.added_by_status.yet}명</div>
+                  <div>플레이타임 : {item.playtime}시간</div>
+                  <div>추천: {item.suggestions_count}</div>
+                  {/* dayjs의존성 사용 날짜 형식변경출력 */}
+                  <div>
+                    최종 업데이트:{" "}
+                    {item.updated
+                      ? dayjs(item.updated).format("YYYY-MM-DD")
+                      : "없음"}
+                  </div>
+                </div>
+                <div>
+                  {item.esrb_rating && (
+                    <div
+                      className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-bold"
+                      style={{
+                        backgroundColor: EsrbColors[item.esrb_rating.name],
+                      }}
+                    >
+                      {EsrbNumbers[item.esrb_rating.name] ?? "?"}
+                    </div>
+                  )}
+                </div>
               </Overlay>
             </GameCard>
           </Link>

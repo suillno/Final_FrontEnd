@@ -66,7 +66,7 @@ const GlobalStyle = createGlobalStyle`
     line-height: 1.5;
     font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
     color: #222;
-    background-color: #fff;
+    background-color: #1e1f24;
   }
 `;
 

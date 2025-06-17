@@ -63,6 +63,8 @@ export interface GameResult {
   tags: Tag[]; // 태그 리스트
   esrb_rating: ESRBRating; // ESRB 등급
   short_screenshots: Screenshot[]; // 스크린샷 리스트
+  developers: Company[];
+  publishers: Company[];
 }
 
 // 개별 게임 정보 기본값 설정
@@ -108,6 +110,8 @@ export const defaultGameResult: GameResult = {
     slug: "",
   },
   short_screenshots: [],
+  developers: [],
+  publishers: [],
 };
 
 // 플랫폼 아이콘화
@@ -115,25 +119,59 @@ export const platformIcons: { [key: string]: string } = {
   pc: "PC",
   playstation4: "PS4",
   playstation5: "PS5",
-  xboxone: "XBOX",
-  xboxseriesx: "XBOX",
+  playstation: "PS",
+  xboxone: "XONE",
+  xbox: "XBOX",
+  xboxseriesx: "XSERIES",
   nintendo: "NS",
   switch: "NS",
   ios: "iOS",
   android: "AOS",
+  mac: "MAC",
+  macintosh: "MACIN",
+  macos: "MACOS",
+  linux: "LINUX",
+  web: "WEB",
 };
 
-// 플랫폼 아이콘 테두리 색상
+// 등급정보 표기
+export const EsrbNumbers: { [key: string]: string } = {
+  Everyone: "All",
+  "Everyone 10+": "10+",
+  Teen: "13+",
+  Mature: "17+",
+  "Adults Only": "18+",
+  "Rating Pending": "RP",
+};
+
+// 등급정보 아이콘 색상
+export const EsrbColors: { [key: string]: string } = {
+  Everyone: "#2ecc71",
+  "Everyone 10+": "#27ae60",
+  Teen: "#f1c40f",
+  Mature: "#e74c3c",
+  "Adults Only": "#c0392b",
+  "Rating Pending": "#95a5a6",
+};
+
+// 플랫폼 아이콘 테두리 색상 (최적화 추천버전)
 export const platformBorderColors: { [key: string]: string } = {
-  pc: "#4a90e2",
-  playstation4: "#3b5998",
-  playstation5: "#3b5998",
-  xboxone: "#107c10",
+  pc: "#4a90e2", // 파란색 (Windows 블루)
+  playstation4: "#003791", // PS4 블루
+  playstation5: "#003791", // PS5 동일 계열 유지
+  playstation: "#003791", // PS 공통 블루
+  xboxone: "#107c10", // XBOX 그린
+  xbox: "#107c10",
   xboxseriesx: "#107c10",
-  nintendo: "#e60012",
+  nintendo: "#e60012", // 닌텐도 레드
   switch: "#e60012",
-  ios: "#999999",
-  android: "#3ddc84",
+  ios: "#999999", // iOS 실버 계열
+  android: "#3ddc84", // Android 그린
+  mac: "#666666", // Mac 다크실버 계열
+  macintosh: "#666666",
+  macos: "#666666",
+  linux: "#f5c71a", // Linux Tux 노란색
+  web: "#3498db",
 };
 
 // 평점 상세 구조
@@ -235,4 +273,16 @@ export interface ESRBRating {
 export interface Screenshot {
   id: number;
   image: string;
+}
+
+export interface Company {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface developers {
+  id: number;
+  name: string;
+  slug: string;
 }
