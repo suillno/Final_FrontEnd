@@ -1,0 +1,109 @@
+
+# ========================
+# Global
+# ========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.orig
+*.rej
+
+# ========================
+# Java / Spring Boot
+# ========================
+/target/
+/bin/
+/out/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+
+# Maven
+.mvn/
+!**/src/main/**/mvnw
+!**/src/main/**/mvnw.cmd
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+gradle.properties
+
+# IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.project
+.classpath
+.settings/
+.apt_generated/
+.factorypath
+*.prefs
+
+# STS
+.springBeans
+
+# ========================
+# React (Frontend)
+# ========================
+/node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+dist/
+build/
+
+# ========================
+# VSCode
+# ========================
+.vscode/
+
+# ========================
+# OS 별
+# ========================
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# ========================
+# 기타 툴 캐시 (ex: JetBrains, ESLint, etc)
+# ========================
+/.idea/
+/coverage/
+/eslintcache
+*.eslintcache
+
+# ========================
+# Git Ignore에 추가 추천
+# ========================
+logs/
+*.log
+*.pid
+*.seed
+*.dump
+*.hprof
+tmp/
