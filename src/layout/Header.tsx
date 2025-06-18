@@ -2,6 +2,8 @@
 import React from "react";
 import styled from "styled-components";
 import sidebarIcon from "../img/sidebar.png";
+import PGLogo from "../img/PGLogo.png";
+import SearchBox from "../components/common/SearchBox";
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -17,15 +19,26 @@ const HeaderWrapper = styled.header`
   z-index: 1000;
 `;
 
-const SidebarIcon = styled.img`
-  width: 32px;
-  height: 32px;
-  filter: invert(1);
+const HideName = styled.a`
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
-const Logo = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
+const SidebarIcon = styled.img`
+  width: 30px;
+  height: 30px;
+  filter: invert(1);
+  margin-left: 24px;
+`;
+
+const Logo = styled.img`
+  width: 100%; /* 부모 요소 기준 100% */
+  max-width: 70px; /* 최대 너비 제한 */
+  height: auto; /* 비율 유지하면서 높이 자동 */
+  &:hover {
+    filter: invert(1);
+  }
 `;
 
 const HeaderRight = styled.div`
@@ -59,14 +72,15 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
   return (
     <HeaderWrapper>
-      <button onClick={onSidebarToggle}>
-        <SidebarIcon src={sidebarIcon} />
-      </button>
-      <Logo>Humble</Logo>
+      <div className="flex">
+        <Logo src={PGLogo} />
+        <button className="ml-10" onClick={onSidebarToggle}>
+          <SidebarIcon src={sidebarIcon} />
+        </button>
+      </div>
+      <SearchBox />
       <HeaderRight>
-        <button type="button">🔍</button>
-        <input type="text" placeholder="검색" />
-        <a href="member/signup.html">회원가입</a>
+        <HideName>닉네임</HideName>
         <a href="member/login.html">로그인</a>
       </HeaderRight>
     </HeaderWrapper>

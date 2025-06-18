@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 //비밀번호 변경, 2단계 인증 등
 
 const Security: React.FC = () => {
@@ -38,7 +39,10 @@ const Security: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>보안 설정</h2>
+      <div className="flex justify-between">
+        <h2 style={styles.title}>보안 설정</h2>
+        <h2 style={styles.title}>내정보수정</h2>
+      </div>
 
       <div style={styles.section}>
         <h3>비밀번호 변경</h3>
