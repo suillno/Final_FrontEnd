@@ -286,3 +286,39 @@ export interface developers {
   name: string;
   slug: string;
 }
+
+// Steam API 응답에서 사용하는 price_overview 객체 구조
+export interface SteamPriceOverview {
+  currency: string;
+  initial: number;
+  final: number;
+  discount_percent: number;
+}
+
+// Steam API 단일 게임 가격 응답 구조
+export interface SteamAppPriceData {
+  success: boolean;
+  data?: {
+    is_free: boolean;
+    price_overview?: SteamPriceOverview;
+  };
+}
+
+// Steam 전체 응답 타입 (appId가 동적으로 key로 사용됨)
+export type SteamPriceResponse = Record<string, SteamAppPriceData>;
+
+// 예시 초기값 (기본 응답 구조)
+export const defaultSteamPriceResponse: SteamPriceResponse = {
+  "0": {
+    success: false,
+    data: {
+      is_free: false,
+      price_overview: {
+        currency: "KRW",
+        initial: 0,
+        final: 0,
+        discount_percent: 0,
+      },
+    },
+  },
+};

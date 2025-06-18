@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { apiGetGameDetail } from "../api/api";
+import { apiGetGameDetail } from "../components/api/api";
 import { useEffect, useState } from "react";
 import {
   defaultGameResult,
