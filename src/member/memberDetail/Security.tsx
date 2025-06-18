@@ -12,6 +12,7 @@ const Security: React.FC = () => {
       alert("모든 비밀번호 입력란을 채워주세요.");
       return;
     }
+    /////
     if (newPassword !== confirmPassword) {
       alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
       return;
