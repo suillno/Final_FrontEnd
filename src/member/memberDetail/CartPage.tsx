@@ -2,21 +2,26 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 
-// 장바구니에 담긴 아이템 데이터 타입 정의
+// === 타입 정의 ===
+
+// 장바구니에 들어가는 상품 항목 타입
 interface CartItem {
   id: number;
   title: string;
   image: string;
   price: number;
   quantity: number;
+  discount: number; // 할인율 (예: 10은 10%)
 }
 
-// 레이아웃에서 전달받는 사이드바 열림 상태 타입
+// 레이아웃 컨텍스트 타입 (사이드바 열림 여부)
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// 전체 페이지 레이아웃
+// === 스타일 컴포넌트 정의 ===
+
+// 전체 페이지 감싸는 컨테이너 (사이드바 열림 시 좌측 여백 조정)
 const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
@@ -33,7 +38,7 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   }
 `;
 
-// 장바구니 박스 스타일
+// 장바구니 전체 영역 박스
 const SectionBox = styled.div`
   width: 100%;
   max-width: 800px;
@@ -44,14 +49,14 @@ const SectionBox = styled.div`
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 `;
 
-// 제목 스타일
+// 장바구니 제목
 const Title = styled.h2`
   font-size: 28px;
   margin-bottom: 25px;
   text-align: center;
 `;
 
-// 장바구니 목록 영역
+// 게임 리스트 컨테이너
 const List = styled.div`
   display: flex;
   flex-direction: column;
@@ -81,36 +86,18 @@ const Image = styled.img`
   border-radius: 4px;
 `;
 
-// 텍스트 정보 컨테이너
+// 텍스트 정보 영역
 const Info = styled.div`
   flex: 1;
 `;
 
-// 게임 타이틀 텍스트
+// 게임 제목
 const GameTitle = styled.h3`
   font-size: 18px;
   margin: 0 0 8px 0;
 `;
 
-// 수량 조절 버튼 영역
-const QuantityControl = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-
-  button {
-    background-color: #3b3f45;
-    border: none;
-    color: white;
-    padding: 4px 10px;
-    font-size: 16px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-`;
-
-// 가격 및 제거 버튼 영역
+// 가격 정보, 제거 버튼을 감싸는 박스
 const PriceBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -119,13 +106,20 @@ const PriceBox = styled.div`
   min-width: 150px;
 `;
 
-// 가격 텍스트
+// 정가 표시
 const Price = styled.div`
   font-size: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 `;
 
-// 아이템 제거 버튼
+// 할인가 표시
+const Discount = styled.div`
+  font-size: 14px;
+  color: #00e676;
+  margin-bottom: 8px;
+`;
+
+// 제거 버튼
 const RemoveButton = styled.button`
   padding: 8px 12px;
   background-color: #a94442;
@@ -136,7 +130,7 @@ const RemoveButton = styled.button`
   font-size: 14px;
 `;
 
-// 총합 표시 영역
+// 최종 결제 금액 요약
 const TotalBar = styled.div`
   margin-top: 2em;
   text-align: right;
@@ -144,6 +138,7 @@ const TotalBar = styled.div`
   font-weight: bold;
   border-top: 1px solid #555;
   padding-top: 20px;
+  line-height: 1.8;
 `;
 
 // 결제 버튼
@@ -165,11 +160,12 @@ const CheckoutButton = styled.button`
   }
 `;
 
-// 장바구니 페이지 컴포넌트
+// === 메인 장바구니 컴포넌트 ===
 const CartPage: React.FC = () => {
+  // 사이드바 열림 상태 가져오기
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  // 장바구니 초기 상태 설정
+  // 장바구니 초기 상태 (더미 데이터)
   const [cart, setCart] = useState<CartItem[]>([
     {
       id: 1,
@@ -177,6 +173,7 @@ const CartPage: React.FC = () => {
       image: "/games/scum.jpg",
       price: 49000,
       quantity: 1,
+      discount: 10,
     },
     {
       id: 2,
@@ -184,29 +181,31 @@ const CartPage: React.FC = () => {
       image: "/games/mhr.jpg",
       price: 11200,
       quantity: 2,
+      discount: 20,
     },
   ]);
 
-  // 항목 제거 함수
+  // 항목 제거
   const removeItem = (id: number) => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  // // 수량 변경 함수
-  // const changeQuantity = (id: number, amount: number) => {
-  //   setCart(
-  //     cart.map((item) =>
-  //       item.id === id
-  //         ? { ...item, quantity: Math.max(1, item.quantity + amount) }
-  //         : item
-  //     )
-  //   );
-  // };
+  // 총 정가 계산
+  const originalTotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
-  // 총 가격 계산
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // 총 할인 금액 적용한 결제 금액 계산
+  const discountedTotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100),
+    0
+  );
 
-  // 결제 버튼 클릭 핸들러
+  // 할인된 총액
+  const totalDiscount = originalTotal - discountedTotal;
+
+  // 결제 버튼 클릭 시
   const handleCheckout = () => {
     alert("결제 페이지로 이동합니다.");
   };
@@ -215,40 +214,52 @@ const CartPage: React.FC = () => {
     <PageWrapper isSidebarOpen={isSidebarOpen}>
       <SectionBox>
         <Title>장바구니</Title>
+
         {cart.length === 0 ? (
           <p style={{ color: "#ccc", textAlign: "center" }}>
             장바구니가 비어 있습니다.
           </p>
         ) : (
           <>
+            {/* 장바구니 아이템 리스트 */}
             <List>
-              {cart.map((item) => (
-                <ItemCard key={item.id}>
-                  <Image src={item.image} alt={item.title} />
-                  <Info>
-                    <GameTitle>{item.title}</GameTitle>
-                    {/* <QuantityControl>
-                      <button onClick={() => changeQuantity(item.id, -1)}>
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => changeQuantity(item.id, 1)}>
-                        +
-                      </button>
-                    </QuantityControl> */}
-                  </Info>
-                  <PriceBox>
-                    <Price>
-                      ₩ {(item.price * item.quantity).toLocaleString()}
-                    </Price>
-                    <RemoveButton onClick={() => removeItem(item.id)}>
-                      제거
-                    </RemoveButton>
-                  </PriceBox>
-                </ItemCard>
-              ))}
+              {cart.map((item) => {
+                const discounted =
+                  item.price * item.quantity * (1 - item.discount / 100);
+
+                return (
+                  <ItemCard key={item.id}>
+                    <Image src={item.image} alt={item.title} />
+                    <Info>
+                      <GameTitle>{item.title}</GameTitle>
+                    </Info>
+                    <PriceBox>
+                      <Price>
+                        원가: ₩ {(item.price * item.quantity).toLocaleString()}
+                      </Price>
+                      <Discount>
+                        할인가: ₩ {discounted.toLocaleString()} ({item.discount}
+                        % ↓)
+                      </Discount>
+                      <RemoveButton onClick={() => removeItem(item.id)}>
+                        제거
+                      </RemoveButton>
+                    </PriceBox>
+                  </ItemCard>
+                );
+              })}
             </List>
-            <TotalBar>총 합계: ₩ {total.toLocaleString()}</TotalBar>
+
+            {/* 총 금액 정보 */}
+            <TotalBar>
+              원가 총액: ₩ {originalTotal.toLocaleString()} <br />
+              할인 금액: - ₩ {totalDiscount.toLocaleString()} <br />
+              <span style={{ color: "#00e676" }}>
+                최종 결제 금액: ₩ {discountedTotal.toLocaleString()}
+              </span>
+            </TotalBar>
+
+            {/* 결제 버튼 */}
             <CheckoutButton onClick={handleCheckout}>결제하기</CheckoutButton>
           </>
         )}
