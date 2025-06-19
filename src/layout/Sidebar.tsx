@@ -82,6 +82,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <MenuItem>Best of the year</MenuItem>
         <MenuItem>Popular in 2024</MenuItem>
         <MenuItem>All time top 250</MenuItem>
+        <MenuItem>
+          <Link to="/genres/list">Genres</Link>
+        </MenuItem>
       </Section>
 
       <Section>
