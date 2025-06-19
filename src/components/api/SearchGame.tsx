@@ -99,7 +99,7 @@ const SearchGame: React.FC = () => {
   }, [searchKeyword]);
 
   return (
-    <div className="bg-[#1e1f24] text-white py-6 w-full">
+    <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       <MainTitle isSidebarOpen={isSidebarOpen}>
         "{searchKeyword}" 검색 결과
       </MainTitle>
