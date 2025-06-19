@@ -21,12 +21,11 @@ interface LayoutContext {
 const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
-  align-items: flex-start; // 위쪽 정렬
+  align-items: flex-start;
   min-height: 100vh;
   padding: 2em;
-  background-color: #1e1f24;
+  background-color: #121317;
   box-sizing: border-box;
-
   margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 
@@ -40,40 +39,49 @@ const LibraryBox = styled.div`
   width: 100%;
   max-width: 800px;
   background-color: #1f1f1f;
-  border-radius: 8px;
-  padding: 30px;
+  border-radius: 12px;
+  padding: 40px;
   color: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 `;
 
 // 페이지 타이틀
 const Title = styled.h2`
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 28px;
+  margin-bottom: 30px;
+  font-weight: bold;
 `;
 
 // 게임 카드 목록을 세로로 정렬
 const Grid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px; // 카드 간격
+  gap: 20px;
 `;
 
 // 개별 게임 카드
 const Card = styled.div`
-  background-color: #2b2b2b;
-  border-radius: 6px;
-  padding: 15px;
-  display: flex; // 이미지 + 텍스트 가로 배치
+  background-color: #2a2c34;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
   align-items: center;
   gap: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
 `;
 
 // 게임 커버 이미지
 const Image = styled.img`
-  width: 120px;
-  height: 80px;
+  width: 130px;
+  height: 90px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 `;
 
 // 카드 오른쪽 텍스트 영역
@@ -83,42 +91,49 @@ const Info = styled.div`
 
 // 게임 제목
 const GameTitle = styled.h3`
-  font-size: 18px;
-  margin: 0 0 8px 0;
+  font-size: 20px;
+  margin: 0 0 10px 0;
 `;
 
 // 구매일 표시
 const Date = styled.p`
-  font-size: 12px;
+  font-size: 13px;
   color: #bbb;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 `;
 
 // 설치 버튼
 const Button = styled.button`
-  padding: 8px 12px;
-  background-color: #00bfff;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #00bfff, #009acd);
   border: none;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #0080b0;
+  }
 `;
 
 // 더보기 / 접기 버튼
 const MoreButton = styled.button`
   margin-top: 30px;
-  padding: 10px 20px;
-  background-color: #444;
+  padding: 12px 24px;
+  background-color: #3a3a3a;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 15px;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #666;
+    background-color: #5a5a5a;
   }
 `;
 
@@ -159,14 +174,10 @@ const Library: React.FC = () => {
     },
   ]);
 
-  // 초기 보여줄 게임 개수
   const INITIAL_COUNT = 2;
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
-
-  // 모두 보여주고 있는지 여부
   const isAllVisible = visibleCount >= games.length;
 
-  // 더보기 / 접기 토글
   const handleToggle = () => {
     if (isAllVisible) {
       setVisibleCount(INITIAL_COUNT);
@@ -184,7 +195,6 @@ const Library: React.FC = () => {
           <p style={{ color: "#ccc" }}>구매한 게임이 없습니다.</p>
         ) : (
           <>
-            {/* 게임 카드 리스트 */}
             <Grid>
               {games.slice(0, visibleCount).map((game) => (
                 <Card key={game.id}>
@@ -198,7 +208,6 @@ const Library: React.FC = () => {
               ))}
             </Grid>
 
-            {/* 더보기 / 접기 버튼 */}
             {games.length > INITIAL_COUNT && (
               <div style={{ textAlign: "center" }}>
                 <MoreButton onClick={handleToggle}>

@@ -28,7 +28,7 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   align-items: flex-start;
   min-height: 100vh;
   padding: 2em;
-  background-color: #1e1f24;
+  background-color: #121317;
   box-sizing: border-box;
   margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
@@ -42,18 +42,19 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
 const SectionBox = styled.div`
   width: 100%;
   max-width: 800px;
-  background-color: #1f1f1f;
-  border-radius: 8px;
-  padding: 30px;
+  background-color: #1e1f1f;
+  border-radius: 12px;
+  padding: 40px;
   color: #fff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 `;
 
 // 장바구니 제목
 const Title = styled.h2`
-  font-size: 28px;
-  margin-bottom: 25px;
+  font-size: 30px;
+  margin-bottom: 30px;
   text-align: center;
+  font-weight: bold;
 `;
 
 // 게임 리스트 컨테이너
@@ -65,12 +66,13 @@ const List = styled.div`
 
 // 개별 아이템 카드
 const ItemCard = styled.div`
-  background-color: #2b2b2b;
-  border-radius: 6px;
-  padding: 15px;
+  background-color: #292c31;
+  border-radius: 10px;
+  padding: 20px;
   display: flex;
   align-items: center;
   gap: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s;
 
   &:hover {
@@ -80,10 +82,11 @@ const ItemCard = styled.div`
 
 // 게임 이미지
 const Image = styled.img`
-  width: 120px;
-  height: 80px;
+  width: 130px;
+  height: 90px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 `;
 
 // 텍스트 정보 영역
@@ -93,8 +96,9 @@ const Info = styled.div`
 
 // 게임 제목
 const GameTitle = styled.h3`
-  font-size: 18px;
-  margin: 0 0 8px 0;
+  font-size: 20px;
+  margin: 0 0 10px 0;
+  font-weight: bold;
 `;
 
 // 가격 정보, 제거 버튼을 감싸는 박스
@@ -110,24 +114,32 @@ const PriceBox = styled.div`
 const Price = styled.div`
   font-size: 16px;
   margin-bottom: 8px;
+  color: #ccc;
 `;
 
 // 할인가 표시
 const Discount = styled.div`
-  font-size: 14px;
+  font-size: 15px;
   color: #00e676;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  font-weight: bold;
 `;
 
 // 제거 버튼
 const RemoveButton = styled.button`
   padding: 8px 12px;
-  background-color: #a94442;
+  background-color: #d32f2f;
   border: none;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #b71c1c;
+  }
 `;
 
 // 최종 결제 금액 요약
@@ -143,15 +155,15 @@ const TotalBar = styled.div`
 
 // 결제 버튼
 const CheckoutButton = styled.button`
-  margin-top: 1em;
+  margin-top: 1.5em;
   width: 100%;
   padding: 15px;
-  background-color: #00c853;
+  background: linear-gradient(135deg, #00c853, #009b46);
   color: white;
   font-size: 16px;
   font-weight: bold;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
 
@@ -162,14 +174,12 @@ const CheckoutButton = styled.button`
 
 // === 메인 장바구니 컴포넌트 ===
 const CartPage: React.FC = () => {
-  // 사이드바 열림 상태 가져오기
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  // 장바구니 초기 상태 (더미 데이터)
   const [cart, setCart] = useState<CartItem[]>([
     {
       id: 1,
-      title: "SCUM",
+      title: "엘든 링",
       image: "/games/scum.jpg",
       price: 49000,
       quantity: 1,
@@ -177,7 +187,7 @@ const CartPage: React.FC = () => {
     },
     {
       id: 2,
-      title: "Monster Hunter Rise",
+      title: "스타듀 밸리",
       image: "/games/mhr.jpg",
       price: 11200,
       quantity: 2,
@@ -185,27 +195,22 @@ const CartPage: React.FC = () => {
     },
   ]);
 
-  // 항목 제거
   const removeItem = (id: number) => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  // 총 정가 계산
   const originalTotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // 총 할인 금액 적용한 결제 금액 계산
   const discountedTotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100),
     0
   );
 
-  // 할인된 총액
   const totalDiscount = originalTotal - discountedTotal;
 
-  // 결제 버튼 클릭 시
   const handleCheckout = () => {
     alert("결제 페이지로 이동합니다.");
   };
@@ -221,7 +226,6 @@ const CartPage: React.FC = () => {
           </p>
         ) : (
           <>
-            {/* 장바구니 아이템 리스트 */}
             <List>
               {cart.map((item) => {
                 const discounted =
@@ -250,7 +254,6 @@ const CartPage: React.FC = () => {
               })}
             </List>
 
-            {/* 총 금액 정보 */}
             <TotalBar>
               원가 총액: ₩ {originalTotal.toLocaleString()} <br />
               할인 금액: - ₩ {totalDiscount.toLocaleString()} <br />
@@ -259,7 +262,6 @@ const CartPage: React.FC = () => {
               </span>
             </TotalBar>
 
-            {/* 결제 버튼 */}
             <CheckoutButton onClick={handleCheckout}>결제하기</CheckoutButton>
           </>
         )}

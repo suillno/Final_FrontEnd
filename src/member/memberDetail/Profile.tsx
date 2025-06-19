@@ -122,7 +122,7 @@ const Checkbox = styled.input`
 
 // ==== 컴포넌트 구현 ====
 
-const ProfileAndSecurity: React.FC = () => {
+const Profile: React.FC = () => {
   // 사이드바 열림 여부 가져오기
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
@@ -324,4 +324,4 @@ const ProfileAndSecurity: React.FC = () => {
   );
 };
 
-export default ProfileAndSecurity;
+export default Profile;
