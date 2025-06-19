@@ -15,6 +15,7 @@ import FindId from "../member/memberControl/FindId";
 import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
+import SearchGame from "../components/api/SearchGame";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
         <Route path="game/:id" element={<GameDetail />} />
+        <Route path="/searchgame" element={<SearchGame />} />
         <Route path="admin" element={<AdminIndex />} />
         <Route path="member/library" element={<Library />} />
         <Route path="member/dashboard" element={<Dashboard />} />

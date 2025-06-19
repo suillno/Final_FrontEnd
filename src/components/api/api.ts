@@ -32,6 +32,21 @@ export const apiGetGameDetail = async (gameId: string) => {
 };
 
 /**
+ * 게임 제목 기반 RAWG 게임 목록 검색
+ */
+export const apiGetGameSearch = async (gameTitle: string) => {
+  try {
+    const res = await instance.get("/game/search/rwag", {
+      params: { search: gameTitle },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("게임 검색 호출 에러", error);
+    return null;
+  }
+};
+
+/**
  * Steam 가격 정보 조회 (게임 제목 기반)
  * 1. 제목으로 AppID 검색 → 2. 가격정보 호출 → 가격정보 반환
  */

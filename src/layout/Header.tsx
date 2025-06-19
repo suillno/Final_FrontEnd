@@ -7,6 +7,7 @@ import SearchBox from "../components/common/SearchBox";
 
 // ✅ 헤더 전체 감싸는 스타일드 컴포넌트
 const HeaderWrapper = styled.header`
+  position: fixed;
   background-color: #3b3e45;
   width: 100%;
   padding: 10px 24px;

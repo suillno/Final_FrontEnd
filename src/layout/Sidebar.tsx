@@ -11,6 +11,7 @@ const SidebarContainer = styled.nav<{ isOpen: boolean }>`
   position: fixed;
   top: 60px;
   left: ${({ isOpen }) => (isOpen ? "0" : "-180px")};
+  overflow: auto;
   transition: left 0.3s ease;
   overflow-y: 1000;
   z-index: 1000;

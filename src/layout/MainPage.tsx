@@ -6,6 +6,9 @@ import { apiGetGameList } from "../components/api/api";
 import Loader from "../components/common/Loader";
 import { Link, useOutletContext } from "react-router-dom";
 import GameCard from "../components/api/GameCard";
+import { useLocation } from "react-router-dom";
+
+// 헤더에서 입력받은 값이 있으면 타이틀로 서치 동작
 
 // 레이아웃 컨텍스트 타입 (사이드바 열림 여부 확인용)
 interface LayoutContext {
@@ -68,7 +71,7 @@ const MainPage: React.FC = () => {
   }, [pageCount]);
 
   return (
-    <div className="bg-[#1e1f24] text-white py-6 w-full">
+    <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
       <MainTitle isSidebarOpen={isSidebarOpen}>Top picks</MainTitle>
 

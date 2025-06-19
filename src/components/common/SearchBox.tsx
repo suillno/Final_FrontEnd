@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import SearchIcon from "../../img/SearchIcon.svg";
+import { useNavigate } from "react-router-dom";
 
 // 🔹 검색창 전체를 감싸는 래퍼 (아이콘 + 입력창 포함)
 const SearchWrapper = styled.div`
@@ -56,6 +57,9 @@ const SearchBox = () => {
   const inputRef = useRef<HTMLInputElement>(null); // input 요소 접근용 ref
   const [query, setQuery] = useState(""); // 입력된 검색어 상태
 
+  // 셀렉트값 넘겨주기
+  const navigate = useNavigate();
+
   // 🔸 검색창이 열릴 때 자동 포커스
   useEffect(() => {
     if (showInput && inputRef.current) {
@@ -67,6 +71,8 @@ const SearchBox = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       console.log("🔍 검색어:", query); // 실제 검색 로직 대체 가능
+      // 검색제출시 페이지로 값 전달
+      navigate(`/searchgame?search=${encodeURIComponent(query)}`);
     }
     if (e.key === "Escape") {
       setShowInput(false); // ESC 키 누르면 검색창 닫기
