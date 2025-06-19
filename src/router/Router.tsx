@@ -15,6 +15,7 @@ import FindId from "../member/memberControl/FindId";
 import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
+import LoginT from "../member/memberControl/LoginT";
 
 function Router() {
   return (
@@ -36,6 +37,7 @@ function Router() {
         <Route path="findid" element={<FindId />} />
         <Route path="findpw" element={<FindPw />} />
         <Route path="login" element={<Login />} />
+        <Route path="logint" element={<LoginT />} />
         <Route path="signup" element={<Signup />} />
       </Route>
     </Routes>

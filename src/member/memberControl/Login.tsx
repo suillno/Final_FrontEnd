@@ -15,7 +15,7 @@ const Container = styled.div`
   background-color: #3a3c42;
   padding: 40px;
   border-radius: 8px;
-  width: 100%;
+  width: 500em;
   max-width: 400px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 `;
