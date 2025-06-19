@@ -16,6 +16,7 @@ import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
 import SearchGame from "../components/api/SearchGame";
+import Genres from "../genres/Genres";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
         <Route path="member/profile" element={<Profile />} />
         <Route path="member/security" element={<Security />} />
         <Route path="member/wallet" element={<Wallet />} />
+        <Route path="genres/list" element={<Genres />} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}
