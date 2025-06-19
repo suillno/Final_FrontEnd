@@ -9,7 +9,7 @@ const SidebarContainer = styled.nav<{ isOpen: boolean }>`
   color: white;
   padding: 20px;
   position: fixed;
-  top: 60px;
+  top: 50px;
   left: ${({ isOpen }) => (isOpen ? "0" : "-180px")};
   overflow: auto;
   transition: left 0.3s ease;

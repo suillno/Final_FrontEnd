@@ -16,7 +16,7 @@ import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
 import SearchGame from "../components/api/SearchGame";
-import Genres from "../genres/Genres";
+import Genres from "../gameApi/Genres";
 
 function Router() {
   return (
