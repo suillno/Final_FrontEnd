@@ -1,11 +1,12 @@
-// ✅ Header.tsx
+// Header.tsx
 import React from "react";
 import styled from "styled-components";
 import sidebarIcon from "../img/sidebar.png";
 import PGLogo from "../img/PGLogo.png";
 import SearchBox from "../components/common/SearchBox";
+import { Link } from "react-router-dom";
 
-// ✅ 헤더 전체 감싸는 스타일드 컴포넌트
+// 헤더 전체 감싸는 스타일드 컴포넌트
 const HeaderWrapper = styled.header`
   position: fixed;
   background-color: #3b3e45;
@@ -17,7 +18,7 @@ const HeaderWrapper = styled.header`
   z-index: 1000;
 `;
 
-// ✅ 닉네임 링크 - 모바일에선 안 보이고, 폰트 크기도 줄이기
+// 닉네임 링크 - 모바일에선 안 보이고, 폰트 크기도 줄이기
 const HideName = styled.a`
   font-size: 1rem;
 
@@ -27,20 +28,14 @@ const HideName = styled.a`
   }
 `;
 
-// ✅ 사이드바 아이콘 이미지
+// 사이드바 아이콘 이미지
 const SidebarIcon = styled.img`
   width: 30px;
   height: 30px;
   filter: invert(1);
 `;
 
-// 중앙 서치박스 우측정렬
-const CenterIcon = styled.div`
-  display: flex;
-  justify-content: end;
-`;
-
-// ✅ 로고 이미지
+// 로고 이미지
 const Logo = styled.img`
   width: 100%;
   max-width: 3.2em;
@@ -53,7 +48,7 @@ const Logo = styled.img`
   }
 `;
 
-// ✅ 오른쪽 로그인 영역
+// 오른쪽 로그인 영역
 const HeaderRight = styled.div`
   display: flex;
   align-items: center;
@@ -84,14 +79,16 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
   return (
-    // ✅ 상단 고정 헤더 레이아웃
+    // 상단 고정 헤더 레이아웃
     <HeaderWrapper className="flex justify-between items-center">
       {/* 좌측: 사이드바 버튼 + 로고 */}
       <div className="flex items-center gap-4 basis-1/4">
         <button onClick={onSidebarToggle}>
           <SidebarIcon src={sidebarIcon} />
         </button>
-        <Logo src={PGLogo} />
+        <Link to={"/"}>
+          <Logo src={PGLogo} />
+        </Link>
       </div>
 
       {/* 중앙: 검색창 - 가운데 정렬 + 모바일에서 줄이면 text-sm 대응 */}

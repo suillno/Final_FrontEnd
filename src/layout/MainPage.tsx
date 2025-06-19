@@ -94,7 +94,7 @@ const MainPage: React.FC = () => {
         <div className="flex justify-center mt-8 h-35 ">
           <button
             type="button"
-            className="w-24 h-12 bg-blue-500 text-white rounded text-center"
+            className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
             style={{ marginTop: "2em", fontWeight: "600" }}
             onClick={pageNext}
           >

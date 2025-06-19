@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import gameImg from "../img/game.jpg";
 import { useOutletContext } from "react-router-dom";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 // 레이아웃 컨텍스트 타입
 interface LayoutContext {
@@ -65,6 +65,11 @@ const GenreListWrapper = styled.div`
       padding: 5px 10px;
       color: white;
       font-size: 14px;
+
+      // 마우스 호버시 색변경
+      &:hover {
+        filter: invert(1);
+      }
     }
   }
 `;
@@ -93,15 +98,47 @@ const Genres = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 🔹 마우스 휠을 가로 스크롤로 전환
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [games, setGames] = useState<any[]>([]);
+
+  // 장르 버튼 동작
+  const GenreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const genre = e.currentTarget.value;
+    console.log(genre);
+    // setSelectedGenre(genre); api 호출
+  };
+
+  // 🔹 RAWG API에서 사용하는 장르 슬러그(영문) 배열
+  const genresEn = [
+    "racing", // 레이싱
+    "shooter", // 슈팅
+    "adventure", // 어드벤처
+    "action", // 액션
+    "rpg", // 롤플레잉 (RPG)
+    "fighting", // 격투
+    "puzzle", // 퍼즐
+    "strategy", // 전략
+    "arcade", // 아케이드
+    "simulation", // 시뮬레이션
+    "sports", // 스포츠
+    "card", // 카드
+    "family", // 패밀리
+    "board-games", // 보드 게임
+    "educational", // 교육
+    "casual", // 캐주얼
+    "indie", // 인디
+    "massively-multiplayer", // 대규모 멀티플레이어
+    "platformer", // 플랫폼
+  ];
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
     const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY === 0) return; // 수직 스크롤이 없으면 무시
-      e.preventDefault(); // 수직 스크롤 막기
-      el.scrollLeft += e.deltaY; // 수직 입력을 가로로 전환
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
     };
 
     el.addEventListener("wheel", handleWheel, { passive: false });
@@ -115,9 +152,11 @@ const Genres = () => {
         {/* 장르 버튼 스크롤 리스트 */}
         <GenreListWrapper ref={scrollRef}>
           <ul>
-            {Array.from({ length: 14 }, (_, i) => (
+            {genresEn.map((genre, i) => (
               <li key={i}>
-                <button type="button">게임장르</button>
+                <button type="button" value={genre} onClick={GenreClick}>
+                  {genre}
+                </button>
               </li>
             ))}
           </ul>
