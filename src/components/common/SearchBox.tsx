@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import SearchIcon from "../../img/SearchIcon.svg";
 
 // 🔹 검색창 전체를 감싸는 래퍼 (아이콘 + 입력창 포함)
 const SearchWrapper = styled.div`
@@ -10,11 +11,12 @@ const SearchWrapper = styled.div`
 
 // 🔹 검색 입력창 스타일 정의
 const SearchInput = styled.input<{ visible: boolean }>`
+  position: absolute;
   width: ${(props) =>
-    props.visible ? "300px" : "0px"}; // 표시 여부에 따라 너비
+    props.visible ? "100%" : "0px"}; // 표시 여부에 따라 너비
   max-width: 100%; // 부모 영역 초과 방지
   min-width: 0;
-  font-size: 12px;
+  font-size: 14px;
   height: 24px;
   opacity: ${(props) => (props.visible ? 1 : 0)}; // 투명도 조절
   padding: ${(props) => (props.visible ? "8px 12px" : "0")}; // 여백 조절
@@ -22,10 +24,11 @@ const SearchInput = styled.input<{ visible: boolean }>`
   background-color: #3a3c42;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   transition: width 0.3s ease, opacity 0.3s ease, padding 0.3s ease; // 부드러운 애니메이션
   pointer-events: ${(props) =>
     props.visible ? "auto" : "none"}; // 클릭 가능 여부
+  z-index: 1;
 
   @media (max-width: 768px) {
     width: ${(props) => (props.visible ? "180px" : "0px")};
@@ -39,9 +42,9 @@ const IconButton = styled.div`
   align-items: center;
   color: white;
   gap: 8px;
+  z-index: 0;
 
   a {
-    color: white;
     text-decoration: none;
     font-weight: 500;
   }
@@ -87,23 +90,10 @@ const SearchBox = () => {
       {/* 🔍 아이콘 + 텍스트: 입력창이 닫혀 있을 때만 표시 */}
       {!showInput && (
         <IconButton onClick={() => setShowInput(true)}>
-          <a>Search Games</a>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            viewBox="0 -960 960 960"
-            width="24px"
-            fill="#e3e3e3"
-          >
-            {/* Google Material Icons 기반 돋보기 아이콘 */}
-            <path
-              d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 
-              75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 
-              83t-38 69l252 252-56 56ZM380-400q75 0 
-              127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 
-              0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
-            />
-          </svg>
+          <img className="w-4 h-4 md:w-6 md:h-6" src={SearchIcon} alt="" />
+          <p className="text-sm sm:text-base md:text-lg text-[rgba(128,128,128,0.6)]">
+            Search Games
+          </p>
         </IconButton>
       )}
     </SearchWrapper>

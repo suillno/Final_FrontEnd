@@ -25,9 +25,9 @@ const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
 // 페이지 타이틀 스타일 정의
 const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
   font-size: 4vw;
-  line-height: 74px;
+  line-height: 50px;
   font-weight: 700;
-  padding: 1em;
+  padding-bottom: 1em;
   margin-right: 5%;
   margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
