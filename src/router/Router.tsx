@@ -18,7 +18,6 @@ import CartPage from "../member/memberDetail/CartPage";
 import WishList from "../member/memberDetail/WishList";
 import SearchGame from "../components/api/SearchGame";
 
-
 function Router() {
   return (
     <Routes>
