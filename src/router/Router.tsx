@@ -8,7 +8,6 @@ import AdminIndex from "../admin/AdminIndex";
 import Library from "../member/memberDetail/Library";
 import Dashboard from "../member/memberDetail/Dashboard";
 import Profile from "../member/memberDetail/Profile";
-import Security from "../member/memberDetail/Security";
 import Wallet from "../member/memberDetail/Wallet";
 import { Route, Routes } from "react-router-dom";
 import FindId from "../member/memberControl/FindId";
@@ -30,7 +29,6 @@ function Router() {
         <Route path="member/library" element={<Library />} />
         <Route path="member/dashboard" element={<Dashboard />} />
         <Route path="member/profile" element={<Profile />} />
-        <Route path="member/security" element={<Security />} />
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="genres/list" element={<Genres />} />
       </Route>
