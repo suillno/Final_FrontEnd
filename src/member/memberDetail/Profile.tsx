@@ -2,32 +2,39 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 
-// 사용자 프로필 타입 정의
+// 🔷 사용자 프로필 타입 정의
 interface UserProfile {
   nickname: string;
   email: string;
   profileImage: string;
 }
 
-// Layout 컴포넌트에서 전달되는 context 타입 정의
+// 🔷 Layout 컴포넌트에서 전달되는 context 타입 정의 (사이드바 열림 여부)
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// ==== Styled-components 정의 ====
+/* ==== Styled-components 정의 ==== */
 
-// 전체 페이지 레이아웃 - 사이드바 열림 여부에 따라 왼쪽 마진 조절
+// 전체 페이지 래퍼 - 사이드바 열림 여부에 따라 margin 조절 + 세로 가운데 정렬
 const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
+  align-items: center; /* 세로 중앙 정렬 */
+  height: 100vh;
   padding: 2em;
   background-color: #1e1f24;
-  min-height: 100vh;
   margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 1.5em;
+    align-items: flex-start; /* 모바일에서는 위쪽 정렬 */
+  }
 `;
 
-// 콘텐츠 박스 - 프로필/보안 설정을 담는 박스
+// 콘텐츠 박스 - 프로필 또는 보안 설정 영역
 const SectionBox = styled.div`
   width: 100%;
   max-width: 600px;
@@ -38,14 +45,14 @@ const SectionBox = styled.div`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 `;
 
-// 탭 메뉴 스타일
+// 탭 메뉴 상단 영역
 const TabMenu = styled.div`
   display: flex;
   margin-bottom: 20px;
   gap: 10px;
 `;
 
-// 탭 버튼 - 선택된 상태는 색상 강조
+// 탭 버튼 - 선택 상태일 때 색상 강조
 const TabButton = styled.button<{ active: boolean }>`
   flex: 1;
   padding: 12px;
@@ -57,18 +64,18 @@ const TabButton = styled.button<{ active: boolean }>`
   cursor: pointer;
 `;
 
-// 각 섹션 타이틀
+// 섹션 제목
 const Title = styled.h2`
   font-size: 22px;
   margin-bottom: 20px;
 `;
 
-// 입력 필드 묶음
+// 각 필드 묶음
 const Field = styled.div`
   margin-bottom: 16px;
 `;
 
-// 공통 인풋 필드
+// 입력 인풋 필드 스타일
 const Input = styled.input`
   width: 100%;
   padding: 10px;
@@ -79,7 +86,7 @@ const Input = styled.input`
   color: #fff;
 `;
 
-// 공통 버튼 - 색상 조절 가능
+// 공통 버튼 스타일 (색상 커스터마이징 가능)
 const Button = styled.button<{ color?: string }>`
   width: 100%;
   padding: 12px;
@@ -105,7 +112,7 @@ const ProfileImage = styled.img`
   margin-bottom: 10px;
 `;
 
-// 2단계 인증 토글 라벨
+// 토글 라벨 (2단계 인증)
 const ToggleLabel = styled.label`
   display: flex;
   align-items: center;
@@ -114,46 +121,41 @@ const ToggleLabel = styled.label`
   gap: 10px;
 `;
 
-// 체크박스 스타일
+// 체크박스
 const Checkbox = styled.input`
   width: 18px;
   height: 18px;
 `;
 
-// ==== 컴포넌트 구현 ====
+/* ==== Profile 컴포넌트 ==== */
 
 const Profile: React.FC = () => {
-  // 사이드바 열림 여부 가져오기
+  // 사이드바 상태 받아오기
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  // 현재 탭 상태 (내 정보 / 보안 설정)
+  // 현재 탭 상태: profile(내 정보) / security(보안 설정)
   const [tab, setTab] = useState<"profile" | "security">("profile");
 
-  // 사용자 정보 상태
+  // 사용자 기본 정보 상태
   const [user, setUser] = useState<UserProfile>({
     nickname: "게이머123",
     email: "gamer@example.com",
     profileImage: "/default-avatar.png",
   });
 
-  // 수정 모드 여부
-  const [editMode, setEditMode] = useState(false);
-
-  // 2단계 인증 여부
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-
-  // 비밀번호 상태
+  const [editMode, setEditMode] = useState(false); // 수정 모드
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false); // 2단계 인증
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // 사용자 정보 텍스트 변경 핸들러
+  // 입력 필드 변경 핸들러 (닉네임, 이메일)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 프로필 이미지 변경 핸들러 (미리보기 포함)
+  // 프로필 이미지 파일 업로드 및 미리보기 설정
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -199,7 +201,7 @@ const Profile: React.FC = () => {
     setConfirmPassword("");
   };
 
-  // 2단계 인증 토글
+  // 2단계 인증 토글 핸들러
   const toggleTwoFactor = () => {
     setTwoFactorEnabled(!twoFactorEnabled);
     alert(
@@ -210,7 +212,7 @@ const Profile: React.FC = () => {
   return (
     <PageWrapper isSidebarOpen={isSidebarOpen}>
       <SectionBox>
-        {/* 탭 버튼 */}
+        {/* 탭 메뉴 */}
         <TabMenu>
           <TabButton
             active={tab === "profile"}
@@ -230,6 +232,8 @@ const Profile: React.FC = () => {
         {tab === "profile" && (
           <>
             <Title>내 정보</Title>
+
+            {/* 프로필 이미지 */}
             <div style={{ textAlign: "center" }}>
               <ProfileImage src={user.profileImage} alt="프로필 이미지" />
               {editMode && (
@@ -241,6 +245,7 @@ const Profile: React.FC = () => {
               )}
             </div>
 
+            {/* 닉네임 */}
             <Field>
               <label>닉네임</label>
               <Input
@@ -251,6 +256,7 @@ const Profile: React.FC = () => {
               />
             </Field>
 
+            {/* 이메일 */}
             <Field>
               <label>이메일</label>
               <Input
@@ -262,6 +268,7 @@ const Profile: React.FC = () => {
               />
             </Field>
 
+            {/* 저장 or 수정 버튼 */}
             {editMode ? (
               <Button color="#4caf50" onClick={handleSave}>
                 저장하기
@@ -277,6 +284,7 @@ const Profile: React.FC = () => {
           <>
             <Title>보안 설정</Title>
 
+            {/* 현재 비밀번호 */}
             <Field>
               <label>현재 비밀번호</label>
               <Input
@@ -286,6 +294,7 @@ const Profile: React.FC = () => {
               />
             </Field>
 
+            {/* 새 비밀번호 */}
             <Field>
               <label>새 비밀번호</label>
               <Input
@@ -295,6 +304,7 @@ const Profile: React.FC = () => {
               />
             </Field>
 
+            {/* 비밀번호 확인 */}
             <Field>
               <label>새 비밀번호 확인</label>
               <Input
@@ -304,8 +314,10 @@ const Profile: React.FC = () => {
               />
             </Field>
 
+            {/* 변경 버튼 */}
             <Button onClick={handlePasswordChange}>비밀번호 변경</Button>
 
+            {/* 2단계 인증 토글 */}
             <Field>
               <label>2단계 인증</label>
               <ToggleLabel>

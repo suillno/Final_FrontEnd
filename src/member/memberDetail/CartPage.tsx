@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router";
 
 // === 타입 정의 ===
 
