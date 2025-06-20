@@ -2,6 +2,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
 import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5";
 import bgImage from "../../img/g1.png";
+import { Link } from "react-router-dom";
 
 //  styled-components 변환
 const Section = styled.section`
@@ -203,7 +204,7 @@ export default function Login() {
       <FormBox>
         <Form onSubmit={onSubmit}>
           <h2>로그인</h2>
-          // 스펠 체크 제거
+          {/* 스펠체크 제거 */}
           <InputBox spellCheck="false" style={{ marginBottom: "10px" }}>
             <input
               type="text"
@@ -240,8 +241,12 @@ export default function Login() {
             </Register>
 
             <Find>
-              <a href="#">아이디 찾기</a>
-              <a href="#">비밀번호 찾기</a>
+              <Link to={"/member/findid"}>
+                <a href="#">아이디 찾기</a>
+              </Link>
+              <Link to={"/member/findpw"}>
+                <a href="#">비밀번호 찾기</a>
+              </Link>
             </Find>
           </div>
         </Form>

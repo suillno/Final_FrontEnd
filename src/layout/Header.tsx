@@ -99,9 +99,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
       {/* 우측: 닉네임 + 로그인 */}
       <HeaderRight className="basis-1/4 justify-end">
         <HideName className="text-base sm:text-sm">닉네임</HideName>
-        <a href="member/login.html" className="text-sm sm:text-base md:text-lg">
-          로그인
-        </a>
+        <Link to={"/member/logint"}>
+          <a className="text-sm sm:text-base md:text-lg">로그인</a>
+        </Link>
       </HeaderRight>
     </HeaderWrapper>
   );

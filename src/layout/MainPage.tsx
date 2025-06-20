@@ -80,7 +80,8 @@ const MainPage: React.FC = () => {
         isSidebarOpen={isSidebarOpen}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
       >
-        {gameResponse.results.map((item: GameResult, idx: number) => (
+        {/* 값이 null 일때를 대비 옵셔널 체이닝사용 */}
+        {gameResponse?.results?.map((item: GameResult, idx: number) => (
           <Link to={`/game/${item.id}`} key={idx}>
             <GameCard item={item} />
           </Link>

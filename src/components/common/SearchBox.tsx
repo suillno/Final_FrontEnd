@@ -83,6 +83,7 @@ const SearchBox = () => {
     <SearchWrapper>
       {/* 🔍 검색 입력창: showInput이 true일 때 표시됨 */}
       <SearchInput
+        spellCheck="false"
         visible={showInput}
         ref={inputRef} // 포커스 제어용 ref
         type="text"
