@@ -1,7 +1,7 @@
-// ✅ Header.tsx
 import React from "react";
 import styled from "styled-components";
 import sidebarIcon from "../img/sidebar.png";
+import pgLogo from "../img/PGLogo.png"
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -62,7 +62,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
       <button onClick={onSidebarToggle}>
         <SidebarIcon src={sidebarIcon} />
       </button>
-      <Logo>Humble</Logo>
+      <Logo>
+        <img src={pgLogo} alt="PickGameLogo" style={{ height: "20px", width: "20px"}} />
+      </Logo>
       <HeaderRight>
         <button type="button">🔍</button>
         <input type="text" placeholder="검색" />

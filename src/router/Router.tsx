@@ -5,10 +5,11 @@ import Layout from "../layout/Layout";
 import GameDetail from "../gameApi/GameDetail";
 
 // 어드민 영역
-import AdminPermission from "../admin/AdminPermission";
 import CustomerSupport from "../admin/CustomerSupport";
 import ReviewManagement from "../admin/ReviewManagement";
 import UserManagement from "../admin/UserManagement";
+import Chart from "../admin/Chart";
+
 
 import Library from "../member/memberDetail/Library";
 import Dashboard from "../member/memberDetail/Dashboard";
@@ -20,7 +21,7 @@ import FindId from "../member/memberControl/FindId";
 import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
-import AdminChart from "../admin/AdminChart"
+
 
 function Router() {
   return (
@@ -35,11 +36,10 @@ function Router() {
         <Route path="member/security" element={<Security />} />
         <Route path="member/wallet" element={<Wallet />} />
         {/* 어드민 */}
-        <Route path="admin/AdminPermission" element={<AdminPermission/>} />
         <Route path="admin/CustomerSupport" element={<CustomerSupport/>} />
         <Route path="admin/ReviewManagement" element={<ReviewManagement/>} />
         <Route path="admin/UserManagement" element={<UserManagement/>} />
-        <Route path="admin/AdminChart" element={<AdminChart />} />
+        <Route path="admin/Chart" element={<Chart/>} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}

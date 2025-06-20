@@ -12,7 +12,7 @@ const SidebarContainer = styled.nav<{ isOpen: boolean }>`
   top: 60px;
   left: ${({ isOpen }) => (isOpen ? "0" : "-180px")};
   transition: left 0.3s ease;
-  overflow-y: 1000;
+  overflow-y: auto;
   z-index: 1000;
 
   @media (max-width: 768px) {
@@ -48,6 +48,12 @@ const MenuItem = styled.div`
   font-size: 15px;
   cursor: pointer;
   color: #e0e0e0;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
   &:hover {
     color: #1ea7fd;
   }
@@ -63,13 +69,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     <SidebarContainer isOpen={isOpen}>
       <Section>
         <MenuItem className="font-bold">
-          <Link to={"/"}>Home</Link>
+          <Link to="/">Home</Link>
         </MenuItem>
-        {/* 리뷰 추천수, 신규순 조회 */}
         <MenuItem>Reviews</MenuItem>
-        {/* 사용자페이지 */}
         <MenuItem>suillno 🔶</MenuItem>
-        {/* 장바구니 */}
         <MenuItem>Wishlist</MenuItem>
         <MenuItem>My Library</MenuItem>
       </Section>
@@ -86,6 +89,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <MenuItem>Platforms</MenuItem>
         <MenuItem>Stores</MenuItem>
         <MenuItem>Collections</MenuItem>
+      </Section>
+
+      <Section>
+        <SectionTitle>Admin</SectionTitle>
+        <MenuItem>
+          <Link to="/admin/Chart">Chart</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/admin/CustomerSupport">CustomerSupport</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/admin/ReviewManagement">ReviewManagement</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/admin/UserManagement">UserManagement</Link>
+        </MenuItem>
+        <br/><br/><br/>
       </Section>
     </SidebarContainer>
   );
