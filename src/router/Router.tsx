@@ -16,6 +16,7 @@ import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
 import LoginT from "../member/memberControl/LoginT";
+import SignupT from "../member/memberControl/SignupT";
 
 function Router() {
   return (
@@ -39,6 +40,7 @@ function Router() {
         <Route path="login" element={<Login />} />
         <Route path="logint" element={<LoginT />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="signupt" element={<SignupT />} />
       </Route>
     </Routes>
   );
