@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 
-// 거래 타입
+// 💳 거래 타입 정의
 interface Transaction {
   id: number;
   type: "충전" | "사용";
@@ -10,12 +10,12 @@ interface Transaction {
   date: string;
 }
 
-// Layout.tsx에서 전달받는 Context 타입
+// 🔧 Layout에서 전달되는 context 타입
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// 전체 페이지 Wrapper
+// 📦 페이지 전체 wrapper - 사이드바 열림 여부에 따라 margin-left 조절
 const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
@@ -31,7 +31,7 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   }
 `;
 
-// 내부 컨텐츠 박스
+// 📦 내부 지갑 박스 UI
 const WalletBox = styled.div`
   width: 100%;
   max-width: 520px;
@@ -42,7 +42,7 @@ const WalletBox = styled.div`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 `;
 
-// 제목 + 아이콘
+// 💰 타이틀 + 아이콘
 const Title = styled.h2`
   font-size: 26px;
   margin-bottom: 25px;
@@ -56,7 +56,7 @@ const Title = styled.h2`
   }
 `;
 
-// 잔액 표시 박스
+// 💵 잔액 표시 박스
 const BalanceBox = styled.div`
   background: linear-gradient(135deg, #00bfff, #007acc);
   padding: 20px;
@@ -69,13 +69,14 @@ const BalanceBox = styled.div`
   box-shadow: 0 4px 10px rgba(0, 191, 255, 0.3);
 `;
 
-// 충전 입력과 버튼 영역
+// 💳 충전 입력 영역
 const ChargeSection = styled.div`
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
 `;
 
+// 🔢 금액 입력 필드 (화살표 제거)
 const Input = styled.input`
   flex: 1;
   padding: 10px;
@@ -83,8 +84,19 @@ const Input = styled.input`
   border: 1px solid #555;
   background-color: #1f1f1f;
   color: #fff;
+
+  // 🔽 숫자 input의 기본 스핀 버튼 제거 (Chrome/Safari)
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  // 🔽 Firefox에서 화살표 제거
+  -moz-appearance: textfield;
 `;
 
+// 🚀 충전 버튼
 const Button = styled.button`
   padding: 10px 20px;
   background-color: #00bfff;
@@ -99,13 +111,14 @@ const Button = styled.button`
   }
 `;
 
-// 프리셋 금액 버튼들
+// 🎯 프리셋 금액 버튼 영역
 const PresetButtons = styled.div`
   display: flex;
   gap: 10px;
   margin-bottom: 30px;
 `;
 
+// 💸 개별 프리셋 버튼
 const PresetButton = styled.button`
   background-color: #333;
   border: 1px solid #555;
@@ -121,7 +134,7 @@ const PresetButton = styled.button`
   }
 `;
 
-// 거래 내역 카드 리스트
+// 🧾 거래 내역 리스트
 const History = styled.div``;
 
 const List = styled.ul`
@@ -129,6 +142,7 @@ const List = styled.ul`
   padding: 0;
 `;
 
+// 📄 거래 아이템 스타일
 const ListItem = styled.li<{ type: "충전" | "사용" }>`
   padding: 12px;
   margin-bottom: 10px;
@@ -145,11 +159,12 @@ const ListItem = styled.li<{ type: "충전" | "사용" }>`
 
 const Wallet: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
-  const [balance, setBalance] = useState(0);
-  const [chargeAmount, setChargeAmount] = useState("");
-  const [history, setHistory] = useState<Transaction[]>([]);
 
-  // 충전 처리
+  const [balance, setBalance] = useState(0); // 잔액 상태
+  const [chargeAmount, setChargeAmount] = useState(""); // 입력 필드 값
+  const [history, setHistory] = useState<Transaction[]>([]); // 거래 내역 배열
+
+  // ✅ 충전 버튼 클릭 시 처리
   const handleCharge = () => {
     const amount = parseInt(chargeAmount, 10);
     if (isNaN(amount) || amount <= 0) {
@@ -169,16 +184,18 @@ const Wallet: React.FC = () => {
     setChargeAmount("");
   };
 
-  // 프리셋 금액 클릭 시
+  // ✅ 프리셋 버튼 클릭 시 입력 값에 누적
   const handlePreset = (amount: number) => {
-    setChargeAmount(amount.toString());
+    setChargeAmount((prev) => {
+      const current = parseInt(prev || "0", 10);
+      return (current + amount).toString();
+    });
   };
 
   return (
     <PageWrapper isSidebarOpen={isSidebarOpen}>
       <WalletBox>
         <Title>내 지갑</Title>
-
         <BalanceBox>{balance.toLocaleString()}₩</BalanceBox>
 
         <ChargeSection>

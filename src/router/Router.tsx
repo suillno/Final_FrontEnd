@@ -1,10 +1,8 @@
 import MainPage from "../layout/MainPage";
 import PublicLayout from "../layout/PublicLayout";
 import Layout from "../layout/Layout";
-
 import GameDetail from "../gameApi/GameDetail";
 import AdminIndex from "../admin/AdminIndex";
-
 import Library from "../member/memberDetail/Library";
 import Dashboard from "../member/memberDetail/Dashboard";
 import Profile from "../member/memberDetail/Profile";
@@ -14,9 +12,11 @@ import FindId from "../member/memberControl/FindId";
 import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
+import LoginT from "../member/memberControl/LoginT";
+import SignupT from "../member/memberControl/SignupT";
 import CartPage from "../member/memberDetail/CartPage";
 import WishList from "../member/memberDetail/WishList";
-
+import SearchGame from "../components/api/SearchGame";
 
 function Router() {
   return (
@@ -33,7 +33,6 @@ function Router() {
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="member/CartPage" element={<CartPage />} />
         <Route path="member/WishList" element={<WishList />} />
-
       </Route>
 
       {/* 레이아웃 없이 호출 */}
@@ -41,7 +40,9 @@ function Router() {
         <Route path="findid" element={<FindId />} />
         <Route path="findpw" element={<FindPw />} />
         <Route path="login" element={<Login />} />
+        <Route path="logint" element={<LoginT />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="signupt" element={<SignupT />} />
       </Route>
     </Routes>
   );
