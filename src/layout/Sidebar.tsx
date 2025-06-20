@@ -9,8 +9,9 @@ const SidebarContainer = styled.nav<{ isOpen: boolean }>`
   color: white;
   padding: 20px;
   position: fixed;
-  top: 60px;
+  top: 50px;
   left: ${({ isOpen }) => (isOpen ? "0" : "-180px")};
+  overflow: auto;
   transition: left 0.3s ease;
   overflow-y: 1000;
   z-index: 1000;
@@ -68,7 +69,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         {/* 리뷰 추천수, 신규순 조회 */}
         <MenuItem>Reviews</MenuItem>
         {/* 사용자페이지 */}
-        <MenuItem>suillno 🔶</MenuItem>
+        <MenuItem className="font-bold">
+          <Link to={"/member/security"}>suillno 🔶</Link>
+        </MenuItem>
         {/* 장바구니 */}
         <MenuItem>Wishlist</MenuItem>
         <MenuItem>My Library</MenuItem>
@@ -79,6 +82,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <MenuItem>Best of the year</MenuItem>
         <MenuItem>Popular in 2024</MenuItem>
         <MenuItem>All time top 250</MenuItem>
+        <MenuItem>
+          <Link to="/genres/list">Genres</Link>
+        </MenuItem>
       </Section>
 
       <Section>

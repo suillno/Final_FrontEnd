@@ -1,14 +1,11 @@
 import MainPage from "../layout/MainPage";
 import PublicLayout from "../layout/PublicLayout";
 import Layout from "../layout/Layout";
-
 import GameDetail from "../gameApi/GameDetail";
 import AdminIndex from "../admin/AdminIndex";
-
 import Library from "../member/memberDetail/Library";
 import Dashboard from "../member/memberDetail/Dashboard";
 import Profile from "../member/memberDetail/Profile";
-import Security from "../member/memberDetail/Security";
 import Wallet from "../member/memberDetail/Wallet";
 import { Route, Routes } from "react-router-dom";
 import FindId from "../member/memberControl/FindId";
@@ -17,6 +14,10 @@ import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
 import LoginT from "../member/memberControl/LoginT";
 import SignupT from "../member/memberControl/SignupT";
+import CartPage from "../member/memberDetail/CartPage";
+import WishList from "../member/memberDetail/WishList";
+import SearchGame from "../components/api/SearchGame";
+
 
 function Router() {
   return (
@@ -25,12 +26,14 @@ function Router() {
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
         <Route path="game/:id" element={<GameDetail />} />
+        <Route path="/searchgame" element={<SearchGame />} />
         <Route path="admin" element={<AdminIndex />} />
         <Route path="member/library" element={<Library />} />
         <Route path="member/dashboard" element={<Dashboard />} />
         <Route path="member/profile" element={<Profile />} />
-        <Route path="member/security" element={<Security />} />
         <Route path="member/wallet" element={<Wallet />} />
+        <Route path="member/CartPage" element={<CartPage />} />
+        <Route path="member/WishList" element={<WishList />} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}
