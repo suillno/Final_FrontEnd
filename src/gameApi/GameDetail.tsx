@@ -12,16 +12,42 @@ import Loader from "../components/common/Loader";
 
 // 본문 컨테이너 영역 (dominant_color를 연하게 배경으로 사용)
 const ContentContainer = styled.div<{ bgColor: string }>`
+  margin-top: 50px;
   background-color: ${({ bgColor }) =>
     `${bgColor}20`}; // 연한 배경색 (투명도 적용)
   border-radius: 12px;
   padding: 2rem;
   margin-top: 2rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem; // 줄이고 싶다면 여기 유지
+  }
+
+  @media (max-width: 468px) {
+    font-size: 0.7em;
+    max-height: 180px;
+  }
 `;
 
 // About 영역 스타일 (styled-components 활용)
 const GameAbout = styled.div`
   margin: 5% 5%;
+  max-height: 220px;
+  overflow-y: auto;
+
+  h2 {
+    @media (max-width: 768px) {
+      font-size: 1.5rem; // 줄이고 싶다면 여기 유지
+    }
+
+    @media (max-width: 468px) {
+      font-size: 1.3em;
+    }
+  }
+`;
+
+const TextHidden = styled.div`
+  display: block;
 `;
 
 // GameDetail 컴포넌트
@@ -89,10 +115,12 @@ const GameDetail = () => {
 
               {/* About 영역 (HTML description 파싱 출력) */}
               <GameAbout>
-                <p className="text-2xl font-bold mb-2">About</p>
-                <p
-                  dangerouslySetInnerHTML={{ __html: gameDetail.description }}
-                ></p>
+                <h2 className="text-2xl font-bold mb-2">About</h2>
+                <TextHidden>
+                  <p
+                    dangerouslySetInnerHTML={{ __html: gameDetail.description }}
+                  ></p>
+                </TextHidden>
               </GameAbout>
 
               {/* 상세 정보 영역 (2열 테이블 형태) */}
@@ -115,7 +143,7 @@ const GameDetail = () => {
                 <div>{gameDetail.genres.map((g) => g.name).join(", ")}</div>
 
                 <div className="font-bold text-gray-400">플랫폼</div>
-                {/* ✅ 플랫폼에 약어 + 색상 적용 */}
+                {/* 플랫폼에 약어 + 색상 적용 */}
                 <div className="flex gap-1 flex-wrap">
                   {gameDetail.parent_platforms.map((p) => {
                     const slug = p.platform.slug;
@@ -149,7 +177,7 @@ const GameDetail = () => {
                       href={`https://${s.store.domain}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="bg-white/10 px-4 py-2 rounded-lg"
+                      className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-white transition-colors"
                     >
                       {s.store.name}
                     </a>
@@ -158,7 +186,7 @@ const GameDetail = () => {
               </div>
 
               {/* 태그 영역 */}
-              <div className="max-w-4xl mx-auto mt-8">
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden sm:block">
                 <div className="font-bold text-gray-400 mb-2">태그</div>
                 <div className="flex flex-wrap gap-2">
                   {gameDetail.tags.slice(0, 20).map((t, idx) => (

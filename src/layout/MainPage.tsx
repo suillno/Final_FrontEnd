@@ -6,6 +6,9 @@ import { apiGetGameList } from "../components/api/api";
 import Loader from "../components/common/Loader";
 import { Link, useOutletContext } from "react-router-dom";
 import GameCard from "../components/api/GameCard";
+import { useLocation } from "react-router-dom";
+
+// 헤더에서 입력받은 값이 있으면 타이틀로 서치 동작
 
 // 레이아웃 컨텍스트 타입 (사이드바 열림 여부 확인용)
 interface LayoutContext {
@@ -25,9 +28,9 @@ const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
 // 페이지 타이틀 스타일 정의
 const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
   font-size: 4vw;
-  line-height: 74px;
+  line-height: 50px;
   font-weight: 700;
-  padding: 1em;
+  padding-bottom: 1em;
   margin-right: 5%;
   margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
@@ -68,7 +71,7 @@ const MainPage: React.FC = () => {
   }, [pageCount]);
 
   return (
-    <div className="bg-[#1e1f24] text-white py-6 w-full">
+    <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
       <MainTitle isSidebarOpen={isSidebarOpen}>Top picks</MainTitle>
 
@@ -91,7 +94,7 @@ const MainPage: React.FC = () => {
         <div className="flex justify-center mt-8 h-35 ">
           <button
             type="button"
-            className="w-24 h-12 bg-blue-500 text-white rounded text-center"
+            className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
             style={{ marginTop: "2em", fontWeight: "600" }}
             onClick={pageNext}
           >

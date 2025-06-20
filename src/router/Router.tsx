@@ -17,6 +17,7 @@ import Signup from "../member/memberControl/Signup";
 import CartPage from "../member/memberDetail/CartPage";
 import WishList from "../member/memberDetail/WishList";
 
+
 function Router() {
   return (
     <Routes>
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
         <Route path="game/:id" element={<GameDetail />} />
+        <Route path="/searchgame" element={<SearchGame />} />
         <Route path="admin" element={<AdminIndex />} />
         <Route path="member/library" element={<Library />} />
         <Route path="member/dashboard" element={<Dashboard />} />
@@ -31,6 +33,7 @@ function Router() {
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="member/CartPage" element={<CartPage />} />
         <Route path="member/WishList" element={<WishList />} />
+
       </Route>
 
       {/* 레이아웃 없이 호출 */}
