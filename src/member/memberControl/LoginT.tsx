@@ -5,12 +5,12 @@ import bgImage from "../../img/g1.png";
 
 //  styled-components 변환
 const Section = styled.section`
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   width: 100%;
+  position: relative;
   &::before {
     content: "";
     position: absolute;
@@ -19,6 +19,17 @@ const Section = styled.section`
     width: 100%;
     height: 100%;
     background: url(${bgImage}) no-repeat center center / cover;
+    z-index: -2;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: -1;
   }
 `;
 
@@ -92,7 +103,7 @@ const InputBox = styled.div`
 `;
 
 const Forget = styled.div`
-  margin: -15px 20px 0;
+  margin: -15px 20px 10;
   font-size: 0.9em;
   display: flex;
   color: #fff;
@@ -113,6 +124,7 @@ const Forget = styled.div`
 `;
 
 const Button = styled.button`
+  margin-top: 10px;
   width: 100%;
   height: 40px;
   border-radius: 40px;
@@ -134,7 +146,7 @@ const Register = styled.div`
   font-size: 0.9em;
   color: #fff;
   text-align: center;
-  margin: 25px 0 10px;
+  margin: 10px 0 10px;
 
   a {
     text-decoration: none;
@@ -152,7 +164,7 @@ const Find = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
+  margin: 5px 0 20px;
 
   a {
     text-decoration: none;
@@ -224,16 +236,18 @@ export default function Login() {
 
           <Button type="submit">로그인</Button>
 
-          <Register>
-            <p>
-              계정이 없으신가요? <a href="#">가입하기</a>
-            </p>
-          </Register>
+          <div>
+            <Register>
+              <p>
+                계정이 없으신가요? <a href="#">가입하기</a>
+              </p>
+            </Register>
 
-          <Find>
-            <a href="#">아이디 찾기</a>
-            <a href="#">비밀번호 찾기</a>
-          </Find>
+            <Find>
+              <a href="#">아이디 찾기</a>
+              <a href="#">비밀번호 찾기</a>
+            </Find>
+          </div>
         </Form>
       </FormBox>
     </Section>
