@@ -4,7 +4,7 @@ import * as Styled from "./reviewManagement/ReviewManagement.styles";
 import { LayoutContext, Review } from "./reviewManagement/ReviewManagement.types";
 import ReviewDetailModal from "./reviewManagement/ReviewDetailModal";
 
-// 초기 더미 데이터
+// 리뷰 더미 데이터
 const initialReviews: Review[] = [
   { id: 1, userId: "userA", gameTitle: "Elden Ring", content: "정말 재미있어요!", reportCount: 0 },
   { id: 2, userId: "userB", gameTitle: "GTA V", content: "욕설이 많아요", reportCount: 2 },
@@ -18,6 +18,7 @@ const ITEMS_PER_PAGE = 10;
 const ReviewManagement: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
+  // 상태 변수들
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [search, setSearch] = useState("");
   const [filterReported, setFilterReported] = useState(false);
@@ -25,7 +26,7 @@ const ReviewManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
 
-  // 삭제 처리
+  // 삭제 기능
   const handleDelete = (id: number) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
       setReviews((prev) => prev.filter((review) => review.id !== id));
@@ -44,16 +45,19 @@ const ReviewManagement: React.FC = () => {
     : filtered;
 
   const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
-  const paginated = sorted.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginated = sorted.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Styled.Container isSidebarOpen={isSidebarOpen}>
-      {/* 타이틀 & 컨트롤 전체 가운데 */}
-      <Styled.HeaderWrapper>
+      {/* 전체 컨텐츠 래퍼: 테이블과 타이틀 좌측정렬을 동일 기준으로 맞춤 */}
+      <Styled.InnerWrapper>
         <Styled.Title>리뷰 관리</Styled.Title>
 
+        {/* 검색/정렬/필터 컨트롤 영역 */}
         <Styled.Controls>
-
           <Styled.SearchInput
             type="text"
             placeholder="검색 (유저ID, 게임제목, 내용)"
@@ -67,6 +71,7 @@ const ReviewManagement: React.FC = () => {
           <Styled.SortButton onClick={() => setSortByReport((prev) => !prev)}>
             신고순 정렬 {sortByReport ? "▲" : "▼"}
           </Styled.SortButton>
+
           <label>
             <input
               type="checkbox"
@@ -76,10 +81,8 @@ const ReviewManagement: React.FC = () => {
             신고된 리뷰만 보기
           </label>
         </Styled.Controls>
-      </Styled.HeaderWrapper>
 
-      {/* 테이블 */}
-      <Styled.TableWrapper>
+        {/* 테이블 */}
         <Styled.ReviewTable>
           <thead>
             <tr>
@@ -113,20 +116,20 @@ const ReviewManagement: React.FC = () => {
             ))}
           </tbody>
         </Styled.ReviewTable>
-      </Styled.TableWrapper>
 
-      {/* 페이지네이션 */}
-      <Styled.Pagination>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i + 1}
-            onClick={() => setCurrentPage(i + 1)}
-            className={currentPage === i + 1 ? "active" : ""}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </Styled.Pagination>
+        {/* 페이지네이션 */}
+        <Styled.Pagination>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? "active" : ""}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </Styled.Pagination>
+      </Styled.InnerWrapper>
 
       {/* 상세 모달 */}
       {selectedReview && (

@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+
+
 // 전체 페이지 컨테이너
 export const Container = styled.div<{ isSidebarOpen: boolean }>`
   padding: 2rem;
@@ -8,6 +10,16 @@ export const Container = styled.div<{ isSidebarOpen: boolean }>`
   color: white;
   background-color: #1e1f24;
   min-height: 100vh;
+`;
+
+// 타이틀과 테이블 시작 위치를 통일하기 위한 래퍼
+export const InnerWrapper = styled.div`
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 `;
 
 // 가운데 정렬용 상단 헤더 wrapper
