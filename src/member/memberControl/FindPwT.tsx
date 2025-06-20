@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
-import { IoMailOutline } from "react-icons/io5";
-import bgImage from "../../img/g3.webp";
+import { IoIdCardOutline, IoMailOutline } from "react-icons/io5";
+import bgImage from "../../img/g4.webp";
 
 const Section = styled.section`
   display: flex;
@@ -120,23 +120,27 @@ const Button = styled.button`
   }
 `;
 
-export default function FindIdT() {
-  const [email, setEmail] = useState("");
-  const [foundId, setFoundId] = useState<string | null>(null);
+export default function FindPwT() {
+  const [form, setForm] = useState({
+    id: "",
+    email: "",
+  });
+
+  const [result, setResult] = useState<string | null>(null);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
+    const { id, value } = e.target;
+    setForm({ ...form, [id]: value });
   };
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 👉 여기에 실제 API 호출 로직 연결 (지금은 임시)
-    // 가짜 아이디 찾기 (예시)
-    if (email === "test@email.com") {
-      setFoundId("testuser123");
+    // 👉 실제 API 호출로 변경 가능 (지금은 예시)
+    if (form.id === "testuser123" && form.email === "test@email.com") {
+      setResult("등록된 이메일로 임시 비밀번호를 발송했습니다.");
     } else {
-      setFoundId("해당 이메일로 등록된 아이디가 없습니다.");
+      setResult("일치하는 회원 정보가 없습니다.");
     }
   };
 
@@ -144,29 +148,37 @@ export default function FindIdT() {
     <Section>
       <FormBox>
         <Form onSubmit={onSubmit}>
-          <h2>아이디 찾기</h2>
+          <h2>비밀번호 찾기</h2>
+
+          <InputBox>
+            <input
+              type="text"
+              id="id"
+              required
+              value={form.id}
+              onChange={onChange}
+            />
+            <label htmlFor="id">아이디</label>
+            <IoIdCardOutline />
+          </InputBox>
 
           <InputBox>
             <input
               type="email"
               id="email"
               required
-              value={email}
+              value={form.email}
               onChange={onChange}
             />
             <label htmlFor="email">이메일</label>
             <IoMailOutline />
           </InputBox>
 
-          <Button type="submit">아이디 찾기</Button>
+          <Button type="submit">비밀번호 찾기</Button>
 
-          {foundId && (
+          {result && (
             <ResultBox>
-              <p>
-                {typeof foundId === "string"
-                  ? `찾은 아이디: ${foundId}`
-                  : foundId}
-              </p>
+              <p>{result}</p>
             </ResultBox>
           )}
         </Form>
