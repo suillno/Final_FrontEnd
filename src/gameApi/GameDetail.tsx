@@ -12,12 +12,9 @@ import Loader from "../components/common/Loader";
 
 // 본문 컨테이너 영역 (dominant_color를 연하게 배경으로 사용)
 const ContentContainer = styled.div<{ bgColor: string }>`
-  margin-top: 50px;
   background-color: ${({ bgColor }) =>
     `${bgColor}20`}; // 연한 배경색 (투명도 적용)
   border-radius: 12px;
-  padding: 2rem;
-  margin-top: 2rem;
 
   @media (max-width: 768px) {
     font-size: 0.875rem; // 줄이고 싶다면 여기 유지
@@ -86,12 +83,12 @@ const GameDetail = () => {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className="w-full min-h-screen bg-black text-white flex justify-center">
+        <div className="mt-12 w-full min-h-screen bg-black text-white flex justify-center">
           {/* 본문 영역 전체 */}
           <div className="max-w-[80%] mx-auto w-full">
             {/* 상단 헤더 이미지 영역 */}
             <div
-              className="w-full h-[300px] bg-cover bg-center"
+              className="w-full h-[250px] bg-cover bg-center"
               style={{ backgroundImage: `url(${gameDetail.background_image})` }}
             >
               <div className="w-full h-full bg-black/40 flex items-center justify-center">

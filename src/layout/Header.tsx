@@ -142,7 +142,6 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
         <HideName onClick={() => setDropdownOpen((prev) => !prev)}>
           닉네임
         </HideName>
-
         {/* 로그인 링크 */}
         <a href="member/login.html" className="text-sm sm:text-base md:text-lg">
           로그인
