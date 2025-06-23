@@ -43,6 +43,7 @@ const LibraryBox = styled.div`
   padding: 40px;
   color: #fff;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  margin-top: 150px;
 `;
 
 // 페이지 타이틀
