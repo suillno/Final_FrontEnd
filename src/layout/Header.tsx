@@ -203,7 +203,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
         <HideName onClick={toggleDropdown}>닉네임</HideName>
 
         {/* 로그인 버튼 */}
-        <a href="member/login.html">로그인</a>
+        <Link to={"/member/login"}>
+          <a>로그인</a>
+        </Link>
 
         {/* 드롭다운 메뉴 */}
         {isDropdownVisible && (

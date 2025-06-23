@@ -9,6 +9,7 @@ import {
 } from "../types/types";
 import styled from "styled-components";
 import Loader from "../components/common/Loader";
+import SteamPrice from "../components/api/SteamPrice";
 
 // 본문 컨테이너 영역 (dominant_color를 연하게 배경으로 사용)
 const ContentContainer = styled.div<{ bgColor: string }>`
@@ -28,9 +29,12 @@ const ContentContainer = styled.div<{ bgColor: string }>`
 
 // About 영역 스타일 (styled-components 활용)
 const GameAbout = styled.div`
-  margin: 5% 5%;
-  max-height: 220px;
   overflow-y: auto;
+  margin: 5%;
+
+  div {
+    max-height: 250px;
+  }
 
   h2 {
     @media (max-width: 768px) {
@@ -41,10 +45,6 @@ const GameAbout = styled.div`
       font-size: 1.3em;
     }
   }
-`;
-
-const TextHidden = styled.div`
-  display: block;
 `;
 
 // GameDetail 컴포넌트
@@ -110,57 +110,57 @@ const GameDetail = () => {
                 </div>
               </div>
 
-              {/* About 영역 (HTML description 파싱 출력) */}
-              <GameAbout>
-                <h2 className="text-2xl font-bold mb-2">About</h2>
-                <TextHidden>
-                  <p
-                    dangerouslySetInnerHTML={{ __html: gameDetail.description }}
-                  ></p>
-                </TextHidden>
-              </GameAbout>
+              <div className="flex justify-between gap-10">
+                {/* About 영역 - 2/3 차지 */}
+                <GameAbout className="w-2/3">
+                  <h2 className="text-2xl font-bold mb-2">About</h2>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: gameDetail.description,
+                    }}
+                  />
+                </GameAbout>
 
-              {/* 상세 정보 영역 (2열 테이블 형태) */}
-              <div className="grid grid-cols-2 gap-y-4 text-sm max-w-4xl mx-auto">
-                <div className="font-bold text-gray-400">출시일</div>
-                <div>{gameDetail.released}</div>
-
-                <div className="font-bold text-gray-400">평점</div>
-                <div>
-                  {gameDetail.rating} / {gameDetail.rating_top}
-                </div>
-
-                <div className="font-bold text-gray-400">메타크리틱</div>
-                <div>{gameDetail.metacritic ?? "없음"}</div>
-
-                <div className="font-bold text-gray-400">플레이타임</div>
-                <div>{gameDetail.playtime}시간</div>
-
-                <div className="font-bold text-gray-400">장르</div>
-                <div>{gameDetail.genres.map((g) => g.name).join(", ")}</div>
-
-                <div className="font-bold text-gray-400">플랫폼</div>
-                {/* 플랫폼에 약어 + 색상 적용 */}
-                <div className="flex gap-1 flex-wrap">
-                  {gameDetail.parent_platforms.map((p) => {
-                    const slug = p.platform.slug;
-                    const platformName = platformIcons[slug];
-                    if (!platformName) return null; // 등록되지 않은 slug는 제외
-                    return (
-                      <span
-                        key={slug}
-                        className="text-xs font-semibold px-2 py-0.5 rounded"
-                        style={{
-                          border: `1px solid ${
-                            platformBorderColors[slug] || "#ccc"
-                          }`,
-                          color: "#fff",
-                        }}
-                      >
-                        {platformName}
-                      </span>
-                    );
-                  })}
+                {/* 상세 정보 영역 - 1/3 차지 */}
+                <div className="w-1/3 grid grid-cols-2 gap-y-1 text-sm">
+                  <div className="font-bold text-gray-400">정상가</div>
+                  <div>
+                    <SteamPrice gameName={gameDetail.name} />
+                  </div>
+                  <div className="font-bold text-gray-400">출시일</div>
+                  <div>{gameDetail.released}</div>
+                  <div className="font-bold text-gray-400">평점</div>
+                  <div>
+                    {gameDetail.rating} / {gameDetail.rating_top}
+                  </div>
+                  <div className="font-bold text-gray-400">메타크리틱</div>
+                  <div>{gameDetail.metacritic ?? "없음"}</div>
+                  <div className="font-bold text-gray-400">플레이타임</div>
+                  <div>{gameDetail.playtime}시간</div>
+                  <div className="font-bold text-gray-400">장르</div>
+                  <div>{gameDetail.genres.map((g) => g.name).join(", ")}</div>
+                  <div className="font-bold text-gray-400">플랫폼</div>
+                  <div className="flex gap-1 flex-wrap">
+                    {gameDetail.parent_platforms.map((p) => {
+                      const slug = p.platform.slug;
+                      const platformName = platformIcons[slug];
+                      if (!platformName) return null;
+                      return (
+                        <span
+                          key={slug}
+                          className="text-xs font-semibold px-2 py-0.5 rounded"
+                          style={{
+                            border: `1px solid ${
+                              platformBorderColors[slug] || "#ccc"
+                            }`,
+                            color: "#fff",
+                          }}
+                        >
+                          {platformName}
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 

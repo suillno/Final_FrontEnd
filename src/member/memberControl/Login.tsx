@@ -2,6 +2,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
 import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5";
 import bgImage from "../../img/g1.png";
+import { Link } from "react-router-dom";
 
 //  styled-components 변환
 const Section = styled.section`
@@ -239,13 +240,20 @@ export default function Login() {
           <div>
             <Register>
               <p>
-                계정이 없으신가요? <a href="#">가입하기</a>
+                계정이 없으신가요?{" "}
+                <Link to={"../../member/signup"}>
+                  <a>가입하기</a>
+                </Link>
               </p>
             </Register>
 
             <Find>
-              <a href="#">아이디 찾기</a>
-              <a href="#">비밀번호 찾기</a>
+              <Link to={"../../member/findid"}>
+                <a>아이디 찾기</a>
+              </Link>
+              <Link to={"../../member/findpw"}>
+                <a href="#">비밀번호 찾기</a>
+              </Link>
             </Find>
           </div>
         </Form>

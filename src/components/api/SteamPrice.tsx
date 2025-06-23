@@ -43,15 +43,7 @@ const SteamPrice: React.FC<SteamPriceProps> = ({ gameName }) => {
   }, [gameName]);
 
   // 렌더링 영역: 가격 정보와 아이콘 출력
-  return (
-    <div className="text-sm mt-1">
-      <span className="flex items-center gap-1">
-        {/* 동그라미 안에 화폐 아이콘 */}
-        <PriceSvg />
-        가격: {price}
-      </span>
-    </div>
-  );
+  return <>{price}</>;
 };
 
 export default SteamPrice;
