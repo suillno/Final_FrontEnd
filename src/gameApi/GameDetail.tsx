@@ -29,8 +29,8 @@ const ContentContainer = styled.div<{ bgColor: string }>`
 
 // About 영역 스타일 (styled-components 활용)
 const GameAbout = styled.div`
-  overflow-y: auto;
   margin: 5%;
+  overflow-y: auto;
 
   div {
     max-height: 250px;
@@ -45,6 +45,30 @@ const GameAbout = styled.div`
       font-size: 1.3em;
     }
   }
+`;
+
+// 양쪽배열 모바일환경시 한줄배열
+const AboutBetween = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  @media (max-width: 468px) {
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7em;
+  }
+`;
+
+// div 영역 반투명 줄표기
+const WhiteLine = styled.div`
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 `;
 
 // GameDetail 컴포넌트
@@ -98,21 +122,10 @@ const GameDetail = () => {
 
             {/* 본문 내용 - dominant_color 적용 */}
             <ContentContainer bgColor={gameDetail.dominant_color}>
-              {/* 좋아요 및 장바구니 버튼 */}
-              <div className="flex flex-col items-center my-10">
-                <div className="flex gap-4">
-                  <button className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-full font-bold text-white">
-                    ❤️ 좋아요
-                  </button>
-                  <button className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-full font-bold text-white">
-                    🛒 장바구니
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex justify-between gap-10">
-                {/* About 영역 - 2/3 차지 */}
-                <GameAbout className="w-2/3">
+              {/* 양측배열 */}
+              <AboutBetween>
+                {/* About 영역 - 2/3 차지 768px 이하시 전체차지 */}
+                <GameAbout className="md:w-2/3">
                   <h2 className="text-2xl font-bold mb-2">About</h2>
                   <div
                     dangerouslySetInnerHTML={{
@@ -121,8 +134,8 @@ const GameDetail = () => {
                   />
                 </GameAbout>
 
-                {/* 상세 정보 영역 - 1/3 차지 */}
-                <div className="w-1/3 grid grid-cols-2 gap-y-1 text-sm">
+                {/* 상세 정보 영역 - 1/3 차지 768px 이하시 전체차지 */}
+                <WhiteLine className="md:w-1/3 md:mt-10 grid grid-cols-2 gap-y-1 text-sm max-w-[245px]">
                   <div className="font-bold text-gray-400">정상가</div>
                   <div>
                     <SteamPrice gameName={gameDetail.name} />
@@ -148,12 +161,15 @@ const GameDetail = () => {
                       return (
                         <span
                           key={slug}
-                          className="text-xs font-semibold px-2 py-0.5 rounded"
+                          className="inline-block text-[11px] font-semibold px-2 rounded border"
                           style={{
                             border: `1px solid ${
                               platformBorderColors[slug] || "#ccc"
                             }`,
                             color: "#fff",
+                            height: "20px",
+                            lineHeight: "20px", // ✅ 텍스트를 수직 가운데로 맞춤
+                            verticalAlign: "middle",
                           }}
                         >
                           {platformName}
@@ -161,8 +177,21 @@ const GameDetail = () => {
                       );
                     })}
                   </div>
-                </div>
-              </div>
+                  {/* 좋아요 및 장바구니 버튼 영역 */}
+                  <div className="my-2 text-center">
+                    {" "}
+                    {/* ✅ 텍스트 정렬 기준으로 가운데 정렬 */}
+                    <div className="inline-block whitespace-nowrap">
+                      <button className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2">
+                        장바구니
+                      </button>
+                      <button className="bg-white hover:bg-gray-100 text-black font-bold py-2 px-5 rounded shadow border border-gray-300">
+                        위시리스트
+                      </button>
+                    </div>
+                  </div>
+                </WhiteLine>
+              </AboutBetween>
 
               {/* 구매 스토어 영역 */}
               <div className="max-w-4xl mx-auto mt-8">
