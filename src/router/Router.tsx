@@ -18,6 +18,7 @@ import CustomerSupport from "../admin/CustomerSupport";
 import ReviewManagement from "../admin/ReviewManagement";
 import UserManagement from "../admin/UserManagement";
 import Chart from "../admin/Chart";
+import Genres from "../gameApi/Genres";
 
 function Router() {
   return (
@@ -33,11 +34,13 @@ function Router() {
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="member/CartPage" element={<CartPage />} />
         <Route path="member/WishList" element={<WishList />} />
+
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport/>} />
         <Route path="admin/ReviewManagement" element={<ReviewManagement/>} />
         <Route path="admin/UserManagement" element={<UserManagement/>} />
         <Route path="admin/Chart" element={<Chart/>} />
+        <Route path="member/Genres" element={<Genres />} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}

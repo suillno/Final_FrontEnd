@@ -31,6 +31,18 @@ export const apiGetGameDetail = async (gameId: string) => {
   }
 };
 
+export const apiGetGameGenres = async (Genres: string, pageNext: number) => {
+  try {
+    const res = await instance.get("/game/genres", {
+      params: { genres: Genres, page: pageNext },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("장르 리스트 호출 에러", error);
+    return null;
+  }
+};
+
 /**
  * 게임 제목 기반 RAWG 게임 목록 검색
  */
