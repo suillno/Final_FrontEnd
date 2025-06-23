@@ -15,10 +15,6 @@ import FindId from "../member/memberControl/FindId";
 import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
-import LoginT from "../member/memberControl/LoginT";
-import SignupT from "../member/memberControl/SignupT";
-import FindIdT from "../member/memberControl/FindIdT";
-import FindPwT from "../member/memberControl/FindPwT";
 
 function Router() {
   return (
@@ -38,13 +34,9 @@ function Router() {
       {/* 레이아웃 없이 호출 */}
       <Route path="/member" element={<PublicLayout />}>
         <Route path="findid" element={<FindId />} />
-        <Route path="findidt" element={<FindIdT />} />
         <Route path="findpw" element={<FindPw />} />
-        <Route path="findpwt" element={<FindPwT />} />
         <Route path="login" element={<Login />} />
-        <Route path="logint" element={<LoginT />} />
         <Route path="signup" element={<Signup />} />
-        <Route path="signupt" element={<SignupT />} />
       </Route>
     </Routes>
   );
