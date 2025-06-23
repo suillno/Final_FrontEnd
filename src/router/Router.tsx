@@ -12,8 +12,6 @@ import FindId from "../member/memberControl/FindId";
 import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
-import LoginT from "../member/memberControl/LoginT";
-import SignupT from "../member/memberControl/SignupT";
 import CartPage from "../member/memberDetail/CartPage";
 import WishList from "../member/memberDetail/WishList";
 import SearchGame from "../components/api/SearchGame";
@@ -40,9 +38,7 @@ function Router() {
         <Route path="findid" element={<FindId />} />
         <Route path="findpw" element={<FindPw />} />
         <Route path="login" element={<Login />} />
-        <Route path="logint" element={<LoginT />} />
         <Route path="signup" element={<Signup />} />
-        <Route path="signupt" element={<SignupT />} />
       </Route>
     </Routes>
   );
