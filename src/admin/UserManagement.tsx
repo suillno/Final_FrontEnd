@@ -34,7 +34,7 @@ const UserManagement: React.FC = () => {
     // 사이드바 상태에 따라 margin-left 조절
     <Container isSidebarOpen={isSidebarOpen}>
       {/* 페이지 제목 */}
-      <Title>회원 관리</Title>
+      <Title style={{marginTop: "100px", marginLeft:"22px"}}>회원 관리</Title>
 
       {/* 유저 리스트 컴포넌트 렌더링 */}
       <UserList />

@@ -54,7 +54,7 @@ const ReviewManagement: React.FC = () => {
     <Styled.Container isSidebarOpen={isSidebarOpen}>
       {/* 전체 컨텐츠 래퍼: 테이블과 타이틀 좌측정렬을 동일 기준으로 맞춤 */}
       <Styled.InnerWrapper>
-        <Styled.Title>리뷰 관리</Styled.Title>
+        <Styled.Title style={{marginTop: "100px"}}>리뷰 관리</Styled.Title>
 
         {/* 검색/정렬/필터 컨트롤 영역 */}
         <Styled.Controls>

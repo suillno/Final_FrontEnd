@@ -59,7 +59,7 @@ const Chart: React.FC = () => {
 
   return (
     <Styled.Container isSidebarOpen={isSidebarOpen}>
-      <Styled.Title>📊 통계 대시보드</Styled.Title>
+      <Styled.Title style={{marginTop: "100px"}}>📊 통계 대시보드</Styled.Title>
 
       <Styled.VisitorInfo>
         🧑‍💻 오늘 방문자 수: <strong>{visitors.today}</strong>명<br />

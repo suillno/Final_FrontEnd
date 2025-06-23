@@ -65,7 +65,7 @@ const CustomerSupport: React.FC = () => {
 
   return (
     <Styled.Container isSidebarOpen={isSidebarOpen}>
-      <Styled.Title>고객 문의 관리</Styled.Title>
+      <Styled.Title style={{marginTop: "100px"}}>고객 문의 관리</Styled.Title>
 
       {/* 필터 영역 */}
       <Styled.FilterBox>
