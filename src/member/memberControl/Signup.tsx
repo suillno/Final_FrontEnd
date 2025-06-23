@@ -1,142 +1,218 @@
-import React from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
+import {
+  IoIdCardOutline,
+  IoLockClosedOutline,
+  IoMailOutline,
+} from "react-icons/io5";
+import bgImage from "../../img/g2.png";
 
-// 기존 스타일 유지
-const Body = styled.body`
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background-color: #2c2f38;
-  color: #ffffff;
+const Section = styled.section`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-`;
-
-const Container = styled.div`
-  background-color: #3a3c42;
-  padding: 40px;
-  border-radius: 8px;
+  min-height: 100vh;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url(${bgImage}) no-repeat center center / cover;
+    z-index: -2;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+  }
 `;
 
-const H2 = styled.h2`
-  text-align: center;
-  margin-bottom: 24px;
+const FormBox = styled.div`
+  position: relative;
+  width: 400px;
+  height: 700px;
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const SignupForm = styled.form`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+
+  h2 {
+    font-size: 2em;
+    color: #fff;
+    text-align: center;
+    margin-top: 20px;
+  }
+`;
+
+const InputBox = styled.div`
+  position: relative;
+  width: 310px;
+  border-bottom: 2px solid #fff;
 
   label {
-    margin-top: 12px;
-    margin-bottom: 4px;
-    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 1em;
+    pointer-events: none;
+    transition: 0.5s;
+  }
+
+  input:focus ~ label,
+  input:valid ~ label {
+    top: -5px;
   }
 
   input {
-    padding: 10px;
-    border-radius: 4px;
+    width: 100%;
+    height: 50px;
+    background: transparent;
     border: none;
-    background-color: #565962;
-    color: white;
+    outline: none;
+    font-size: 1em;
+    padding: 0 15px 0 5px;
+    color: #fff;
   }
 
-  input::placeholder {
-    color: #cccccc;
-  }
-
-  button {
-    margin-top: 24px;
-    padding: 12px;
-    background-color: #1ea7fd;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #0e82d6;
+  svg {
+    position: absolute;
+    right: 8px;
+    color: #fff;
+    font-size: 1.2em;
+    top: 20px;
   }
 `;
 
-const Signup = () => {
-  // 후에 onSubmit 연결 가능(이건 잘 모르겠네..)
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+const Button = styled.button`
+  margin-bottom: 30px;
+  width: 100%;
+  height: 40px;
+  border-radius: 40px;
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  outline: none;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+
+  &:hover {
+    background: #fff;
+    color: black;
+  }
+`;
+
+type SignupForm = {
+  id: string;
+  password: string;
+  confirmPassword: string;
+  email: string;
+};
+
+export default function Signup() {
+  const [form, setForm] = useState<SignupForm>({
+    id: "",
+    password: "",
+    confirmPassword: "",
+    email: "",
+  });
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setForm({ ...form, [id]: value });
+  };
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("회원가입 폼 제출됨!");
-    // 여기에 유효성 검사, API 연동 추가 가능(이것도 수일님한테 물어보기기)
+
+    // 비밀번호 확인
+    if (form.password !== form.confirmPassword) {
+      alert("비밀번호가 일치하지 않습니다!");
+      return;
+    }
+
+    console.log("회원가입 정보:", form);
   };
 
   return (
-    <Body>
-      <Container>
-        <H2>회원가입</H2>
-        <SignupForm onSubmit={handleSubmit}>
-          <label htmlFor="userid">아이디</label>
-          <input
-            type="text"
-            id="userid"
-            name="userid"
-            required
-            placeholder="아이디를 입력하세요"
-          />
+    <Section>
+      <FormBox>
+        <Form onSubmit={onSubmit}>
+          <h2>회원가입</h2>
 
-          <label htmlFor="password">비밀번호</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            placeholder="비밀번호를 입력하세요"
-          />
+          <InputBox>
+            <input
+              type="text"
+              id="id"
+              required
+              value={form.id}
+              onChange={onChange}
+            />
+            <label htmlFor="id">아이디</label>
+            <IoIdCardOutline />
+          </InputBox>
 
-          <label htmlFor="confirm-password">비밀번호 확인</label>
-          <input
-            type="password"
-            id="confirm-password"
-            name="confirm-password"
-            required
-            placeholder="비밀번호를 다시 입력하세요"
-          />
+          <InputBox>
+            <input
+              type="password"
+              id="password"
+              required
+              value={form.password}
+              onChange={onChange}
+            />
+            <label htmlFor="password">비밀번호</label>
+            <IoLockClosedOutline />
+          </InputBox>
 
-          <label htmlFor="email">이메일</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            placeholder="이메일을 입력하세요"
-          />
+          <InputBox>
+            <input
+              type="password"
+              id="confirmPassword"
+              required
+              value={form.confirmPassword}
+              onChange={onChange}
+            />
+            <label htmlFor="confirmPassword">비밀번호 확인</label>
+            <IoLockClosedOutline />
+          </InputBox>
 
-          <label htmlFor="name">이름</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            required
-            placeholder="이름을 입력하세요"
-          />
+          <InputBox>
+            <input
+              type="email"
+              id="email"
+              required
+              value={form.email}
+              onChange={onChange}
+            />
+            <label htmlFor="email">이메일</label>
+            <IoMailOutline />
+          </InputBox>
 
-          <label htmlFor="phone">전화번호</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            required
-            placeholder="전화번호를 입력하세요"
-          />
-
-          <button type="submit">가입하기</button>
-        </SignupForm>
-      </Container>
-    </Body>
+          <Button type="submit">가입하기</Button>
+        </Form>
+      </FormBox>
+    </Section>
   );
-};
-
-export default Signup;
+}
