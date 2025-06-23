@@ -2,7 +2,6 @@ import MainPage from "../layout/MainPage";
 import PublicLayout from "../layout/PublicLayout";
 import Layout from "../layout/Layout";
 import GameDetail from "../gameApi/GameDetail";
-import AdminIndex from "../admin/AdminIndex";
 import Library from "../member/memberDetail/Library";
 import Dashboard from "../member/memberDetail/Dashboard";
 import Profile from "../member/memberDetail/Profile";
@@ -15,6 +14,10 @@ import Signup from "../member/memberControl/Signup";
 import CartPage from "../member/memberDetail/CartPage";
 import WishList from "../member/memberDetail/WishList";
 import SearchGame from "../components/api/SearchGame";
+import CustomerSupport from "../admin/CustomerSupport";
+import ReviewManagement from "../admin/ReviewManagement";
+import UserManagement from "../admin/UserManagement";
+import Chart from "../admin/Chart";
 
 function Router() {
   return (
@@ -24,13 +27,17 @@ function Router() {
         <Route index element={<MainPage />} />
         <Route path="game/:id" element={<GameDetail />} />
         <Route path="/searchgame" element={<SearchGame />} />
-        <Route path="admin" element={<AdminIndex />} />
         <Route path="member/library" element={<Library />} />
         <Route path="member/dashboard" element={<Dashboard />} />
         <Route path="member/profile" element={<Profile />} />
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="member/CartPage" element={<CartPage />} />
         <Route path="member/WishList" element={<WishList />} />
+        {/* 어드민 */}
+        <Route path="admin/CustomerSupport" element={<CustomerSupport/>} />
+        <Route path="admin/ReviewManagement" element={<ReviewManagement/>} />
+        <Route path="admin/UserManagement" element={<UserManagement/>} />
+        <Route path="admin/Chart" element={<Chart/>} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}

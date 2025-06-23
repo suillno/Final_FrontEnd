@@ -93,6 +93,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <MenuItem>Stores</MenuItem>
         <MenuItem>Collections</MenuItem>
       </Section>
+
+      <Section>
+        <SectionTitle>Admin</SectionTitle>
+        <MenuItem>
+          <Link to="/admin/Chart">Chart</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/admin/CustomerSupport">CustomerSupport</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/admin/ReviewManagement">ReviewManagement</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/admin/UserManagement">UserManagement</Link>
+        </MenuItem>
+        <br/><br/><br/>
+      </Section>
+
     </SidebarContainer>
   );
 };
