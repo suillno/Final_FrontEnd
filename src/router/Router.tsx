@@ -15,6 +15,7 @@ import Signup from "../member/memberControl/Signup";
 import CartPage from "../member/memberDetail/CartPage";
 import WishList from "../member/memberDetail/WishList";
 import SearchGame from "../components/api/SearchGame";
+import Genres from "../gameApi/Genres";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="member/CartPage" element={<CartPage />} />
         <Route path="member/WishList" element={<WishList />} />
+        <Route path="member/Genres" element={<Genres />} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}

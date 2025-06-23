@@ -1,14 +1,17 @@
 import styled from "styled-components";
-import gameImg from "../img/game.jpg";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, Link } from "react-router-dom";
 import React, { useRef, useEffect, useState } from "react";
+import { apiGetGameGenres } from "../components/api/api";
+import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
+import GameCard from "../components/api/GameCard";
+import Loader from "../components/common/Loader";
 
-// 레이아웃 컨텍스트 타입
+// 레이아웃 사이드바 상태 확인용 타입 정의
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// 🔹 페이지 타이틀
+// 페이지 상단 타이틀 스타일
 const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
   font-size: 4vw;
   line-height: 50px;
@@ -22,7 +25,7 @@ const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
   }
 `;
 
-// 🔹 전체 컨테이너
+// 전체 영역 컨테이너 스타일
 const GenresContainer = styled.div<{ isSidebarOpen: boolean }>`
   margin-right: 5%;
   margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "5%")};
@@ -32,28 +35,24 @@ const GenresContainer = styled.div<{ isSidebarOpen: boolean }>`
   }
 `;
 
-// 🔹 장르 버튼 스크롤 리스트
+// 장르 버튼 가로 스크롤 영역 스타일
 const GenreListWrapper = styled.div`
   overflow-x: auto;
   margin-bottom: 20px;
-
-  /* 스크롤 숨기기 */
   &::-webkit-scrollbar {
     display: none;
   }
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 
   ul {
     display: flex;
     flex-wrap: nowrap;
     gap: 10px;
     padding: 10px 0;
-
-    /* 스크롤 숨기기 */
     &::-webkit-scrollbar {
       display: none;
     }
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
   }
 
   li {
@@ -66,7 +65,7 @@ const GenreListWrapper = styled.div`
       color: white;
       font-size: 14px;
 
-      // 마우스 호버시 색변경
+      // 마우스 호버 시 색 반전
       &:hover {
         filter: invert(1);
       }
@@ -74,63 +73,78 @@ const GenreListWrapper = styled.div`
   }
 `;
 
-// 🔹 게임 이미지 영역
-const GameImg = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+// 게임 카드 그리드 영역 스타일
+const GameGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-
-  img {
-    width: calc(33.333% - 20px);
-    max-width: 100%;
-    border-radius: 8px;
-    background-color: #555;
-  }
-
-  @media (max-width: 768px) {
-    img {
-      width: 100%;
-    }
-  }
 `;
 
 const Genres = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [games, setGames] = useState<any[]>([]);
+  // 초기 장르 선택값을 action으로 설정
+  const [selectedGenre, setSelectedGenre] = useState<string>("action");
 
-  // 장르 버튼 동작
-  const GenreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const genre = e.currentTarget.value;
-    console.log(genre);
-    // setSelectedGenre(genre); api 호출
-  };
+  // RAWG API 응답 상태
+  const [gameResponse, setGameResponse] =
+    useState<GameResponse>(defaultGameResponse);
 
-  // 🔹 RAWG API에서 사용하는 장르 슬러그(영문) 배열
+  // 현재 페이지 번호 (더보기 누르면 증가)
+  const [pageCount, setPageCount] = useState<number>(1);
+
+  // API 호출 중 여부
+  const [isLoading, setIsLoading] = useState(false);
+
+  // RAWG에서 제공하는 장르 슬러그 목록
   const genresEn = [
-    "racing", // 레이싱
-    "shooter", // 슈팅
-    "adventure", // 어드벤처
-    "action", // 액션
-    "rpg", // 롤플레잉 (RPG)
-    "fighting", // 격투
-    "puzzle", // 퍼즐
-    "strategy", // 전략
-    "arcade", // 아케이드
-    "simulation", // 시뮬레이션
-    "sports", // 스포츠
-    "card", // 카드
-    "family", // 패밀리
-    "board-games", // 보드 게임
-    "educational", // 교육
-    "casual", // 캐주얼
-    "indie", // 인디
-    "massively-multiplayer", // 대규모 멀티플레이어
-    "platformer", // 플랫폼
+    "racing",
+    "shooter",
+    "adventure",
+    "action",
+    "rpg",
+    "fighting",
+    "puzzle",
+    "strategy",
+    "arcade",
+    "simulation",
+    "sports",
+    "card",
+    "family",
+    "board-games",
+    "educational",
+    "casual",
+    "indie",
+    "massively-multiplayer",
+    "platformer",
   ];
 
+  // 장르 버튼 클릭 시 실행
+  // 선택된 장르 변경 후 페이지 및 결과 초기화
+  const GenreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const genre = e.currentTarget.value;
+    setSelectedGenre(genre);
+    setPageCount(1);
+    setGameResponse(defaultGameResponse);
+  };
+
+  // selectedGenre 또는 pageCount가 변경되면 게임 데이터 불러오기
+  useEffect(() => {
+    if (!selectedGenre) return;
+    setIsLoading(true);
+    apiGetGameGenres(selectedGenre, pageCount)
+      .then((res) => {
+        const results =
+          pageCount === 1
+            ? res.results
+            : [...gameResponse.results, ...res.results];
+        setGameResponse({ ...res, results });
+      })
+      .finally(() => setIsLoading(false));
+  }, [selectedGenre, pageCount]);
+
+  // 마우스 휠로 장르 버튼 가로 스크롤 이동 가능하도록 처리
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -145,11 +159,15 @@ const Genres = () => {
     return () => el.removeEventListener("wheel", handleWheel);
   }, []);
 
+  // 페이지 번호 증가 (더보기 클릭 시)
+  const pageNext = () => setPageCount((prev) => prev + 1);
+
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
-      <MainTitle isSidebarOpen={isSidebarOpen}>Top picks</MainTitle>
+      {/* 타이틀 영역 */}
+      <MainTitle isSidebarOpen={isSidebarOpen}>Genre {selectedGenre}</MainTitle>
       <GenresContainer isSidebarOpen={isSidebarOpen}>
-        {/* 장르 버튼 스크롤 리스트 */}
+        {/* 장르 버튼 리스트 */}
         <GenreListWrapper ref={scrollRef}>
           <ul>
             {genresEn.map((genre, i) => (
@@ -161,13 +179,29 @@ const Genres = () => {
             ))}
           </ul>
         </GenreListWrapper>
-
-        {/* 이미지 목록 */}
-        <GameImg>
-          {Array.from({ length: 6 }, (_, i) => (
-            <img src={gameImg} alt="게임 이미지" key={i} />
+        {/* 게임 카드 리스트 출력 */}
+        <GameGrid>
+          {gameResponse?.results?.map((item: GameResult, idx: number) => (
+            <Link to={`/game/${item.id}`} key={idx}>
+              <GameCard item={item} />
+            </Link>
           ))}
-        </GameImg>
+        </GameGrid>
+        {/* 로딩 중이면 로딩 컴포넌트, 아니면 더보기 버튼 */}
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <div className="flex justify-center mt-8 h-35">
+            <button
+              type="button"
+              className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+              style={{ marginTop: "2em", fontWeight: "600" }}
+              onClick={pageNext}
+            >
+              더보기
+            </button>
+          </div>
+        )}
       </GenresContainer>
     </div>
   );
