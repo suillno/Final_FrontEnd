@@ -1,3 +1,4 @@
+import ScrollToTop from "./components/common/ScrollToTop";
 import Router from "./router/Router";
 import GlobalReset from "./style/GlobalReset";
 import GlobalStyle from "./style/GlobalStyle";
@@ -10,6 +11,8 @@ function App() {
       <GlobalReset />
       <GlobalStyle />
       <BrowserRouter>
+        {/* 페이지 이동시 스크롤 탑 */}
+        <ScrollToTop />
         <Router />
       </BrowserRouter>
     </>

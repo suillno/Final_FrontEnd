@@ -6,7 +6,8 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+}
 
   /* 커스텀 스크롤바 전체 적용 */
   ::-webkit-scrollbar {
