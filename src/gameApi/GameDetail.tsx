@@ -13,6 +13,7 @@ import {
 import styled from "styled-components";
 import Loader from "../components/common/Loader";
 import SteamPrice from "../components/api/SteamPrice";
+import SimpleSlider from "../components/common/Slick";
 
 // 본문 컨테이너 영역 (dominant_color를 연하게 배경으로 사용)
 const ContentContainer = styled.div<{ bgColor: string }>`
@@ -34,18 +35,25 @@ const ContentContainer = styled.div<{ bgColor: string }>`
 const GameAbout = styled.div`
   margin: 5%;
   overflow-y: auto;
+  max-height: 300px;
 
-  div {
+  @media (max-width: 768px) {
     max-height: 250px;
+  }
+
+  @media (max-width: 468px) {
+    max-height: 200px;
   }
 
   h2 {
     @media (max-width: 768px) {
       font-size: 1.5rem; // 줄이고 싶다면 여기 유지
+      max-height: 250px;
     }
 
     @media (max-width: 468px) {
       font-size: 1.3em;
+      max-height: 200px;
     }
   }
 `;
@@ -72,6 +80,13 @@ const AboutBetween = styled.div`
 const WhiteLine = styled.div`
   border-top: 1px solid rgba(255, 255, 255, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+`;
+
+// 구매스토어 반응형 동작
+const ShopMobile = styled.div`
+  @media (max-width: 768px) {
+    padding-bottom: 20%;
+  }
 `;
 
 // GameDetail 컴포넌트
@@ -137,16 +152,6 @@ const GameDetail = () => {
               <AboutBetween>
                 {/* About 영역 - 2/3 차지 768px 이하시 전체차지 */}
                 <GameAbout className="md:w-2/3">
-                  <div>
-                    {gameImg.results?.map((img) => (
-                      <img
-                        key={img.id}
-                        src={img.image}
-                        alt="screenshot"
-                        className="w-1/3 object-cover rounded"
-                      />
-                    ))}
-                  </div>
                   <h2 className="text-2xl font-bold mb-2">About</h2>
                   <div
                     dangerouslySetInnerHTML={{
@@ -156,7 +161,12 @@ const GameDetail = () => {
                 </GameAbout>
 
                 {/* 상세 정보 영역 - 1/3 차지 768px 이하시 전체차지 */}
-                <WhiteLine className="md:w-1/3 md:mt-10 grid grid-cols-2 gap-y-1 text-sm max-w-[245px]">
+                <WhiteLine className="md:w-1/3 md:mt-10 grid grid-cols-2 gap-y-1 text-sm max-w-[300px] max-h-[700px]">
+                  {gameImg.results.length > 0 && (
+                    <WhiteLine className="col-span-2 mb-2">
+                      <SimpleSlider images={gameImg.results} />
+                    </WhiteLine>
+                  )}
                   <div className="font-bold text-gray-400">정상가</div>
                   <div>
                     <SteamPrice gameName={gameDetail.name} />
@@ -215,7 +225,7 @@ const GameDetail = () => {
               </AboutBetween>
 
               {/* 구매 스토어 영역 */}
-              <div className="max-w-4xl mx-auto mt-8">
+              <ShopMobile className="max-w-4xl mx-auto mt-8">
                 <div className="font-bold text-gray-400 mb-2">구매 스토어</div>
                 <div className="flex flex-wrap gap-3">
                   {gameDetail.stores.map((s, idx) => (
@@ -230,10 +240,10 @@ const GameDetail = () => {
                     </a>
                   ))}
                 </div>
-              </div>
+              </ShopMobile>
 
               {/* 태그 영역 */}
-              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden sm:block">
+              <div className="max-w-4xl mx-auto mb-20 mt-8 text-sm sm:text-base md:text-lg hidden sm:block">
                 <div className="font-bold text-gray-400 mb-2">태그</div>
                 <div className="flex flex-wrap gap-2">
                   {gameDetail.tags.slice(0, 20).map((t, idx) => (
