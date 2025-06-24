@@ -25,11 +25,17 @@ const AuthStatus = () => {
   return (
     <>
       {userInfo && userInfo.username ? (
-        <button onClick={logout} className="text-white">
+        <button
+          onClick={logout}
+          className="text-white cursor-pointer hover:text-gray-400 transition-colors duration-200"
+        >
           로그아웃
         </button>
       ) : (
-        <Link to="/member/login" className="text-white">
+        <Link
+          to="/member/login"
+          className="text-white cursor-pointer hover:text-gray-400 transition-colors duration-200"
+        >
           로그인
         </Link>
       )}

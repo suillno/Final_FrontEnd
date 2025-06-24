@@ -20,7 +20,7 @@ import {
   LeftText,
   RightText,
   Find,
-} from "../../components/auth/Login.styles";
+} from "../../style/Login.styles";
 
 // 아이콘
 import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5";

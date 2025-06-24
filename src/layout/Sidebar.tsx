@@ -18,7 +18,7 @@ const SidebarContainer = styled.nav<{ $isOpen: boolean }>`
   z-index: 1000;
 
   @media (max-width: 768px) {
-    top: 60px;
+    top: 50px;
   }
 `;
 

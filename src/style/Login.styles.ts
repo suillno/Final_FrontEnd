@@ -1,6 +1,6 @@
 // components/auth/Login.styles.ts
 import styled from "styled-components";
-import bgImage from "../../img/g1.jpg";
+import bgImage from "../img/g1.jpg";
 
 export const Section = styled.section`
   display: grid;
