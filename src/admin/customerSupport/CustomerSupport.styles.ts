@@ -10,18 +10,19 @@ export const Container = styled.div<{ isSidebarOpen: boolean }>`
   min-height: 100vh;
 `;
 
-/* 상단 타이틀 (ex. "고객 문의 관리") */
+/* 상단 타이틀 */
 export const Title = styled.h2`
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
 `;
 
-/* 상태 필터 박스 - 체크박스들 정렬 */
+/* 상태 필터 박스 - 체크박스 정렬 */
 export const FilterBox = styled.div`
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+
   label {
     display: flex;
     align-items: center;
@@ -29,20 +30,48 @@ export const FilterBox = styled.div`
   }
 `;
 
-/* 검색 입력창 */
-export const SearchInput = styled.input`
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+/* 🔍 검색 바 전체 wrapper */
+export const SearchBar = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
   margin-bottom: 1.5rem;
-  width: 250px;
-  background-color: #f1f1f1;
-  color: #000;
+`;
+
+/* 🔍 검색 입력창 */
+export const SearchInput = styled.input`
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem; /* 오른쪽 패딩으로 아이콘 공간 확보 */
+  border-radius: 6px;
+  border: 1px solid #555;
+  width: 180px;
+  background-color: #2c2f36;
+  color: white;
   font-size: 1rem;
+  transition: width 0.3s ease, background-color 0.3s ease;
+
   &:focus {
-    outline: none;
-    border: 1px solid #4b7bec;
-    background-color: #fff;
+    width: 300px;
+    border-color: #4b7bec;
+    background-color: #1f2127;
+  }
+
+  &::placeholder {
+    color: #bbb;
+  }
+`;
+
+/* 🔍 돋보기 아이콘 버튼 */
+export const SearchIcon = styled.button`
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #4b7bec;
+  cursor: pointer;
+
+  &:hover {
+    color: #82b1ff;
   }
 `;
 
@@ -76,6 +105,10 @@ export const ViewButton = styled.button`
   border-radius: 4px;
   color: white;
   cursor: pointer;
+
+  &:hover {
+    background: #5d8bf4;
+  }
 `;
 
 /* 처리 상태 변경 버튼 */
@@ -86,6 +119,10 @@ export const ChangeButton = styled.button`
   border-radius: 4px;
   color: white;
   cursor: pointer;
+
+  &:hover {
+    background: #28c76f;
+  }
 `;
 
 /* 페이지네이션 버튼 컨테이너 */
@@ -121,7 +158,7 @@ export const ModalOverlay = styled.div`
   z-index: 999;
 `;
 
-/* 모달 박스 내부 컨테이너 */
+/* 모달 내부 박스 */
 export const ModalBox = styled.div`
   background: #2c2f36;
   padding: 2rem;
@@ -130,7 +167,6 @@ export const ModalBox = styled.div`
   max-width: 90%;
   color: white;
 
-  /* 모든 자식 요소를 수직 정렬 + 가운데 정렬 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,27 +177,26 @@ export const ModalBox = styled.div`
   }
 `;
 
-
 /* 모달 닫기 버튼 */
 export const CloseButton = styled.button`
-  margin: 1.5rem auto 0 auto; 
-  display: block;            
+  margin-top: 1.5rem;
   background: #444;
   border: none;
   padding: 0.5rem 1rem;
   color: white;
   cursor: pointer;
   border-radius: 4px;
-`
+  align-self: center;
+`;
 
-/* 상태 변경 버튼 목록 감싸는 박스 */
+/* 상태 버튼 감싸는 박스 */
 export const StatusBox = styled.div`
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
 `;
 
-/* 각각의 처리 상태 버튼 (대기/처리중/완료) */
+/* 처리 상태 버튼 (대기, 처리중, 완료) */
 export const StatusButton = styled.button`
   padding: 0.5rem 1rem;
   border: none;

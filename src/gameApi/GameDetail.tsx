@@ -1,15 +1,19 @@
 import { useParams } from "react-router-dom";
-import { apiGetGameDetail } from "../components/api/api";
+import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 import { useEffect, useState } from "react";
 import {
   defaultGameResult,
   GameResult,
   platformIcons,
   platformBorderColors,
+  GameShortImg,
+  GameShortImgResponse,
+  GameImgDefault,
 } from "../types/types";
 import styled from "styled-components";
 import Loader from "../components/common/Loader";
 import SteamPrice from "../components/api/SteamPrice";
+import SimpleSlider from "../components/common/Slick";
 
 // 본문 컨테이너 영역 (dominant_color를 연하게 배경으로 사용)
 const ContentContainer = styled.div<{ bgColor: string }>`
@@ -31,18 +35,25 @@ const ContentContainer = styled.div<{ bgColor: string }>`
 const GameAbout = styled.div`
   margin: 5%;
   overflow-y: auto;
+  max-height: 500px;
 
-  div {
+  @media (max-width: 768px) {
     max-height: 250px;
+  }
+
+  @media (max-width: 468px) {
+    max-height: 200px;
   }
 
   h2 {
     @media (max-width: 768px) {
       font-size: 1.5rem; // 줄이고 싶다면 여기 유지
+      max-height: 250px;
     }
 
     @media (max-width: 468px) {
       font-size: 1.3em;
+      max-height: 200px;
     }
   }
 `;
@@ -71,6 +82,13 @@ const WhiteLine = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 `;
 
+// 구매스토어 반응형 동작
+const ShopMobile = styled.div`
+  @media (max-width: 768px) {
+    padding-bottom: 20%;
+  }
+`;
+
 // GameDetail 컴포넌트
 const GameDetail = () => {
   // 로딩 상태 관리
@@ -82,6 +100,8 @@ const GameDetail = () => {
 
   // 게임 상세 정보 상태 초기화
   const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult);
+  // 게임 이미지 가져오기
+  const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault);
 
   // 컴포넌트 mount 시 상세정보 호출
   useEffect(() => {
@@ -92,6 +112,12 @@ const GameDetail = () => {
   const GetGameDetail = () => {
     setIsLoading(true); // 로딩 시작
     if (id) {
+      // 이미지 api호출
+      apiGetGameImg(id).then((resImg) => {
+        setGameImg(resImg);
+        console.log(resImg); // 이미지 정상값 확인
+      });
+
       apiGetGameDetail(id)
         .then((res) => {
           setGameDetail(res);
@@ -99,6 +125,29 @@ const GameDetail = () => {
         })
         .finally(() => setIsLoading(false)); // 로딩 종료
     }
+  };
+
+  // 리뷰 관련 상태
+  const [rating, setRating] = useState<number>(0); // 선택된 평점
+  const [reviewText, setReviewText] = useState<string>(""); // 입력된 리뷰 내용
+  const [reviews, setReviews] = useState<{ rating: number; text: string }[]>(
+    []
+  ); // 리뷰 리스트
+
+  // 리뷰 등록 핸들러
+  const submitReview = () => {
+    if (rating === 0 || reviewText.trim() === "") {
+      alert("평점과 리뷰를 모두 입력해 주세요.");
+      return;
+    }
+
+    // 새로운 리뷰 추가
+    const newReview = { rating, text: reviewText };
+    setReviews([...reviews, newReview]);
+
+    // 입력 초기화
+    setRating(0);
+    setReviewText("");
   };
 
   return (
@@ -135,7 +184,12 @@ const GameDetail = () => {
                 </GameAbout>
 
                 {/* 상세 정보 영역 - 1/3 차지 768px 이하시 전체차지 */}
-                <WhiteLine className="md:w-1/3 md:mt-10 grid grid-cols-2 gap-y-1 text-sm max-w-[245px]">
+                <WhiteLine className="md:w-1/3 md:mt-10 grid grid-cols-2 gap-y-1 text-sm max-w-[300px] max-h-[700px]">
+                  {gameImg.results.length > 0 && (
+                    <WhiteLine className="col-span-2 mb-2">
+                      <SimpleSlider images={gameImg.results} />
+                    </WhiteLine>
+                  )}
                   <div className="font-bold text-gray-400">정상가</div>
                   <div>
                     <SteamPrice gameName={gameDetail.name} />
@@ -180,7 +234,7 @@ const GameDetail = () => {
                   {/* 좋아요 및 장바구니 버튼 영역 */}
                   <div className="my-2 text-center">
                     {" "}
-                    {/* ✅ 텍스트 정렬 기준으로 가운데 정렬 */}
+                    {/* 텍스트 정렬 기준으로 가운데 정렬 */}
                     <div className="inline-block whitespace-nowrap">
                       <button className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2">
                         장바구니
@@ -193,8 +247,73 @@ const GameDetail = () => {
                 </WhiteLine>
               </AboutBetween>
 
+              {/* 리뷰 영역 */}
+              <div className="max-w-4xl mx-auto mt-12 p-4 bg-white/5 rounded-xl">
+                <div className="font-bold text-lg text-gray-300 mb-3">
+                  리뷰 남기기
+                </div>
+
+                {/* 평점 선택 */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-white font-semibold">평점:</div>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <span
+                      key={num}
+                      onClick={() => setRating(num)}
+                      className={`cursor-pointer text-2xl ${
+                        num <= rating ? "text-yellow-400" : "text-gray-600"
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+
+                {/* 리뷰 작성 입력창 */}
+                <textarea
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="게임에 대한 후기를 남겨주세요..."
+                  className="w-full h-24 p-3 rounded bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring focus:border-yellow-400 mb-4 resize-none"
+                />
+
+                {/* 등록 버튼 */}
+                <button
+                  onClick={submitReview}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded"
+                >
+                  등록하기
+                </button>
+
+                {/* 리뷰 리스트 표시 */}
+                <div className="mt-8">
+                  <div className="font-bold text-lg text-gray-300 mb-3">
+                    리뷰 목록
+                  </div>
+                  {reviews.length === 0 ? (
+                    <div className="text-gray-400">
+                      아직 작성된 리뷰가 없습니다.
+                    </div>
+                  ) : (
+                    <ul className="space-y-4">
+                      {reviews.map((rev, idx) => (
+                        <li key={idx} className="bg-white/10 p-3 rounded">
+                          <div className="text-yellow-400 mb-1">
+                            {"★".repeat(rev.rating)}{" "}
+                            <span className="text-gray-400 text-sm">
+                              ({rev.rating}점)
+                            </span>
+                          </div>
+                          <div className="text-white">{rev.text}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
               {/* 구매 스토어 영역 */}
-              <div className="max-w-4xl mx-auto mt-8">
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">구매 스토어</div>
                 <div className="flex flex-wrap gap-3">
                   {gameDetail.stores.map((s, idx) => (
@@ -212,7 +331,7 @@ const GameDetail = () => {
               </div>
 
               {/* 태그 영역 */}
-              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden sm:block">
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">태그</div>
                 <div className="flex flex-wrap gap-2">
                   {gameDetail.tags.slice(0, 20).map((t, idx) => (

@@ -304,6 +304,22 @@ export interface SteamAppPriceData {
   };
 }
 
+// 개별 이미지 정보
+export interface GameShortImg {
+  id: number;
+  image: string;
+}
+
+// API 응답 전체 구조
+export interface GameShortImgResponse {
+  results: GameShortImg[];
+}
+
+// 기본값
+export const GameImgDefault: GameShortImgResponse = {
+  results: [],
+};
+
 // Steam 전체 응답 타입 (appId가 동적으로 key로 사용됨)
 export type SteamPriceResponse = Record<string, SteamAppPriceData>;
 
