@@ -1,261 +1,171 @@
-import { useState, ChangeEvent, FormEvent } from "react";
-import styled from "styled-components";
-import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5";
-import bgImage from "../../img/g1.png";
-import { Link } from "react-router-dom";
+// Login.tsx
+import {
+  Section,
+  FormBox,
+  Form,
+  InputBox,
+  Forget,
+  Button,
+  Register,
+  Find,
+} from "../../components/auth/Login.styles"; // 스타일 컴포넌트
+import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5"; // 아이콘
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import { v4 } from "uuid";
+import { osName } from "react-device-detect";
+import axios from "axios";
 
-//  styled-components 변환
-const Section = styled.section`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url(${bgImage}) no-repeat center center / cover;
-    z-index: -2;
-  }
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: -1;
-  }
-`;
+import { setUserInfo } from "../../components/auth/store/userInfo";
+import {
+  setCurrentUser,
+  getCurrentUser,
+} from "../../components/auth/helper/storage";
 
-const FormBox = styled.div`
-  position: relative;
-  width: 400px;
-  height: 450px;
-  background-color: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  backdrop-filter: blur(15px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-
-  h2 {
-    font-size: 2em;
-    color: #fff;
-    text-align: center;
-    margin-top: 20px;
-  }
-`;
-
-const InputBox = styled.div`
-  position: relative;
-  width: 310px;
-  border-bottom: 2px solid #fff;
-
-  label {
-    position: absolute;
-    top: 50%;
-    left: 5px;
-    transform: translateY(-50%);
-    color: #fff;
-    font-size: 1em;
-    pointer-events: none;
-    transition: 0.5s;
-  }
-
-  input:focus ~ label,
-  input:valid ~ label {
-    top: -5px;
-  }
-
-  input {
-    width: 100%;
-    height: 50px;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 1em;
-    padding: 0 15px 0 5px;
-    color: #fff;
-  }
-
-  svg {
-    position: absolute;
-    right: 8px;
-    color: #fff;
-    font-size: 1.2em;
-    top: 20px;
-  }
-`;
-
-const Forget = styled.div`
-  margin: -15px 20px 10;
-  font-size: 0.9em;
-  display: flex;
-  color: #fff;
-  justify-content: center;
-
-  label input {
-    margin-right: 3px;
-  }
-
-  a {
-    color: #fff;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-const Button = styled.button`
-  margin-top: 10px;
-  width: 100%;
-  height: 40px;
-  border-radius: 40px;
-  background: transparent;
-  border: 2px solid #fff;
-  color: #fff;
-  outline: none;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: 600;
-
-  &:hover {
-    background: #fff;
-    color: black;
-  }
-`;
-
-const Register = styled.div`
-  font-size: 0.9em;
-  color: #fff;
-  text-align: center;
-  margin: 10px 0 10px;
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    font-weight: 600;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-const Find = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 5px 0 20px;
-
-  a {
-    text-decoration: none;
-    color: #fff;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-// TypeScript 폼 타입
-type LoginForm = {
-  id: string;
-  password: string;
-};
-
-// 컴포넌트
 export default function Login() {
-  const [form, setForm] = useState<LoginForm>({
-    id: "",
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [loginData, setLoginData] = useState({
+    username: "",
     password: "",
+    deviceInfo: {
+      deviceId: v4(),
+      deviceType: "",
+      notificationToken: v4(),
+    },
   });
 
+  // 입력값 변경 처리
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setForm({ ...form, [id]: value });
+    setLoginData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  // 로그인 요청 처리
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/login",
+        loginData
+      );
+      const { accessToken, tokenType } = res.data;
+
+      const result = await axios.get("http://localhost:8080/api/user/me", {
+        headers: {
+          Authorization: `${tokenType}${accessToken}`,
+        },
+      });
+
+      // 저장
+      setCurrentUser(res.data);
+      dispatch(setUserInfo(result.data));
+      navigate("/");
+    } catch (err) {
+      console.error("로그인 실패", err);
+      alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // 운영체제 감지 및 설정
+  useEffect(() => {
+    let device = "";
+    switch (osName) {
+      case "Windows":
+        device = "DEVICE_TYPE_WINDOWS";
+        break;
+      case "Mac OS":
+        device = "DEVICE_TYPE_MACOS";
+        break;
+      case "Android":
+        device = "DEVICE_TYPE_ANDROID";
+        break;
+      case "iOS":
+        device = "DEVICE_TYPE_IOS";
+        break;
+      default:
+        device = "OTHERS";
+    }
+
+    setLoginData((prev) => ({
+      ...prev,
+      deviceInfo: {
+        ...prev.deviceInfo,
+        deviceType: device,
+      },
+    }));
+
+    // 디버그 확인용
+    console.log("현재 로그인 사용자:", getCurrentUser());
+  }, []);
+
+  // UI 렌더링
   return (
     <Section>
       <FormBox>
         <Form onSubmit={onSubmit}>
           <h2>로그인</h2>
 
+          {/* 아이디 입력 */}
           <InputBox style={{ marginBottom: "10px" }}>
             <input
               type="text"
-              id="id"
-              required
-              value={form.id}
+              id="username"
+              value={loginData.username}
               onChange={onChange}
+              required
             />
-            <label htmlFor="id">아이디</label>
+            <label htmlFor="username">아이디</label>
             <IoIdCardOutline />
           </InputBox>
 
+          {/* 비밀번호 입력 */}
           <InputBox style={{ marginBottom: "10px" }}>
             <input
               type="password"
               id="password"
-              required
-              value={form.password}
+              value={loginData.password}
               onChange={onChange}
+              required
             />
             <label htmlFor="password">비밀번호</label>
             <IoLockClosedOutline />
           </InputBox>
 
+          {/* 로그인 상태 유지 */}
           <Forget>
             <label>
               <input type="checkbox" /> 로그인 상태 유지
             </label>
           </Forget>
 
-          <Button type="submit">로그인</Button>
+          {/* 로그인 버튼 */}
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "로그인 중..." : "로그인"}
+          </Button>
 
-          <div>
-            <Register>
-              <p>
-                계정이 없으신가요?{" "}
-                <Link to={"../../member/signup"}>
-                  <a>가입하기</a>
-                </Link>
-              </p>
-            </Register>
+          {/* 회원가입/아이디/비밀번호 찾기 링크 */}
+          <Register>
+            <p>
+              계정이 없으신가요? <Link to="/member/signup">가입하기</Link>
+            </p>
+          </Register>
 
-            <Find>
-              <Link to={"../../member/findid"}>
-                <a>아이디 찾기</a>
-              </Link>
-              <Link to={"../../member/findpw"}>
-                <a href="#">비밀번호 찾기</a>
-              </Link>
-            </Find>
-          </div>
+          <Find>
+            <Link to="/member/findid">아이디 찾기</Link>
+            <Link to="/member/findpw">비밀번호 찾기</Link>
+          </Find>
         </Form>
       </FormBox>
     </Section>

@@ -4,6 +4,7 @@ import sidebarIcon from "../img/sidebar.png";
 import PGLogo from "../img/PGLogo.png";
 import SearchBox from "../components/common/SearchBox";
 import { Link } from "react-router-dom";
+import LoginOut from "../components/auth/LoginOut";
 
 // ======================= 🔸 드롭다운 애니메이션 정의 =======================
 
@@ -203,9 +204,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
         <HideName onClick={toggleDropdown}>닉네임</HideName>
 
         {/* 로그인 버튼 */}
-        <Link to={"/member/login"}>
-          <a>로그인</a>
-        </Link>
+        <LoginOut />
 
         {/* 드롭다운 메뉴 */}
         {isDropdownVisible && (
