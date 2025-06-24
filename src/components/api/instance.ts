@@ -9,8 +9,6 @@ export const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const fullUrl = `${config.baseURL}${config.url}`;
-    console.log("요청 URL:", fullUrl);
-    console.log("요청 파라미터:", config.params);
     return config;
   },
   (error) => {
