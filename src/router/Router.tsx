@@ -20,6 +20,15 @@ import UserManagement from "../admin/UserManagement";
 import Chart from "../admin/Chart";
 import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
+import GameLongPlayList from "../gameApi/GameLongPlayList";
+import Auth from "../components/auth/helper/Auth";
+
+// DB에있는 권한 확인
+const ROLES = {
+  ROLE_SYSTEM: 1,
+  ROLE_ADMIN: 2,
+  ROLE_USER: 3,
+};
 
 function Router() {
   return (
@@ -27,11 +36,18 @@ function Router() {
       {/* 메인 레이아웃 */}
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
-        <Route path="member/library" element={<Library />} />
-        <Route path="member/dashboard" element={<Dashboard />} />
-        <Route path="member/profile" element={<Profile />} />
-        <Route path="member/wallet" element={<Wallet />} />
-        <Route path="member/CartPage" element={<CartPage />} />
+
+        {/* 사용자 정보 조회 */}
+        <Route
+          path="member"
+          element={<Auth allowedRoles={[ROLES.ROLE_USER]} />}
+        >
+          <Route path="library" element={<Library />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="wallet" element={<Wallet />} />
+          <Route path="CartPage" element={<CartPage />} />
+        </Route>
 
         {/* 게임기능 */}
         <Route path="game/WishList" element={<WishList />} />
@@ -39,6 +55,7 @@ function Router() {
         <Route path="game/:id" element={<GameDetail />} />
         <Route path="/searchgame" element={<SearchGame />} />
         <Route path="game/Genres" element={<Genres />} />
+        <Route path="/game/GameLongPlayList" element={<GameLongPlayList />} />
 
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport />} />

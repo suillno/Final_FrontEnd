@@ -7,7 +7,7 @@ import {
   IoMailOutline,
   IoManOutline,
 } from "react-icons/io5";
-import bgImage from "../../img/g2.png";
+import bgImage from "../../img/g2.jpg";
 
 const Section = styled.section`
   display: flex;
@@ -33,7 +33,7 @@ const Section = styled.section`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.2);
     z-index: -1;
   }
 `;
