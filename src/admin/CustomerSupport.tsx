@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+// ✅ /admin/CustomerSupport.tsx
+
+import React, { useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import * as Styled from "./customerSupport/CustomerSupport.styles";
 import { Inquiry, LayoutContext } from "./customerSupport/CustomerSupport.types";
 import InquiryViewModal from "./customerSupport/InquiryViewModal";
 import InquiryStatusModal from "./customerSupport/InquiryStatusModal";
+import { FaSearch } from "react-icons/fa"; // 돋보기 아이콘
 
-// 임시 초기 데이터
+// 🌟 초기 더미 데이터
 const initialData: Inquiry[] = [
   { id: 1001, status: "처리중", username: "박건우", date: "2025-06-19", content: "서비스 이용 중 오류가 발생했습니다." },
   { id: 1002, status: "완료", username: "이규철", date: "2025-06-18", content: "환불 요청 드립니다." },
@@ -19,26 +22,29 @@ const initialData: Inquiry[] = [
   { id: 1010, status: "처리중", username: "김철수", date: "2025-06-10", content: "상품 불량 문의합니다." },
 ];
 
+// 페이지 당 표시 개수
 const ITEMS_PER_PAGE = 10;
 
 const CustomerSupport: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
   const [inquiries, setInquiries] = useState<Inquiry[]>(initialData); // 전체 문의 목록
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null); // 필터 상태
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null); // 필터
   const [search, setSearch] = useState(""); // 검색어
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const [currentPage, setCurrentPage] = useState(1); // 페이지
 
-  const [viewContent, setViewContent] = useState<string | null>(null); // 보기용 모달 상태
-  const [editTarget, setEditTarget] = useState<Inquiry | null>(null); // 상태 변경 모달 대상
+  const [viewContent, setViewContent] = useState<string | null>(null); // 상세 모달
+  const [editTarget, setEditTarget] = useState<Inquiry | null>(null); // 상태 변경 모달
 
-  // 체크박스 필터 토글
+  const inputRef = useRef<HTMLInputElement>(null); // 검색 input ref
+
+  // 상태 체크박스 필터 toggle
   const handleStatusSelect = (status: string) => {
     setSelectedStatus((prev) => (prev === status ? null : status));
     setCurrentPage(1);
   };
 
-  // 처리 상태 변경 처리 함수
+  // 상태 변경 모달에서 새로운 상태 반영
   const handleStatusChange = (newStatus: Inquiry["status"]) => {
     if (editTarget) {
       setInquiries((prev) =>
@@ -50,13 +56,19 @@ const CustomerSupport: React.FC = () => {
     }
   };
 
-  // 필터링된 데이터
+  // 검색 트리거 (돋보기 버튼 또는 Enter)
+  const handleSearch = () => {
+    setCurrentPage(1);
+  };
+
+  // 필터 + 검색 적용된 데이터
   const filteredData = inquiries.filter(
     (item) =>
       (!selectedStatus || item.status === selectedStatus) &&
       (item.username.includes(search) || item.content.includes(search))
   );
 
+  // 페이지네이션 계산
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -65,9 +77,10 @@ const CustomerSupport: React.FC = () => {
 
   return (
     <Styled.Container isSidebarOpen={isSidebarOpen}>
-      <Styled.Title style={{marginTop: "100px"}}>고객 문의 관리</Styled.Title>
+      {/* 타이틀 */}
+      <Styled.Title style={{ marginTop: "100px" }}>고객 문의 관리</Styled.Title>
 
-      {/* 필터 영역 */}
+      {/* 🔘 처리 상태 필터 */}
       <Styled.FilterBox>
         {["대기", "처리중", "완료"].map((status) => (
           <label key={status}>
@@ -81,18 +94,22 @@ const CustomerSupport: React.FC = () => {
         ))}
       </Styled.FilterBox>
 
-      {/* 검색창 */}
-      <Styled.SearchInput
-        type="text"
-        placeholder="유저명 또는 내용 검색"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setCurrentPage(1);
-        }}
-      />
+      {/* 🔍 검색창 */}
+      <Styled.SearchBar>
+        <Styled.SearchInput
+          ref={inputRef}
+          type="text"
+          placeholder="유저명, 내용 검색"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+        />
+        <Styled.SearchIcon onClick={handleSearch}>
+          <FaSearch />
+        </Styled.SearchIcon>
+      </Styled.SearchBar>
 
-      {/* 문의 테이블 */}
+      {/* 📋 테이블 */}
       <Styled.Table>
         <thead>
           <tr>
@@ -112,39 +129,35 @@ const CustomerSupport: React.FC = () => {
               <td>{item.username}</td>
               <td>{item.date}</td>
               <td>
-                <Styled.ViewButton onClick={() => setViewContent(item.content)}>
-                  보기
-                </Styled.ViewButton>
+                <Styled.ViewButton onClick={() => setViewContent(item.content)}>보기</Styled.ViewButton>
               </td>
               <td>
-                <Styled.ChangeButton onClick={() => setEditTarget(item)}>
-                  변경
-                </Styled.ChangeButton>
+                <Styled.ChangeButton onClick={() => setEditTarget(item)}>변경</Styled.ChangeButton>
               </td>
             </tr>
           ))}
         </tbody>
       </Styled.Table>
 
-      {/* 페이지네이션 */}
+      {/* 📌 페이지네이션 */}
       <Styled.Pagination>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+        {Array.from({ length: totalPages }, (_, i) => (
           <button
-            key={num}
-            className={num === currentPage ? "active" : ""}
-            onClick={() => setCurrentPage(num)}
+            key={i + 1}
+            className={currentPage === i + 1 ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
           >
-            {num}
+            {i + 1}
           </button>
         ))}
       </Styled.Pagination>
 
-      {/* 상세 보기 모달 */}
+      {/* 📄 상세 모달 */}
       {viewContent && (
         <InquiryViewModal content={viewContent} onClose={() => setViewContent(null)} />
       )}
 
-      {/* 상태 변경 모달 */}
+      {/* ✏️ 상태 변경 모달 */}
       {editTarget && (
         <InquiryStatusModal
           target={editTarget}
