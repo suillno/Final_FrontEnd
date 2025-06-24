@@ -1,11 +1,14 @@
 import { useParams } from "react-router-dom";
-import { apiGetGameDetail } from "../components/api/api";
+import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 import { useEffect, useState } from "react";
 import {
   defaultGameResult,
   GameResult,
   platformIcons,
   platformBorderColors,
+  GameShortImg,
+  GameShortImgResponse,
+  GameImgDefault,
 } from "../types/types";
 import styled from "styled-components";
 import Loader from "../components/common/Loader";
@@ -82,6 +85,8 @@ const GameDetail = () => {
 
   // 게임 상세 정보 상태 초기화
   const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult);
+  // 게임 이미지 가져오기
+  const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault);
 
   // 컴포넌트 mount 시 상세정보 호출
   useEffect(() => {
@@ -92,6 +97,12 @@ const GameDetail = () => {
   const GetGameDetail = () => {
     setIsLoading(true); // 로딩 시작
     if (id) {
+      // 이미지 api호출
+      apiGetGameImg(id).then((resImg) => {
+        setGameImg(resImg);
+        console.log(resImg); // 이미지 정상값 확인
+      });
+
       apiGetGameDetail(id)
         .then((res) => {
           setGameDetail(res);
@@ -126,6 +137,16 @@ const GameDetail = () => {
               <AboutBetween>
                 {/* About 영역 - 2/3 차지 768px 이하시 전체차지 */}
                 <GameAbout className="md:w-2/3">
+                  <div>
+                    {gameImg.results?.map((img) => (
+                      <img
+                        key={img.id}
+                        src={img.image}
+                        alt="screenshot"
+                        className="w-1/3 object-cover rounded"
+                      />
+                    ))}
+                  </div>
                   <h2 className="text-2xl font-bold mb-2">About</h2>
                   <div
                     dangerouslySetInnerHTML={{
