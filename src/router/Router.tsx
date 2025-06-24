@@ -38,13 +38,13 @@ function Router() {
         <Route path="game/GameYearList" element={<GameYearList />} />
         <Route path="game/:id" element={<GameDetail />} />
         <Route path="/searchgame" element={<SearchGame />} />
+        <Route path="game/Genres" element={<Genres />} />
 
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport />} />
         <Route path="admin/ReviewManagement" element={<ReviewManagement />} />
         <Route path="admin/UserManagement" element={<UserManagement />} />
         <Route path="admin/Chart" element={<Chart />} />
-        <Route path="member/Genres" element={<Genres />} />
       </Route>
 
       {/* 레이아웃 없이 호출 */}
