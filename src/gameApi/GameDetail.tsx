@@ -316,7 +316,7 @@ const GameDetail = () => {
               <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">구매 스토어</div>
                 <div className="flex flex-wrap gap-3">
-                  {gameDetail.stores.map((s, idx) => (
+                  {gameDetail?.stores?.map((s, idx) => (
                     <a
                       key={idx}
                       href={`https://${s.store.domain}`}
