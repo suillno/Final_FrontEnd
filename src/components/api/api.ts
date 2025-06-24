@@ -113,7 +113,7 @@ export const apiGetSteamPriceByName = async (gameName: string) => {
 };
 
 /**
- *
+ * 2024년 인기게임 조회
  * @param GameYear
  * @param pageNext
  * @returns
@@ -126,6 +126,24 @@ export const apiGetGameYear = async (GameYear: string, pageNext: number) => {
     return res.data;
   } catch (error) {
     console.error("2024년 인기게임 호출 실패", error);
+    return null;
+  }
+};
+
+/**
+ * 베스트 플레이타임 조회
+ * @param GameTime
+ * @param pageNext
+ * @returns
+ */
+export const apiGetGameTime = async (GameTime: string, pageNext: number) => {
+  try {
+    const res = await instance.get("/game/gameLongPlayList", {
+      params: { gamePlayTime: GameTime, page: pageNext },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("베스트 플레이타임 호출 실패", error);
     return null;
   }
 };
