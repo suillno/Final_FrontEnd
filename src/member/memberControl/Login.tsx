@@ -5,11 +5,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
 import axios from "axios";
-
 // Redux 액션 및 토큰 저장 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
 import { setCurrentUser } from "../../components/auth/helper/storage";
-
 // 스타일 컴포넌트
 import {
   Section,
