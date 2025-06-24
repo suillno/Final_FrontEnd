@@ -13,15 +13,40 @@ interface LayoutContext {
 
 // 페이지 상단 타이틀 스타일
 const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
-  font-size: 4vw;
-  line-height: 50px;
-  font-weight: 700;
-  padding-bottom: 1em;
-  margin-right: 5%;
+  font-size: 3.5vw;
+  font-weight: 900;
   margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
+
+  background: linear-gradient(90deg, #6dd5fa, #2980b9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  display: inline-block;
+  animation: wave 2s infinite ease-in-out;
+
+  @keyframes wave {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(1.5deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    75% {
+      transform: rotate(-1.5deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
   @media (max-width: 768px) {
     margin: 0 5%;
+    font-size: 6vw;
   }
 `;
 
@@ -165,7 +190,9 @@ const Genres = () => {
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 타이틀 영역 */}
-      <MainTitle isSidebarOpen={isSidebarOpen}>Genre {selectedGenre}</MainTitle>
+      <MainTitle isSidebarOpen={isSidebarOpen}>
+        💠 Genre {selectedGenre}
+      </MainTitle>
       <GenresContainer isSidebarOpen={isSidebarOpen}>
         {/* 장르 버튼 리스트 */}
         <GenreListWrapper ref={scrollRef}>
@@ -195,7 +222,7 @@ const Genres = () => {
             <button
               type="button"
               className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-              style={{ marginTop: "2em", fontWeight: "600" }}
+              style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
               onClick={pageNext}
             >
               더보기

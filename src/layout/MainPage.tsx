@@ -27,15 +27,32 @@ const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
 
 // 페이지 타이틀 스타일 정의
 const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
-  font-size: 4vw;
-  line-height: 50px;
-  font-weight: 700;
-  padding-bottom: 1em;
-  margin-right: 5%;
+  font-size: 3.5vw;
+  font-weight: 900;
   margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
+  background: linear-gradient(90deg, #ff512f, #dd2476);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  opacity: 0;
+  animation: fadeInUp 1s ease forwards;
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   @media (max-width: 768px) {
     margin: 0 5%;
+    font-size: 6vw;
   }
 `;
 
@@ -73,7 +90,7 @@ const MainPage: React.FC = () => {
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
-      <MainTitle isSidebarOpen={isSidebarOpen}>Top picks</MainTitle>
+      <MainTitle isSidebarOpen={isSidebarOpen}>🔥 Top Picks</MainTitle>
 
       {/* 게임 카드 목록 영역 */}
       <MainContainer
@@ -96,7 +113,7 @@ const MainPage: React.FC = () => {
           <button
             type="button"
             className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-            style={{ marginTop: "2em", fontWeight: "600" }}
+            style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
             onClick={pageNext}
           >
             더보기
