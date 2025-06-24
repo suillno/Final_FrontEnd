@@ -111,3 +111,21 @@ export const apiGetSteamPriceByName = async (gameName: string) => {
     return { error: "오류" };
   }
 };
+
+/**
+ *
+ * @param GameYear
+ * @param pageNext
+ * @returns
+ */
+export const apiGetGameYear = async (GameYear: string, pageNext: number) => {
+  try {
+    const res = await instance.get("/game/gameYearList", {
+      params: { gameYearList: GameYear, page: pageNext },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("2024년 인기게임 호출 실패", error);
+    return null;
+  }
+};

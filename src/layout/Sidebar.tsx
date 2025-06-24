@@ -80,7 +80,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       <Section>
         <SectionTitle>Top</SectionTitle>
         <MenuItem>Best of the year</MenuItem>
-        <MenuItem>Popular in 2024</MenuItem>
+        <MenuItem>
+          <Link to="/member/GameYearList">Popular in 2024</Link>
+        </MenuItem>
         <MenuItem>All time top 250</MenuItem>
         <MenuItem>
           <Link to="/member/Genres">Genres</Link>
@@ -108,9 +110,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <MenuItem>
           <Link to="/admin/UserManagement">UserManagement</Link>
         </MenuItem>
-        <br/><br/><br/>
+        <br />
+        <br />
+        <br />
       </Section>
-
     </SidebarContainer>
   );
 };
