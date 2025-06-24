@@ -27,15 +27,17 @@ function Router() {
       {/* 메인 레이아웃 */}
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
-        <Route path="game/:id" element={<GameDetail />} />
-        <Route path="/searchgame" element={<SearchGame />} />
         <Route path="member/library" element={<Library />} />
         <Route path="member/dashboard" element={<Dashboard />} />
         <Route path="member/profile" element={<Profile />} />
         <Route path="member/wallet" element={<Wallet />} />
         <Route path="member/CartPage" element={<CartPage />} />
-        <Route path="member/WishList" element={<WishList />} />
-        <Route path="member/GameYearList" element={<GameYearList />} />
+
+        {/* 게임기능 */}
+        <Route path="game/WishList" element={<WishList />} />
+        <Route path="game/GameYearList" element={<GameYearList />} />
+        <Route path="game/:id" element={<GameDetail />} />
+        <Route path="/searchgame" element={<SearchGame />} />
 
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport />} />

@@ -81,11 +81,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <SectionTitle>Top</SectionTitle>
         <MenuItem>Best of the year</MenuItem>
         <MenuItem>
-          <Link to="/member/GameYearList">Popular in 2024</Link>
+          <Link to="/game/GameYearList">Popular in 2024</Link>
         </MenuItem>
         <MenuItem>All time top 250</MenuItem>
         <MenuItem>
-          <Link to="/member/Genres">Genres</Link>
+          <Link to="/game/Genres">Genres</Link>
         </MenuItem>
       </Section>
 
