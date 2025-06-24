@@ -56,20 +56,27 @@ export const Controls = styled.div`
 
 // 검색창
 export const SearchInput = styled.input`
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  border-radius: 6px;
   width: 250px;
-  border: 1px solid #ccc;
+  transition: width 0.3s ease;
+  border: 1px solid #555;
   font-size: 1rem;
-  background-color: #f4f4f4;
-  color: #000;
+  background-color: #2a2b30;
+  color: #fff;
+
+  &::placeholder {
+    color: #aaa;
+  }
 
   &:focus {
     outline: none;
-    border: 1px solid #4b7bec;
-    background-color: #fff;
+    width: 300px;
+    border-color: #4b7bec;
+    background-color: #1e1f24;
   }
 `;
+
 
 // 신고순 정렬 버튼
 export const SortButton = styled.button`
@@ -133,7 +140,7 @@ export const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
-// ✅ 페이지네이션
+// 페이지네이션
 export const Pagination = styled.div`
   margin-top: 2rem;
   display: flex;

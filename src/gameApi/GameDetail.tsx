@@ -35,7 +35,7 @@ const ContentContainer = styled.div<{ bgColor: string }>`
 const GameAbout = styled.div`
   margin: 5%;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: 500px;
 
   @media (max-width: 768px) {
     max-height: 250px;
@@ -127,6 +127,29 @@ const GameDetail = () => {
     }
   };
 
+  // 리뷰 관련 상태
+  const [rating, setRating] = useState<number>(0); // 선택된 평점
+  const [reviewText, setReviewText] = useState<string>(""); // 입력된 리뷰 내용
+  const [reviews, setReviews] = useState<{ rating: number; text: string }[]>(
+    []
+  ); // 리뷰 리스트
+
+  // 리뷰 등록 핸들러
+  const submitReview = () => {
+    if (rating === 0 || reviewText.trim() === "") {
+      alert("평점과 리뷰를 모두 입력해 주세요.");
+      return;
+    }
+
+    // 새로운 리뷰 추가
+    const newReview = { rating, text: reviewText };
+    setReviews([...reviews, newReview]);
+
+    // 입력 초기화
+    setRating(0);
+    setReviewText("");
+  };
+
   return (
     <>
       {/* 로딩 중일 때 Loader 표시 */}
@@ -211,7 +234,7 @@ const GameDetail = () => {
                   {/* 좋아요 및 장바구니 버튼 영역 */}
                   <div className="my-2 text-center">
                     {" "}
-                    {/* ✅ 텍스트 정렬 기준으로 가운데 정렬 */}
+                    {/* 텍스트 정렬 기준으로 가운데 정렬 */}
                     <div className="inline-block whitespace-nowrap">
                       <button className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2">
                         장바구니
@@ -224,8 +247,73 @@ const GameDetail = () => {
                 </WhiteLine>
               </AboutBetween>
 
+              {/* 리뷰 영역 */}
+              <div className="max-w-4xl mx-auto mt-12 p-4 bg-white/5 rounded-xl">
+                <div className="font-bold text-lg text-gray-300 mb-3">
+                  리뷰 남기기
+                </div>
+
+                {/* 평점 선택 */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-white font-semibold">평점:</div>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <span
+                      key={num}
+                      onClick={() => setRating(num)}
+                      className={`cursor-pointer text-2xl ${
+                        num <= rating ? "text-yellow-400" : "text-gray-600"
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+
+                {/* 리뷰 작성 입력창 */}
+                <textarea
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="게임에 대한 후기를 남겨주세요..."
+                  className="w-full h-24 p-3 rounded bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring focus:border-yellow-400 mb-4 resize-none"
+                />
+
+                {/* 등록 버튼 */}
+                <button
+                  onClick={submitReview}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded"
+                >
+                  등록하기
+                </button>
+
+                {/* 리뷰 리스트 표시 */}
+                <div className="mt-8">
+                  <div className="font-bold text-lg text-gray-300 mb-3">
+                    리뷰 목록
+                  </div>
+                  {reviews.length === 0 ? (
+                    <div className="text-gray-400">
+                      아직 작성된 리뷰가 없습니다.
+                    </div>
+                  ) : (
+                    <ul className="space-y-4">
+                      {reviews.map((rev, idx) => (
+                        <li key={idx} className="bg-white/10 p-3 rounded">
+                          <div className="text-yellow-400 mb-1">
+                            {"★".repeat(rev.rating)}{" "}
+                            <span className="text-gray-400 text-sm">
+                              ({rev.rating}점)
+                            </span>
+                          </div>
+                          <div className="text-white">{rev.text}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
               {/* 구매 스토어 영역 */}
-              <ShopMobile className="max-w-4xl mx-auto mt-8">
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">구매 스토어</div>
                 <div className="flex flex-wrap gap-3">
                   {gameDetail.stores.map((s, idx) => (
@@ -240,10 +328,10 @@ const GameDetail = () => {
                     </a>
                   ))}
                 </div>
-              </ShopMobile>
+              </div>
 
               {/* 태그 영역 */}
-              <div className="max-w-4xl mx-auto mb-20 mt-8 text-sm sm:text-base md:text-lg hidden sm:block">
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">태그</div>
                 <div className="flex flex-wrap gap-2">
                   {gameDetail.tags.slice(0, 20).map((t, idx) => (

@@ -60,7 +60,7 @@ const ReviewManagement: React.FC = () => {
         <Styled.Controls>
           <Styled.SearchInput
             type="text"
-            placeholder="검색 (유저ID, 게임제목, 내용)"
+            placeholder="검색 유저ID 게임제목"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
