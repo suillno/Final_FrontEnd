@@ -34,9 +34,14 @@ export const VisitorInfo = styled.div`
 // 차트 카드들을 담는 그리드 레이아웃
 export const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `;
+
 
 // 개별 차트 카드 스타일
 export const Card = styled.div`

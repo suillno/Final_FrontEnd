@@ -1,5 +1,3 @@
-// ✅ /admin/CustomerSupport.tsx
-
 import React, { useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import * as Styled from "./customerSupport/CustomerSupport.styles";
@@ -8,7 +6,7 @@ import InquiryViewModal from "./customerSupport/InquiryViewModal";
 import InquiryStatusModal from "./customerSupport/InquiryStatusModal";
 import { FaSearch } from "react-icons/fa"; // 돋보기 아이콘
 
-// 🌟 초기 더미 데이터
+// 초기 더미 데이터
 const initialData: Inquiry[] = [
   { id: 1001, status: "처리중", username: "박건우", date: "2025-06-19", content: "서비스 이용 중 오류가 발생했습니다." },
   { id: 1002, status: "완료", username: "이규철", date: "2025-06-18", content: "환불 요청 드립니다." },
@@ -80,7 +78,7 @@ const CustomerSupport: React.FC = () => {
       {/* 타이틀 */}
       <Styled.Title style={{ marginTop: "100px" }}>고객 문의 관리</Styled.Title>
 
-      {/* 🔘 처리 상태 필터 */}
+      {/* 처리 상태 필터 */}
       <Styled.FilterBox>
         {["대기", "처리중", "완료"].map((status) => (
           <label key={status}>
@@ -103,13 +101,14 @@ const CustomerSupport: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          spellCheck={false}
         />
         <Styled.SearchIcon onClick={handleSearch}>
           <FaSearch />
         </Styled.SearchIcon>
       </Styled.SearchBar>
 
-      {/* 📋 테이블 */}
+      {/* 테이블 */}
       <Styled.Table>
         <thead>
           <tr>
@@ -139,7 +138,7 @@ const CustomerSupport: React.FC = () => {
         </tbody>
       </Styled.Table>
 
-      {/* 📌 페이지네이션 */}
+      {/* 페이지네이션 */}
       <Styled.Pagination>
         {Array.from({ length: totalPages }, (_, i) => (
           <button
@@ -152,12 +151,12 @@ const CustomerSupport: React.FC = () => {
         ))}
       </Styled.Pagination>
 
-      {/* 📄 상세 모달 */}
+      {/* 상세 모달 */}
       {viewContent && (
         <InquiryViewModal content={viewContent} onClose={() => setViewContent(null)} />
       )}
 
-      {/* ✏️ 상태 변경 모달 */}
+      {/* 상태 변경 모달 */}
       {editTarget && (
         <InquiryStatusModal
           target={editTarget}

@@ -1,9 +1,19 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
+// ✅ Fade-in 애니메이션
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
-
-// 전체 페이지 컨테이너
 export const Container = styled.div<{ isSidebarOpen: boolean }>`
+  animation: ${fadeIn} 0.5s ease;
   padding: 2rem;
   margin-left: ${(props) => (props.isSidebarOpen ? "200px" : "5%")};
   transition: margin-left 0.3s ease;
@@ -12,35 +22,19 @@ export const Container = styled.div<{ isSidebarOpen: boolean }>`
   min-height: 100vh;
 `;
 
-// 타이틀과 테이블 시작 위치를 통일하기 위한 래퍼
 export const InnerWrapper = styled.div`
   max-width: 1000px;
   margin: 0 auto;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
 `;
 
-// 가운데 정렬용 상단 헤더 wrapper
-export const HeaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-`;
-
-// 타이틀
 export const Title = styled.h2`
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
-  text-align: left; 
-  width: 100%;      
 `;
 
-
-// 검색/필터/정렬 컨트롤
 export const Controls = styled.div`
   display: flex;
   align-items: center;
@@ -54,12 +48,11 @@ export const Controls = styled.div`
   }
 `;
 
-// 검색창
 export const SearchInput = styled.input`
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
   border-radius: 6px;
   width: 250px;
-  transition: width 0.3s ease;
+  transition: all 0.3s ease;
   border: 1px solid #555;
   font-size: 1rem;
   background-color: #2a2b30;
@@ -77,8 +70,6 @@ export const SearchInput = styled.input`
   }
 `;
 
-
-// 신고순 정렬 버튼
 export const SortButton = styled.button`
   background: #4b7bec;
   color: white;
@@ -86,25 +77,21 @@ export const SortButton = styled.button`
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #5d8bf4;
+  }
 `;
 
-// 테이블 전체 가운데 정렬
-export const TableWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-// 리뷰 테이블
 export const ReviewTable = styled.table`
   width: 100%;
-  max-width: 1000px;
   border-collapse: collapse;
   background-color: #2c2f36;
 
   th, td {
     padding: 1rem;
     border-bottom: 1px solid #444;
-    vertical-align: middle;
     text-align: center;
   }
 
@@ -116,9 +103,13 @@ export const ReviewTable = styled.table`
   td {
     color: #ddd;
   }
+
+  tbody tr:hover {
+    background-color: #383b45;
+    transition: background-color 0.3s ease;
+  }
 `;
 
-// 내용이 길 경우 표시되는 + 버튼
 export const MoreButton = styled.button`
   margin-left: 8px;
   padding: 2px 8px;
@@ -128,9 +119,12 @@ export const MoreButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+
+  &:hover {
+    background-color: #5d8bf4;
+  }
 `;
 
-// 삭제 버튼
 export const DeleteButton = styled.button`
   background: #eb3b5a;
   color: white;
@@ -138,9 +132,13 @@ export const DeleteButton = styled.button`
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #ff6b81;
+  }
 `;
 
-// 페이지네이션
 export const Pagination = styled.div`
   margin-top: 2rem;
   display: flex;
@@ -154,9 +152,14 @@ export const Pagination = styled.div`
     background-color: #444;
     color: white;
     cursor: pointer;
+    transition: background 0.3s ease;
 
     &.active {
       background-color: #4b7bec;
+    }
+
+    &:hover {
+      background-color: #5d8bf4;
     }
   }
 `;
