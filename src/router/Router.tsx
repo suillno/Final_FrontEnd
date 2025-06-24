@@ -36,10 +36,10 @@ function Router() {
         <Route path="member/WishList" element={<WishList />} />
 
         {/* 어드민 */}
-        <Route path="admin/CustomerSupport" element={<CustomerSupport/>} />
-        <Route path="admin/ReviewManagement" element={<ReviewManagement/>} />
-        <Route path="admin/UserManagement" element={<UserManagement/>} />
-        <Route path="admin/Chart" element={<Chart/>} />
+        <Route path="admin/CustomerSupport" element={<CustomerSupport />} />
+        <Route path="admin/ReviewManagement" element={<ReviewManagement />} />
+        <Route path="admin/UserManagement" element={<UserManagement />} />
+        <Route path="admin/Chart" element={<Chart />} />
         <Route path="member/Genres" element={<Genres />} />
       </Route>
 
