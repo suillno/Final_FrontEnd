@@ -21,7 +21,7 @@ import Chart from "../admin/Chart";
 import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
 import GameLongPlayList from "../gameApi/GameLongPlayList";
-import Auth from "../components/helper/Auth";
+import Auth from "../components/auth/helper/Auth";
 
 // DB에있는 권한 확인
 const ROLES = {

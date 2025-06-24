@@ -17,11 +17,11 @@ import { v4 } from "uuid";
 import { osName } from "react-device-detect";
 import axios from "axios";
 
-import { setUserInfo } from "../../components/store/userInfo";
+import { setUserInfo } from "../../components/auth/store/userInfo";
 import {
   setCurrentUser,
   getCurrentUser,
-} from "../../components/helper/storage";
+} from "../../components/auth/helper/storage";
 
 export default function Login() {
   const dispatch = useDispatch();

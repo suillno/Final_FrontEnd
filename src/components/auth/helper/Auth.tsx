@@ -5,7 +5,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
-import { selectUserInfo } from "../store/userInfo";
+import { selectUserInfo } from "../../auth/store/userInfo";
 
 interface AuthProps {
   allowedRoles: Array<string | number>;

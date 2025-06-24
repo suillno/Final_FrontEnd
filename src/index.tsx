@@ -4,7 +4,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css"; // 또는 './tailwind.css'
 import { Provider } from "react-redux"; // Redux 스토어를 애플리케이션에 연결
-import store from "./components/store/store"; // Redux 스토어 객체 import
+import store from "./components/auth/store/store"; // Redux 스토어 객체 import
 import { BrowserRouter } from "react-router-dom"; // 라우팅 기능 제공
 import { persistStore } from "redux-persist"; // 저장된 상태 관리 설정
 import { PersistGate } from "redux-persist/integration/react"; // 저장된 상태가 로드될 때까지 UI 렌더링 보류

@@ -3,18 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   getCurrentUser,
   removeCurrentUser,
-} from "../../components/helper/storage";
+} from "../../components/auth/helper/storage";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectUserInfo,
-  removeUserInfo,
-} from "../../components/store/userInfo";
+import { selectUserInfo, removeUserInfo } from "./store/userInfo";
 
 const AuthStatus = () => {
   // Redux에서 로그인한 사용자 정보 가져오기
   const userInfo = useSelector(selectUserInfo);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  console.log("로그인정보", userInfo);
 
   // 로그아웃 처리 함수
   const logout = () => {
