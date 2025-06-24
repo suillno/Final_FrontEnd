@@ -20,6 +20,7 @@ import UserManagement from "../admin/UserManagement";
 import Chart from "../admin/Chart";
 import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
+import GameLongPlayList from "../gameApi/GameLongPlayList";
 
 function Router() {
   return (
@@ -39,6 +40,7 @@ function Router() {
         <Route path="game/:id" element={<GameDetail />} />
         <Route path="/searchgame" element={<SearchGame />} />
         <Route path="game/Genres" element={<Genres />} />
+        <Route path="/game/GameLongPlayList" element={<GameLongPlayList />} />
 
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport />} />
