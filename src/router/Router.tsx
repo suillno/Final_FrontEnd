@@ -22,6 +22,7 @@ import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
 import GameLongPlayList from "../gameApi/GameLongPlayList";
 import Auth from "../components/auth/helper/Auth";
+import { NotFound } from "../components/error/NotFound";
 
 // DB에있는 권한 확인
 const ROLES = {
@@ -71,6 +72,8 @@ function Router() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
       </Route>
+      {/* 경로 없을때 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

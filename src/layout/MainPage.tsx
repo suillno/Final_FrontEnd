@@ -101,7 +101,7 @@ const MainPage: React.FC = () => {
       </MainContainer>
 
       {/* 로딩 또는 더보기 */}
-      {isLoading ? (
+      {isLoading || gameResponse.results ? (
         <Loader />
       ) : (
         <div className="flex justify-center mt-8 h-35">
