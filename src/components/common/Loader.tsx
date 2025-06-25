@@ -22,6 +22,14 @@ const LoaderContainer = styled.div`
   background-color: #1e1f24;
 `;
 
+// 버튼동작 스피너
+const LoaderChange = styled.div`
+  display: flex;
+  justify-content: center;
+  background-color: #1e1f24;
+  height: 48px;
+`;
+
 // 스피너 본체
 const LoaderCircle = styled.span`
   position: relative;
@@ -67,3 +75,11 @@ const Loader: React.FC = () => {
 };
 
 export default Loader;
+
+export const LoaderButton: React.FC = () => {
+  return (
+    <LoaderChange>
+      <LoaderCircle />
+    </LoaderChange>
+  );
+};

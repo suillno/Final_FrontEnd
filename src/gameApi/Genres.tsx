@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { apiGetGameGenres } from "../components/api/api";
 import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
 import GameCard from "../components/api/GameCard";
-import Loader from "../components/common/Loader";
+import Loader, { LoaderButton } from "../components/common/Loader";
 
 // 레이아웃 사이드바 상태 확인용 타입 정의
 interface LayoutContext {
@@ -128,6 +128,7 @@ const Genres = () => {
 
   // 로딩 상태
   const [isLoading, setIsLoading] = useState(false);
+  const [firstLoading, setfirstLoading] = useState(false);
 
   // 장르 목록 (label: 한글, value: RAWG 슬러그)
   const genreList = [
@@ -165,8 +166,12 @@ const Genres = () => {
   // 장르나 페이지가 바뀔 때 게임 목록 불러오기
   useEffect(() => {
     if (!selectedSlug) return;
-
-    setIsLoading(true);
+    // 첫 로딩일 경우에만 firstLoading true
+    if (pageCount === 1) {
+      setfirstLoading(true);
+    } else {
+      setIsLoading(true);
+    }
     apiGetGameGenres(selectedSlug, pageCount)
       .then((res) => {
         const results =
@@ -175,7 +180,10 @@ const Genres = () => {
             : [...gameResponse.results, ...res.results];
         setGameResponse({ ...res, results });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setfirstLoading(false);
+        setIsLoading(false);
+      });
   }, [selectedSlug, pageCount]);
 
   // 마우스 휠로 장르 버튼 가로 스크롤 이동 처리
@@ -231,19 +239,24 @@ const Genres = () => {
           ))}
         </GameGrid>
 
-        {/* 로딩 또는 더보기 버튼 */}
-        {isLoading ? (
+        {/* 초기 전체 로딩 상태일 때 */}
+        {firstLoading ? (
           <Loader />
         ) : (
+          // 더보기 버튼 or 로딩 버튼
           <div className="flex justify-center mt-8 h-35">
-            <button
-              type="button"
-              className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-              style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
-              onClick={pageNext}
-            >
-              더보기
-            </button>
+            {isLoading ? (
+              <LoaderButton />
+            ) : (
+              <button
+                type="button"
+                className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+                style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
+                onClick={pageNext}
+              >
+                더보기
+              </button>
+            )}
           </div>
         )}
       </GenresContainer>

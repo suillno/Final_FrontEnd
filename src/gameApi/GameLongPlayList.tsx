@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
 import { apiGetGameTime } from "../components/api/api";
-import Loader from "../components/common/Loader";
+import Loader, { LoaderButton } from "../components/common/Loader";
 import { Link, useOutletContext } from "react-router-dom";
 import GameCard from "../components/api/GameCard";
 
@@ -65,21 +65,33 @@ const GameLongPlayList: React.FC = () => {
     useState<GameResponse>(defaultGameResponse);
   const [pageCount, setPageCount] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [firstLoading, setfirstLoading] = useState(false);
 
   // 페이지 증가 함수 (더보기 버튼 클릭 시 호출)
   const pageNext = () => setPageCount((prev) => prev + 1);
 
   // RAWG API 호출하여 게임 리스트 불러오기
   const getGameTime = (pageCount: number) => {
-    setIsLoading(true);
+    // 첫 로딩일 경우에만 firstLoading true
+    if (pageCount === 1) {
+      setfirstLoading(true);
+    } else {
+      setIsLoading(true);
+    }
     apiGetGameTime("2024", pageCount)
       .then((res) => {
         if (!res) return;
         // 기존 게임 결과에 새 결과 추가
-        const results = [...gameResponse.results, ...res.results];
+        const results =
+          pageCount === 1
+            ? res.results
+            : [...gameResponse.results, ...res.results];
         setGameResponse({ ...res, results });
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setfirstLoading(false);
+        setIsLoading(false);
+      });
   };
 
   // 페이지 변경될 때마다 게임 리스트 불러오기
@@ -105,19 +117,24 @@ const GameLongPlayList: React.FC = () => {
         ))}
       </MainContainer>
 
-      {/* 로딩 스피너 또는 더보기 버튼 */}
-      {isLoading ? (
+      {/* 초기 전체 로딩 상태일 때 */}
+      {firstLoading ? (
         <Loader />
       ) : (
-        <div className="flex justify-center mt-8 h-35 ">
-          <button
-            type="button"
-            className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-            style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
-            onClick={pageNext}
-          >
-            더보기
-          </button>
+        // 더보기 버튼 or 로딩 버튼
+        <div className="flex justify-center mt-8 h-35">
+          {isLoading ? (
+            <LoaderButton />
+          ) : (
+            <button
+              type="button"
+              className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+              style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
+              onClick={pageNext}
+            >
+              더보기
+            </button>
+          )}
         </div>
       )}
     </div>

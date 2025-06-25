@@ -78,8 +78,9 @@ const SearchGame: React.FC = () => {
 
   const [games, setGames] = useState<GameSearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [firstLoading, setfirstLoading] = useState(false);
 
-  // 🔹 검색
+  // 검색
   const getGameList = async (keyword: string) => {
     if (!keyword) return;
     setIsLoading(true);
