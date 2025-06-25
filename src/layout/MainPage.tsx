@@ -1,3 +1,4 @@
+// MainPage.tsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
@@ -100,19 +101,20 @@ const MainPage: React.FC = () => {
       </MainContainer>
 
       {/* 로딩 또는 더보기 */}
-      {isLoading && <Loader />}
-
-      <div className="flex justify-center mt-8 h-35">
-        <button
-          type="button"
-          className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-          style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
-          onClick={pageNext}
-          disabled={isLoading}
-        >
-          더보기
-        </button>
-      </div>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div className="flex justify-center mt-8 h-35">
+          <button
+            type="button"
+            className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+            style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
+            onClick={pageNext}
+          >
+            더보기
+          </button>
+        </div>
+      )}
     </div>
   );
 };
