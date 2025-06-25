@@ -38,12 +38,12 @@ export const Section = styled.section`
     background: url(${bgImage}) no-repeat center center / cover;
     z-index: -3;
   }
-  &.find-id::before {
+  &.find-pw::before {
     transform: translate(0, 0);
     right: 50%;
   }
 
-  &.find-pw::before {
+  &.find-id::before {
     transform: translate(100%, 0);
     right: 50%;
   }
@@ -64,7 +64,7 @@ export const Panel = styled.div<{ $active: boolean }>`
 
 export const FormBox = styled.div`
   width: 400px;
-  height: 450px;
+  height: 500px;
   background-color: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
@@ -141,11 +141,11 @@ export const Button = styled.button`
   background: transparent;
   border: 2px solid #fff;
   color: #fff;
-  /* outline: none; */
+  outline: none;
   cursor: pointer;
   font-size: 1em;
   font-weight: 600;
-  /* margin-top: 5px; */
+  margin-top: 5px;
 
   &:hover {
     background: #fff;
@@ -155,7 +155,7 @@ export const Button = styled.button`
 
 export const ToggleText = styled.p`
   color: #fff;
-  margin-top: 10px;
+  margin-top: 20px;
 
   span {
     font-weight: bold;
@@ -173,6 +173,22 @@ export const ResultBox = styled.div`
   color: #fff;
   text-align: center;
   font-size: 1.1em;
+`;
+
+export const Login = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 10px;
+
+  a {
+    text-decoration: none;
+    color: #fff;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 export const LeftText = styled.div<{ $visible: boolean }>`
