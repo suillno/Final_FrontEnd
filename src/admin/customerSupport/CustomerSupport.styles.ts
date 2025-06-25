@@ -25,9 +25,9 @@ const popIn = keyframes`
 `;
 
 /* 페이지 컨테이너 */
-export const Container = styled.div<{ isSidebarOpen: boolean }>`
+export const Container = styled.div<{ $isSidebarOpen: boolean }>`
   padding: 2rem;
-  margin-left: ${(props) => (props.isSidebarOpen ? "220px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "220px" : "5%")};
   transition: margin-left 0.3s ease;
   color: white;
   background-color: #1e1f24;
@@ -112,7 +112,8 @@ export const Table = styled.table`
   background-color: #2c2f36;
   animation: ${fadeIn} 0.4s ease;
 
-  th, td {
+  th,
+  td {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #444;
@@ -183,9 +184,11 @@ export const Pagination = styled.div`
 /* 모달 오버레이 */
 export const ModalOverlay = styled.div`
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;

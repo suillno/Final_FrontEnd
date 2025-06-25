@@ -17,14 +17,14 @@ interface LayoutContext {
 /* ==== Styled-components 정의 ==== */
 
 // 전체 페이지 래퍼 - 사이드바 열림 여부에 따라 margin 조절 + 세로 가운데 정렬
-const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
+const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center; /* 세로 중앙 정렬 */
   height: 100vh;
   padding: 2em;
   background-color: #1e1f24;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
@@ -210,7 +210,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <PageWrapper isSidebarOpen={isSidebarOpen}>
+    <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <SectionBox>
         {/* 탭 메뉴 */}
         <TabMenu>

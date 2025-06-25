@@ -45,17 +45,17 @@ export const Section = styled.section`
   }
 `;
 
-export const Panel = styled.div<{ active: boolean }>`
+export const Panel = styled.div<{ $active: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   transition: all 0.6s ease;
   transform: translateX(
-    ${(props: { active: boolean }) => (props.active ? "0%" : "100%")}
+    ${(props: { $active: boolean }) => (props.$active ? "0%" : "100%")}
   );
-  opacity: ${(props: { active: boolean }) => (props.active ? 1 : 0)};
-  pointer-events: ${(props: { active: boolean }) =>
-    props.active ? "auto" : "none"};
+  opacity: ${(props: { $active: boolean }) => (props.$active ? 1 : 0)};
+  pointer-events: ${(props: { $active: boolean }) =>
+    props.$active ? "auto" : "none"};
 `;
 
 export const FormBox = styled.div`
@@ -172,7 +172,7 @@ export const ToggleText = styled.p`
   }
 `;
 
-export const LeftText = styled.div<{ visible: boolean }>`
+export const LeftText = styled.div<{ $visible: boolean }>`
   position: absolute;
   top: 50%;
   left: 10%;
@@ -183,10 +183,10 @@ export const LeftText = styled.div<{ visible: boolean }>`
   user-select: none;
   pointer-events: none;
   transition: opacity 0.6s ease;
-  opacity: ${(props: { visible: any }) => (props.visible ? 1 : 0)};
+  opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
 `;
 
-export const RightText = styled.div<{ visible: boolean }>`
+export const RightText = styled.div<{ $visible: boolean }>`
   position: absolute;
   top: 50%;
   right: 10%;
@@ -197,5 +197,5 @@ export const RightText = styled.div<{ visible: boolean }>`
   user-select: none;
   pointer-events: none;
   transition: opacity 0.6s ease;
-  opacity: ${(props: { visible: any }) => (props.visible ? 1 : 0)};
+  opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
 `;

@@ -1,9 +1,9 @@
 import styled from "styled-components";
 
 // 전체 컨테이너 (사이드바 열림 여부에 따라 margin 조정)
-export const Container = styled.div<{ isSidebarOpen: boolean }>`
+export const Container = styled.div<{ $isSidebarOpen: boolean }>`
   padding: 2rem;
-  margin-left: ${(props) => (props.isSidebarOpen ? "220px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "220px" : "5%")};
   transition: margin-left 0.3s ease;
   color: white;
   background-color: #1e1f24;
@@ -41,7 +41,6 @@ export const Grid = styled.div`
     grid-template-columns: 1fr;
   }
 `;
-
 
 // 개별 차트 카드 스타일
 export const Card = styled.div`

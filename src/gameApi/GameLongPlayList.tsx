@@ -15,9 +15,9 @@ interface LayoutContext {
 }
 
 // 메인 그리드 컨테이너 스타일 정의
-const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
+const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
   margin-right: 5%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "5%")};
   transition: margin-left 0.3s ease;
   @media (max-width: 768px) {
     margin: 0 5%;
@@ -25,10 +25,10 @@ const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
 `;
 
 // 페이지 타이틀 스타일 정의
-const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
+const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3.5vw;
   font-weight: 900;
-  margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
   background: linear-gradient(90deg, #ff512f, #dd2476);
   -webkit-background-clip: text;
@@ -90,11 +90,11 @@ const GameLongPlayList: React.FC = () => {
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
-      <MainTitle isSidebarOpen={isSidebarOpen}>🔥 BEST Time</MainTitle>
+      <MainTitle $isSidebarOpen={isSidebarOpen}>🔥 BEST Time</MainTitle>
 
       {/* 게임 카드 목록 영역 */}
       <MainContainer
-        isSidebarOpen={isSidebarOpen}
+        $isSidebarOpen={isSidebarOpen}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
       >
         {/* 값이 null 일때를 대비 옵셔널 체이닝사용 */}

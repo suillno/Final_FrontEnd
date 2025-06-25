@@ -1,23 +1,86 @@
 import React, { useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import * as Styled from "./customerSupport/CustomerSupport.styles";
-import { Inquiry, LayoutContext } from "./customerSupport/CustomerSupport.types";
+import {
+  Inquiry,
+  LayoutContext,
+} from "./customerSupport/CustomerSupport.types";
 import InquiryViewModal from "./customerSupport/InquiryViewModal";
 import InquiryStatusModal from "./customerSupport/InquiryStatusModal";
 import { FaSearch } from "react-icons/fa"; // 돋보기 아이콘
 
 // 초기 더미 데이터
 const initialData: Inquiry[] = [
-  { id: 1001, status: "처리중", username: "박건우", date: "2025-06-19", content: "서비스 이용 중 오류가 발생했습니다." },
-  { id: 1002, status: "완료", username: "이규철", date: "2025-06-18", content: "환불 요청 드립니다." },
-  { id: 1003, status: "대기", username: "김지원", date: "2025-06-17", content: "계정 정보 변경이 안돼요." },
-  { id: 1004, status: "완료", username: "이수진", date: "2025-06-16", content: "비밀번호 재설정이 필요합니다." },
-  { id: 1005, status: "처리중", username: "최우영", date: "2025-06-15", content: "이메일 인증이 안 돼요." },
-  { id: 1006, status: "대기", username: "정하늘", date: "2025-06-14", content: "서비스 이용 문의드립니다." },
-  { id: 1007, status: "완료", username: "홍길동", date: "2025-06-13", content: "탈퇴 요청합니다." },
-  { id: 1008, status: "처리중", username: "고재훈", date: "2025-06-12", content: "문의한 내용 언제 처리되나요?" },
-  { id: 1009, status: "대기", username: "장미란", date: "2025-06-11", content: "배송 지연 관련 문의입니다." },
-  { id: 1010, status: "처리중", username: "김철수", date: "2025-06-10", content: "상품 불량 문의합니다." },
+  {
+    id: 1001,
+    status: "처리중",
+    username: "박건우",
+    date: "2025-06-19",
+    content: "서비스 이용 중 오류가 발생했습니다.",
+  },
+  {
+    id: 1002,
+    status: "완료",
+    username: "이규철",
+    date: "2025-06-18",
+    content: "환불 요청 드립니다.",
+  },
+  {
+    id: 1003,
+    status: "대기",
+    username: "김지원",
+    date: "2025-06-17",
+    content: "계정 정보 변경이 안돼요.",
+  },
+  {
+    id: 1004,
+    status: "완료",
+    username: "이수진",
+    date: "2025-06-16",
+    content: "비밀번호 재설정이 필요합니다.",
+  },
+  {
+    id: 1005,
+    status: "처리중",
+    username: "최우영",
+    date: "2025-06-15",
+    content: "이메일 인증이 안 돼요.",
+  },
+  {
+    id: 1006,
+    status: "대기",
+    username: "정하늘",
+    date: "2025-06-14",
+    content: "서비스 이용 문의드립니다.",
+  },
+  {
+    id: 1007,
+    status: "완료",
+    username: "홍길동",
+    date: "2025-06-13",
+    content: "탈퇴 요청합니다.",
+  },
+  {
+    id: 1008,
+    status: "처리중",
+    username: "고재훈",
+    date: "2025-06-12",
+    content: "문의한 내용 언제 처리되나요?",
+  },
+  {
+    id: 1009,
+    status: "대기",
+    username: "장미란",
+    date: "2025-06-11",
+    content: "배송 지연 관련 문의입니다.",
+  },
+  {
+    id: 1010,
+    status: "처리중",
+    username: "김철수",
+    date: "2025-06-10",
+    content: "상품 불량 문의합니다.",
+  },
 ];
 
 // 페이지 당 표시 개수
@@ -74,7 +137,7 @@ const CustomerSupport: React.FC = () => {
   );
 
   return (
-    <Styled.Container isSidebarOpen={isSidebarOpen}>
+    <Styled.Container $isSidebarOpen={isSidebarOpen}>
       {/* 타이틀 */}
       <Styled.Title style={{ marginTop: "100px" }}>고객 문의 관리</Styled.Title>
 
@@ -128,10 +191,14 @@ const CustomerSupport: React.FC = () => {
               <td>{item.username}</td>
               <td>{item.date}</td>
               <td>
-                <Styled.ViewButton onClick={() => setViewContent(item.content)}>보기</Styled.ViewButton>
+                <Styled.ViewButton onClick={() => setViewContent(item.content)}>
+                  보기
+                </Styled.ViewButton>
               </td>
               <td>
-                <Styled.ChangeButton onClick={() => setEditTarget(item)}>변경</Styled.ChangeButton>
+                <Styled.ChangeButton onClick={() => setEditTarget(item)}>
+                  변경
+                </Styled.ChangeButton>
               </td>
             </tr>
           ))}
@@ -153,7 +220,10 @@ const CustomerSupport: React.FC = () => {
 
       {/* 상세 모달 */}
       {viewContent && (
-        <InquiryViewModal content={viewContent} onClose={() => setViewContent(null)} />
+        <InquiryViewModal
+          content={viewContent}
+          onClose={() => setViewContent(null)}
+        />
       )}
 
       {/* 상태 변경 모달 */}

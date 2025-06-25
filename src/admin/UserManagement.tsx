@@ -11,9 +11,9 @@ interface LayoutContext {
 // ===== 스타일 정의 ===== //
 
 // 전체 페이지 컨테이너 - 사이드바 상태에 따라 왼쪽 여백 조정
-const Container = styled.div<{ isSidebarOpen: boolean }>`
+const Container = styled.div<{ $isSidebarOpen: boolean }>`
   padding: 2rem;
-  margin-left: ${(props) => (props.isSidebarOpen ? "200px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "200px" : "5%")};
   transition: margin-left 0.3s ease;
   color: white;
 `;
@@ -31,7 +31,7 @@ const UserManagement: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
   return (
-    <Container isSidebarOpen={isSidebarOpen}>
+    <Container $isSidebarOpen={isSidebarOpen}>
       <Title>회원 관리</Title>
       <UserList />
     </Container>

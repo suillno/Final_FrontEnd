@@ -12,10 +12,10 @@ interface LayoutContext {
 }
 
 // 페이지 상단 타이틀 스타일
-const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
+const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3.5vw;
   font-weight: 900;
-  margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
 
   background: linear-gradient(90deg, #6dd5fa, #2980b9);
@@ -51,9 +51,9 @@ const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
 `;
 
 // 전체 영역 컨테이너 스타일
-const GenresContainer = styled.div<{ isSidebarOpen: boolean }>`
+const GenresContainer = styled.div<{ $isSidebarOpen: boolean }>`
   margin-right: 5%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "5%")};
   transition: margin-left 0.3s ease;
   @media (max-width: 768px) {
     margin: 0 5%;
@@ -190,10 +190,10 @@ const Genres = () => {
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 타이틀 영역 */}
-      <MainTitle isSidebarOpen={isSidebarOpen}>
+      <MainTitle $isSidebarOpen={isSidebarOpen}>
         💠 Genre {selectedGenre}
       </MainTitle>
-      <GenresContainer isSidebarOpen={isSidebarOpen}>
+      <GenresContainer $isSidebarOpen={isSidebarOpen}>
         {/* 장르 버튼 리스트 */}
         <GenreListWrapper ref={scrollRef}>
           <ul>

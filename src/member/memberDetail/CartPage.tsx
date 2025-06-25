@@ -20,7 +20,7 @@ interface LayoutContext {
 // ========================= 스타일 컴포넌트 =========================
 
 // 🔹 페이지 전체 감싸는 래퍼 (사이드바 상태에 따라 margin 조정)
-const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
+const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -28,7 +28,7 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   padding: 2em;
   background-color: #121317;
   box-sizing: border-box;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
@@ -223,7 +223,7 @@ const CartPage: React.FC = () => {
   };
 
   return (
-    <PageWrapper isSidebarOpen={isSidebarOpen}>
+    <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <SectionBox>
         <Title>장바구니</Title>
 

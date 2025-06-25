@@ -1,15 +1,49 @@
 import React, { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import * as Styled from "./reviewManagement/ReviewManagement.styles";
-import { LayoutContext, Review } from "./reviewManagement/ReviewManagement.types";
+import {
+  LayoutContext,
+  Review,
+} from "./reviewManagement/ReviewManagement.types";
 import ReviewDetailModal from "./reviewManagement/ReviewDetailModal";
 
 const initialReviews: Review[] = [
-  { id: 1, userId: "userA", gameTitle: "Elden Ring", content: "정말 재미있어요!", reportCount: 0 },
-  { id: 2, userId: "userB", gameTitle: "GTA V", content: "욕설이 많아요", reportCount: 2 },
-  { id: 3, userId: "userC", gameTitle: "Zelda", content: "역시 갓겜입니다.", reportCount: 0 },
-  { id: 4, userId: "userD", gameTitle: "The Witcher 3", content: "버그 너무 많음", reportCount: 3 },
-  { id: 5, userId: "userE", gameTitle: "Cyberpunk 2077", content: "최적화가 필요해요. 너무 무거움. 버그도 많고 고쳐야 될 점이 많습니다.", reportCount: 1 },
+  {
+    id: 1,
+    userId: "userA",
+    gameTitle: "Elden Ring",
+    content: "정말 재미있어요!",
+    reportCount: 0,
+  },
+  {
+    id: 2,
+    userId: "userB",
+    gameTitle: "GTA V",
+    content: "욕설이 많아요",
+    reportCount: 2,
+  },
+  {
+    id: 3,
+    userId: "userC",
+    gameTitle: "Zelda",
+    content: "역시 갓겜입니다.",
+    reportCount: 0,
+  },
+  {
+    id: 4,
+    userId: "userD",
+    gameTitle: "The Witcher 3",
+    content: "버그 너무 많음",
+    reportCount: 3,
+  },
+  {
+    id: 5,
+    userId: "userE",
+    gameTitle: "Cyberpunk 2077",
+    content:
+      "최적화가 필요해요. 너무 무거움. 버그도 많고 고쳐야 될 점이 많습니다.",
+    reportCount: 1,
+  },
 ];
 
 const ITEMS_PER_PAGE = 10;
@@ -31,7 +65,9 @@ const ReviewManagement: React.FC = () => {
 
   const filtered = reviews
     .filter((r) =>
-      (r.userId + r.gameTitle + r.content).toLowerCase().includes(search.toLowerCase())
+      (r.userId + r.gameTitle + r.content)
+        .toLowerCase()
+        .includes(search.toLowerCase())
     )
     .filter((r) => (filterReported ? r.reportCount > 0 : true));
 
@@ -46,7 +82,7 @@ const ReviewManagement: React.FC = () => {
   );
 
   return (
-    <Styled.Container isSidebarOpen={isSidebarOpen}>
+    <Styled.Container $isSidebarOpen={isSidebarOpen}>
       <Styled.InnerWrapper>
         <Styled.Title style={{ marginTop: "100px" }}>리뷰 관리</Styled.Title>
 
@@ -93,7 +129,11 @@ const ReviewManagement: React.FC = () => {
                   {review.content.length > 30 ? (
                     <>
                       {review.content.slice(0, 30)}...
-                      <Styled.MoreButton onClick={() => setSelectedReview(review)}>+</Styled.MoreButton>
+                      <Styled.MoreButton
+                        onClick={() => setSelectedReview(review)}
+                      >
+                        +
+                      </Styled.MoreButton>
                     </>
                   ) : (
                     review.content
@@ -101,7 +141,9 @@ const ReviewManagement: React.FC = () => {
                 </td>
                 <td>{review.reportCount}</td>
                 <td>
-                  <Styled.DeleteButton onClick={() => handleDelete(review.id)}>삭제</Styled.DeleteButton>
+                  <Styled.DeleteButton onClick={() => handleDelete(review.id)}>
+                    삭제
+                  </Styled.DeleteButton>
                 </td>
               </tr>
             ))}
@@ -122,7 +164,10 @@ const ReviewManagement: React.FC = () => {
       </Styled.InnerWrapper>
 
       {selectedReview && (
-        <ReviewDetailModal review={selectedReview} onClose={() => setSelectedReview(null)} />
+        <ReviewDetailModal
+          review={selectedReview}
+          onClose={() => setSelectedReview(null)}
+        />
       )}
     </Styled.Container>
   );

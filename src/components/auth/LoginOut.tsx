@@ -13,8 +13,6 @@ const AuthStatus = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("로그인정보", userInfo);
-
   // 로그아웃 처리 함수
   const logout = () => {
     removeCurrentUser(); // localStorage 초기화

@@ -20,9 +20,9 @@ interface GameSearchItem {
 }
 
 // 🔹 메인 컨테이너 스타일 정의
-const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
+const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
   margin-right: 5%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "5%")};
   transition: margin-left 0.3s ease;
   @media (max-width: 768px) {
     margin: 0 5%;
@@ -30,13 +30,13 @@ const MainContainer = styled.div<{ isSidebarOpen: boolean }>`
 `;
 
 // 🔹 타이틀 스타일 정의
-const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
+const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3vw;
   line-height: 50px;
   font-weight: 700;
   padding-bottom: 1em;
   margin-right: 5%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
   @media (max-width: 768px) {
     margin: 0 5%;
@@ -100,12 +100,12 @@ const SearchGame: React.FC = () => {
 
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
-      <MainTitle isSidebarOpen={isSidebarOpen}>
+      <MainTitle $isSidebarOpen={isSidebarOpen}>
         "{searchKeyword}" 검색 결과
       </MainTitle>
 
       <MainContainer
-        isSidebarOpen={isSidebarOpen}
+        $isSidebarOpen={isSidebarOpen}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
       >
         {games.map((item) => (

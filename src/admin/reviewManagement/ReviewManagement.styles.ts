@@ -12,10 +12,10 @@ const fadeIn = keyframes`
   }
 `;
 
-export const Container = styled.div<{ isSidebarOpen: boolean }>`
+export const Container = styled.div<{ $isSidebarOpen: boolean }>`
   animation: ${fadeIn} 0.5s ease;
   padding: 2rem;
-  margin-left: ${(props) => (props.isSidebarOpen ? "200px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "200px" : "5%")};
   transition: margin-left 0.3s ease;
   color: white;
   background-color: #1e1f24;
@@ -89,7 +89,8 @@ export const ReviewTable = styled.table`
   border-collapse: collapse;
   background-color: #2c2f36;
 
-  th, td {
+  th,
+  td {
     padding: 1rem;
     border-bottom: 1px solid #444;
     text-align: center;

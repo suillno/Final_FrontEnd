@@ -1,8 +1,4 @@
-import axios, {
-  AxiosResponse,
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 
 // AxiosRequestConfig 타입 확장
 declare module "axios" {
@@ -20,7 +16,6 @@ export const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const fullUrl = `${config.baseURL}${config.url}`;
-    console.log("요청 URL:", fullUrl);
     return config;
   },
   (error) => {

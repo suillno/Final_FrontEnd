@@ -50,13 +50,13 @@ const initialWishlist: GameItem[] = [
 // 💅 styled-components 정의 (고급 스타일 적용)
 // ===============================
 
-const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
+const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   padding: 2em;
   background-color: #1e1f24;
   min-height: 100vh;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 `;
 
@@ -220,7 +220,7 @@ const WishList: React.FC = () => {
   };
 
   return (
-    <PageWrapper isSidebarOpen={isSidebarOpen}>
+    <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <SectionBox>
         <HeaderRow>
           <Title>찜한 게임 목록</Title>

@@ -14,7 +14,7 @@ interface GamePurchase {
 }
 
 // 🔷 전체 페이지를 감싸는 wrapper - 사이드바 상태에 따라 왼쪽 여백 조절
-const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
+const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,7 +23,7 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   background: linear-gradient(135deg, #1e1f24, #2b2b2b); // 배경 그라데이션
   box-sizing: border-box;
   margin-left: ${(props) =>
-    props.isSidebarOpen
+    props.$isSidebarOpen
       ? "300px"
       : "0"}; // 사이드바 열림 여부에 따라 margin 조절
   transition: margin-left 0.3s ease;
@@ -112,7 +112,7 @@ const Dashboard: React.FC = () => {
   const libraryCount = 12; // 보유 중인 게임 수
 
   return (
-    <PageWrapper isSidebarOpen={isSidebarOpen}>
+    <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <DashboardBox>
         <Title>🎮 대시보드</Title>
 

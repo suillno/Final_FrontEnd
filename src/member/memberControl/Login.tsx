@@ -140,14 +140,14 @@ export default function LoginPage() {
   return (
     <Section className={isSignIn ? "sign-in" : "sign-up"}>
       {/* 회원가입 폼 */}
-      <Panel active={!isSignIn}>
+      <Panel $active={!isSignIn}>
         <FormBox>
           <Form onSubmit={onSubmitRegister}>
             <h2>회원가입</h2>
             <InputBox>
               <input
                 type="text"
-                id="id"
+                id="register-id"
                 required
                 value={registerForm.id}
                 onChange={onChangeRegister}
@@ -158,7 +158,7 @@ export default function LoginPage() {
             <InputBox>
               <input
                 type="password"
-                id="password"
+                id="register-password"
                 required
                 value={registerForm.password}
                 onChange={onChangeRegister}
@@ -186,14 +186,14 @@ export default function LoginPage() {
       </Panel>
 
       {/* 로그인 폼 */}
-      <Panel active={isSignIn}>
+      <Panel $active={isSignIn}>
         <FormBox>
           <Form onSubmit={onSubmitLogin}>
             <h2>로그인</h2>
             <InputBox>
               <input
                 type="text"
-                id="id"
+                id="login-id"
                 required
                 value={loginForm.id}
                 onChange={onChangeLogin}
@@ -204,7 +204,7 @@ export default function LoginPage() {
             <InputBox>
               <input
                 type="password"
-                id="password"
+                id="login-password"
                 required
                 value={loginForm.password}
                 onChange={onChangeLogin}
@@ -223,8 +223,8 @@ export default function LoginPage() {
           </Form>
         </FormBox>
       </Panel>
-      <LeftText visible={isSignIn}>WELCOME BACK!</LeftText>
-      <RightText visible={!isSignIn}>CREATE ACCOUNT</RightText>
+      <LeftText $visible={isSignIn}>WELCOME BACK!</LeftText>
+      <RightText $visible={!isSignIn}>CREATE ACCOUNT</RightText>
     </Section>
   );
 }

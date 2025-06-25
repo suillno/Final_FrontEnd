@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
 // 상대경로로 스타일, 타입 불러오기
@@ -21,7 +28,10 @@ const generateWeekSales = (): DailyData[] =>
   days.map((day) => ({ day, sales: Math.floor(Math.random() * 1000) + 300 }));
 
 const generateMonthSales = (): MonthlyData[] =>
-  months.map((month) => ({ month, sales: Math.floor(Math.random() * 10000) + 10000 }));
+  months.map((month) => ({
+    month,
+    sales: Math.floor(Math.random() * 10000) + 10000,
+  }));
 
 const generateNewUsers = (): DailyData[] =>
   days.map((day) => ({ day, count: Math.floor(Math.random() * 10) + 5 }));
@@ -38,12 +48,21 @@ const Chart: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
   const [weekSales, setWeekSales] = useState<DailyData[]>(generateWeekSales());
-  const [monthSales, setMonthSales] = useState<MonthlyData[]>(generateMonthSales());
+  const [monthSales, setMonthSales] = useState<MonthlyData[]>(
+    generateMonthSales()
+  );
   const [newUsers, setNewUsers] = useState<DailyData[]>(generateNewUsers());
-  const [visitors, setVisitors] = useState<VisitorCount>(generateVisitorCount());
-  const [dailyVisitors, setDailyVisitors] = useState<DailyData[]>(generateVisitorsPerDay());
+  const [visitors, setVisitors] = useState<VisitorCount>(
+    generateVisitorCount()
+  );
+  const [dailyVisitors, setDailyVisitors] = useState<DailyData[]>(
+    generateVisitorsPerDay()
+  );
 
-  const totalDailyVisitors = dailyVisitors.reduce((sum, v) => sum + (v.visitors || 0), 0);
+  const totalDailyVisitors = dailyVisitors.reduce(
+    (sum, v) => sum + (v.visitors || 0),
+    0
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,13 +77,16 @@ const Chart: React.FC = () => {
   }, []);
 
   return (
-    <Styled.Container isSidebarOpen={isSidebarOpen}>
-      <Styled.Title style={{marginTop: "100px"}}>📊 통계 대시보드</Styled.Title>
+    <Styled.Container $isSidebarOpen={isSidebarOpen}>
+      <Styled.Title style={{ marginTop: "100px" }}>
+        📊 통계 대시보드
+      </Styled.Title>
 
       <Styled.VisitorInfo>
-        🧑‍💻 오늘 방문자 수: <strong>{visitors.today}</strong>명<br />
-        총 방문자 수: <strong>{visitors.total.toLocaleString()}</strong>명<br />
-        최근 7일 방문자 총합: <strong>{totalDailyVisitors.toLocaleString()}</strong>명
+        🧑‍💻 오늘 방문자 수: <strong>{visitors.today}</strong>명<br />총 방문자
+        수: <strong>{visitors.total.toLocaleString()}</strong>명<br />
+        최근 7일 방문자 총합:{" "}
+        <strong>{totalDailyVisitors.toLocaleString()}</strong>명
       </Styled.VisitorInfo>
 
       <Styled.Grid>

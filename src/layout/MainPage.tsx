@@ -1,4 +1,3 @@
-// MainPage.tsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
@@ -24,10 +23,10 @@ const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
 `;
 
 // 페이지 타이틀 스타일 정의
-const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
+const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3.5vw;
   font-weight: 900;
-  margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
   background: linear-gradient(90deg, #ff512f, #dd2476);
   -webkit-background-clip: text;
@@ -86,7 +85,7 @@ const MainPage: React.FC = () => {
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
-      <MainTitle isSidebarOpen={isSidebarOpen}>🔥 Top Picks</MainTitle>
+      <MainTitle $isSidebarOpen={isSidebarOpen}>🔥 Top Picks</MainTitle>
 
       {/* 게임 카드 목록 */}
       <MainContainer
@@ -101,20 +100,19 @@ const MainPage: React.FC = () => {
       </MainContainer>
 
       {/* 로딩 또는 더보기 */}
-      {isLoading || gameResponse.results ? (
-        <Loader />
-      ) : (
-        <div className="flex justify-center mt-8 h-35">
-          <button
-            type="button"
-            className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-            style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
-            onClick={pageNext}
-          >
-            더보기
-          </button>
-        </div>
-      )}
+      {isLoading && <Loader />}
+
+      <div className="flex justify-center mt-8 h-35">
+        <button
+          type="button"
+          className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+          style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
+          onClick={pageNext}
+          disabled={isLoading}
+        >
+          더보기
+        </button>
+      </div>
     </div>
   );
 };
