@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
 import { IoIdCardOutline, IoMailOutline } from "react-icons/io5";
-import bgImage from "../../img/g4.png";
+import bgImage from "../../img/g3.jpg";
 
 const Section = styled.section`
   display: flex;
