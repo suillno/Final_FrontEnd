@@ -1,6 +1,6 @@
-// components/auth/Login.styles.ts
+// components/auth/Find.styles.ts
 import styled from "styled-components";
-import bgImage from "../img/g1.jpg";
+import bgImage from "../img/g3.jpg";
 
 export const Section = styled.section`
   display: grid;
@@ -16,7 +16,11 @@ export const Section = styled.section`
     height: 100vh;
     width: 300vw;
     transform: translate(35%, 0);
-    background-image: linear-gradient(-45deg, #420583 0%, #420583 100%);
+    background-image: linear-gradient(
+      -45deg,
+      rgb(90, 8, 177) 0%,
+      rgb(90, 8, 177) 100%
+    );
     transition: 1s ease-in-out;
     z-index: 6;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
@@ -34,12 +38,12 @@ export const Section = styled.section`
     background: url(${bgImage}) no-repeat center center / cover;
     z-index: -3;
   }
-  &.sign-in::before {
+  &.find-id::before {
     transform: translate(0, 0);
     right: 50%;
   }
 
-  &.sign-up::before {
+  &.find-pw::before {
     transform: translate(100%, 0);
     right: 50%;
   }
@@ -60,7 +64,7 @@ export const Panel = styled.div<{ $active: boolean }>`
 
 export const FormBox = styled.div`
   width: 400px;
-  height: 500px;
+  height: 450px;
   background-color: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
@@ -88,6 +92,7 @@ export const Form = styled.form`
 
 export const InputBox = styled.div`
   position: relative;
+  /* width: 310px; */
   width: 100%;
   border-bottom: 2px solid #fff;
   margin-bottom: 20px;
@@ -129,37 +134,22 @@ export const InputBox = styled.div`
 `;
 
 export const Button = styled.button`
+  /* margin-bottom: 30px; */
   width: 100%;
   height: 40px;
   border-radius: 40px;
   background: transparent;
   border: 2px solid #fff;
   color: #fff;
+  /* outline: none; */
   cursor: pointer;
   font-size: 1em;
   font-weight: 600;
-  margin-top: 5px;
+  /* margin-top: 5px; */
 
   &:hover {
     background: #fff;
     color: black;
-  }
-`;
-
-export const Find = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 5px 10px;
-
-  a {
-    text-decoration: none;
-    color: #fff;
-
-    &:hover {
-      text-decoration: underline;
-    }
   }
 `;
 
@@ -178,6 +168,13 @@ export const ToggleText = styled.p`
   }
 `;
 
+export const ResultBox = styled.div`
+  margin-top: 20px;
+  color: #fff;
+  text-align: center;
+  font-size: 1.1em;
+`;
+
 export const LeftText = styled.div<{ $visible: boolean }>`
   position: absolute;
   top: 50%;
@@ -188,7 +185,7 @@ export const LeftText = styled.div<{ $visible: boolean }>`
   color: rgba(255, 255, 255, 255);
   user-select: none;
   pointer-events: none;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.6s ease;
   opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
 `;
 
@@ -202,6 +199,6 @@ export const RightText = styled.div<{ $visible: boolean }>`
   color: rgba(255, 255, 255, 255);
   user-select: none;
   pointer-events: none;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.6s ease;
   opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
 `;

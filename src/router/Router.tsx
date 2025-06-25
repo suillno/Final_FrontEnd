@@ -23,7 +23,7 @@ import GameYearList from "../gameApi/GameYearList";
 import GameLongPlayList from "../gameApi/GameLongPlayList";
 import Auth from "../components/auth/helper/Auth";
 import { NotFound } from "../components/error/NotFound";
-
+import Find from "../member/memberControl/Find";
 // DB에있는 권한 확인
 const ROLES = {
   ROLE_SYSTEM: 1,
@@ -71,6 +71,7 @@ function Router() {
         <Route path="findpw" element={<FindPw />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="find" element={<Find />} />
       </Route>
       {/* 경로 없을때 */}
       <Route path="*" element={<NotFound />} />
