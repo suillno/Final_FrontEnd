@@ -221,8 +221,7 @@ export default function LoginPage() {
               계정이 없으신가요? <span onClick={toggleMode}>회원가입</span>
             </ToggleText>
             <Find>
-              <Link to="/member/findid">아이디 찾기</Link>
-              <Link to="/member/findpw">비밀번호 찾기</Link>
+              <Link to="/member/find">아이디 | 비밀번호 찾기</Link>
             </Find>
           </Form>
         </FormBox>

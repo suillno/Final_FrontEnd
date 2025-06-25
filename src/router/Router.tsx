@@ -7,8 +7,6 @@ import Dashboard from "../member/memberDetail/Dashboard";
 import Profile from "../member/memberDetail/Profile";
 import Wallet from "../member/memberDetail/Wallet";
 import { Route, Routes } from "react-router-dom";
-import FindId from "../member/memberControl/FindId";
-import FindPw from "../member/memberControl/FindPw";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
 import CartPage from "../member/memberDetail/CartPage";
@@ -67,8 +65,6 @@ function Router() {
 
       {/* 레이아웃 없이 호출 */}
       <Route path="/member" element={<PublicLayout />}>
-        <Route path="findid" element={<FindId />} />
-        <Route path="findpw" element={<FindPw />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route path="find" element={<Find />} />
