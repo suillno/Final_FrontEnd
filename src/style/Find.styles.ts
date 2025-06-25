@@ -47,19 +47,34 @@ export const Section = styled.section`
     transform: translate(100%, 0);
     right: 50%;
   }
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
 
 export const Panel = styled.div<{ $active: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* transition: all 0.7s ease; */
+  position: relative;
+  /* transition: all 0.2s ease; */
   transform: translateX(
     ${(props: { $active: boolean }) => (props.$active ? "0%" : "100%")}
   );
   opacity: ${(props: { $active: boolean }) => (props.$active ? 1 : 0)};
   pointer-events: ${(props: { $active: boolean }) =>
     props.$active ? "auto" : "none"};
+
+  @media (max-width: 768px) {
+    display: ${(props) => (props.$active ? "flex" : "none")};
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform: translateX(${(props) => (props.$active ? "0%" : "100%")});
+    opacity: ${(props) => (props.$active ? 1 : 0)};
+    pointer-events: ${(props) => (props.$active ? "auto" : "none")};
+  }
 `;
 
 export const FormBox = styled.div`

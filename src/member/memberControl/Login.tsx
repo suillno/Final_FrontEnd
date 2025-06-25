@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
 import axios from "axios";
+import PGLogo from "../../img/PGLogo.png";
 
 // Redux 상태 저장 액션 및 로컬 저장소 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
@@ -21,10 +22,17 @@ import {
   LeftText,
   RightText,
   Find,
+  Logo,
+  SubLogo,
+  SignPanel,
 } from "../../style/Login.styles";
 
 // 아이콘
-import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5";
+import {
+  IoIdCardOutline,
+  IoLockClosedOutline,
+  IoMailOutline,
+} from "react-icons/io5";
 
 // 로그인 페이지 컴포넌트 정의
 export default function LoginPage() {
@@ -42,9 +50,14 @@ export default function LoginPage() {
 
   // 회원가입 폼 상태
   const [registerForm, setRegisterForm] = useState({
-    registerId: "",
-    registerPassword: "",
-    registerConfirmPassword: "",
+    registerId: "", // 아이디
+    registerPassword: "", // 비밀번호
+    registerConfirmPassword: "", // 비밀번호 확인
+    registerName: "", // 이름
+    registerBirth: "", // 생년월일 (예: "1995-08-15")
+    registerEmail: "", // 본인확인 이메일
+    registerEmailCode: "", // 이메일 인증번호
+    registerPhone: "", // 휴대전화 번호
   });
 
   // 디바이스 정보 상태
@@ -143,54 +156,126 @@ export default function LoginPage() {
 
   return (
     <Section className={isSignIn ? "sign-in" : "sign-up"}>
+      <Link className="md:hidden block m-6 hover:invert" to={"/"}>
+        <img src={PGLogo} alt="PG로고" />
+      </Link>
       {/* 회원가입 패널 */}
-      <Panel $active={!isSignIn}>
-        <FormBox className={!isSignIn ? "active" : ""}>
-          <Form onSubmit={onSubmitRegister}>
-            <h2>회원가입</h2>
-            <InputBox>
-              <input
-                type="text"
-                id="registerId"
-                required
-                value={registerForm.registerId}
-                onChange={onChangeRegister}
-              />
-              <label htmlFor="registerId">아이디</label>
-              <IoIdCardOutline />
-            </InputBox>
-            <InputBox>
-              <input
-                type="password"
-                id="registerPassword"
-                required
-                value={registerForm.registerPassword}
-                onChange={onChangeRegister}
-              />
-              <label htmlFor="registerPassword">비밀번호</label>
-              <IoLockClosedOutline />
-            </InputBox>
-            <InputBox>
-              <input
-                type="password"
-                id="registerConfirmPassword"
-                required
-                value={registerForm.registerConfirmPassword}
-                onChange={onChangeRegister}
-              />
-              <label htmlFor="registerConfirmPassword">비밀번호 확인</label>
-              <IoLockClosedOutline />
-            </InputBox>
-            <Button type="submit">회원가입</Button>
-            <ToggleText>
-              계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
-            </ToggleText>
-          </Form>
-        </FormBox>
-      </Panel>
+      <SignPanel $active={!isSignIn}>
+        <Link to={"/"}>
+          <Logo src={PGLogo} alt="PG로고" $visible={!isSignIn} />
+        </Link>
+        <div className="h-[600px] overflow-auto">
+          <FormBox className={!isSignIn ? "active" : ""}>
+            <Form onSubmit={onSubmitRegister}>
+              <h2>회원가입</h2>
+              <InputBox>
+                <input
+                  type="text"
+                  id="registerId"
+                  required
+                  value={registerForm.registerId}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerId">아이디</label>
+                <IoIdCardOutline />
+              </InputBox>
+              <InputBox>
+                <input
+                  type="password"
+                  id="registerPassword"
+                  required
+                  value={registerForm.registerPassword}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerPassword">비밀번호</label>
+                <IoLockClosedOutline />
+              </InputBox>
+              <InputBox>
+                <input
+                  type="password"
+                  id="registerConfirmPassword"
+                  required
+                  value={registerForm.registerConfirmPassword}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerConfirmPassword">비밀번호 확인</label>
+                <IoLockClosedOutline />
+              </InputBox>
+              {/* 이름 */}
+              <InputBox>
+                <input
+                  type="text"
+                  id="registerName"
+                  required
+                  value={registerForm.registerName}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerName">이름</label>
+                <IoIdCardOutline />
+              </InputBox>
+
+              {/* 생년월일 */}
+              <InputBox>
+                <input
+                  type="date"
+                  id="registerBirth"
+                  required
+                  value={registerForm.registerBirth}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerBirth">생년월일</label>
+              </InputBox>
+
+              {/* 이메일 인증 */}
+              <InputBox>
+                <input
+                  type="email"
+                  id="registerEmail"
+                  required
+                  value={registerForm.registerEmail}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerEmail">본인확인 이메일</label>
+                <IoMailOutline />
+              </InputBox>
+
+              {/* 인증번호 입력칸 */}
+              <InputBox>
+                <input
+                  type="text"
+                  id="registerEmailCode"
+                  required
+                  value={registerForm.registerEmailCode}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerEmailCode">인증번호 입력</label>
+              </InputBox>
+
+              {/* 휴대전화 */}
+              <InputBox>
+                <input
+                  type="tel"
+                  id="registerPhone"
+                  required
+                  value={registerForm.registerPhone}
+                  onChange={onChangeRegister}
+                />
+                <label htmlFor="registerPhone">휴대전화</label>
+              </InputBox>
+              <Button type="submit">회원가입</Button>
+              <ToggleText>
+                계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
+              </ToggleText>
+            </Form>
+          </FormBox>
+        </div>
+      </SignPanel>
 
       {/* 로그인 패널 */}
       <Panel $active={isSignIn}>
+        <Link to={"/"}>
+          <SubLogo src={PGLogo} alt="PG로고" $visible={isSignIn} />
+        </Link>
         <FormBox className={isSignIn ? "active" : ""}>
           <Form onSubmit={onSubmitLogin}>
             <h2>로그인</h2>
@@ -228,8 +313,12 @@ export default function LoginPage() {
       </Panel>
 
       {/* 모드별 텍스트 */}
-      <LeftText $visible={isSignIn}>WELCOME BACK!</LeftText>
-      <RightText $visible={!isSignIn}>CREATE ACCOUNT</RightText>
+      <LeftText className="hidden md:block" $visible={isSignIn}>
+        WELCOME BACK!
+      </LeftText>
+      <RightText className="hidden md:block" $visible={!isSignIn}>
+        CREATE ACCOUNT
+      </RightText>
     </Section>
   );
 }

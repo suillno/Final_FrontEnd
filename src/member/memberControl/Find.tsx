@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
+import PGLogo from "../../img/PGLogo.png";
 
 // Redux 액션 및 토큰 저장 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
@@ -25,6 +26,7 @@ import {
 
 // 아이콘
 import { IoIdCardOutline, IoMailOutline } from "react-icons/io5";
+import { Logo, SubLogo } from "../../style/Login.styles";
 
 export default function Find() {
   const dispatch = useDispatch();
@@ -108,8 +110,14 @@ export default function Find() {
 
   return (
     <Section className={isFindId ? "find-id" : "find-pw"}>
+      <Link className="md:hidden block m-6 hover:invert" to={"/"}>
+        <img src={PGLogo} alt="PG로고" />
+      </Link>
       {/* 비밀번호 찾기 */}
       <Panel $active={isFindId}>
+        <Link to="/">
+          <Logo src={PGLogo} alt="로고" $visible={isFindId} />
+        </Link>
         <FormBox className={!isFindId ? "" : "active"}>
           <Form onSubmit={onSubmitFindPw}>
             <h2>비밀번호 찾기</h2>
@@ -147,6 +155,9 @@ export default function Find() {
       </Panel>
       {/* 아이디 찾기 폼 */}
       <Panel $active={!isFindId}>
+        <Link to="/">
+          <SubLogo src={PGLogo} alt="로고" $visible={!isFindId} />
+        </Link>
         <FormBox className={isFindId ? "" : "active"}>
           <Form onSubmit={onSubmitFindId}>
             <h2>아이디 찾기</h2>
@@ -183,8 +194,12 @@ export default function Find() {
           </Form>
         </FormBox>
       </Panel>
-      <RightText $visible={isFindId}>FIND PASSWORD</RightText>
-      <LeftText $visible={!isFindId}>FIND ID</LeftText>
+      <RightText className="hidden md:block" $visible={isFindId}>
+        FIND PASSWORD
+      </RightText>
+      <LeftText className="hidden md:block" $visible={!isFindId}>
+        FIND ID
+      </LeftText>
     </Section>
   );
 }

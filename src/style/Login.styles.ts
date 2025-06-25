@@ -8,6 +8,7 @@ export const Section = styled.section`
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+
   &::before {
     content: "";
     position: absolute;
@@ -18,12 +19,12 @@ export const Section = styled.section`
     transform: translate(35%, 0);
     background-image: linear-gradient(-45deg, #420583 0%, #420583 100%);
     transition: 1s ease-in-out;
-    z-index: 6;
+    z-index: -2;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-bottom-right-radius: max(50vw, 50vh);
     border-top-left-radius: max(50vw, 50vh);
-    z-index: -2;
   }
+
   &::after {
     content: "";
     position: absolute;
@@ -34,6 +35,7 @@ export const Section = styled.section`
     background: url(${bgImage}) no-repeat center center / cover;
     z-index: -3;
   }
+
   &.sign-in::before {
     transform: translate(0, 0);
     right: 50%;
@@ -42,6 +44,10 @@ export const Section = styled.section`
   &.sign-up::before {
     transform: translate(100%, 0);
     right: 50%;
+  }
+
+  @media (max-width: 768px) {
+    display: block;
   }
 `;
 
@@ -57,11 +63,53 @@ export const Panel = styled.div<{ $active: boolean }>`
   opacity: ${(props: { $active: boolean }) => (props.$active ? 1 : 0)};
   pointer-events: ${(props: { $active: boolean }) =>
     props.$active ? "auto" : "none"};
+
+  @media (max-width: 768px) {
+    display: ${(props) => (props.$active ? "flex" : "none")};
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform: translateX(${(props) => (props.$active ? "0%" : "100%")});
+    opacity: ${(props) => (props.$active ? 1 : 0)};
+    pointer-events: ${(props) => (props.$active ? "auto" : "none")};
+  }
+`;
+
+export const SignPanel = styled.div<{ $active: boolean }>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transform: translateX(${(props) => (props.$active ? "0%" : "100%")});
+  opacity: ${(props) => (props.$active ? 1 : 0)};
+  pointer-events: ${(props) => (props.$active ? "auto" : "none")};
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    display: ${(props) => (props.$active ? "flex" : "none")};
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform: translateX(${(props) => (props.$active ? "0%" : "100%")});
+    opacity: ${(props) => (props.$active ? 1 : 0)};
+    pointer-events: ${(props) => (props.$active ? "auto" : "none")};
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
 `;
 
 export const FormBox = styled.div`
-  width: 400px;
+  width: 375px;
   height: 500px;
+  max-height: 600px;
+  overflow-y: auto;
   background-color: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
@@ -101,6 +149,35 @@ export const InputBox = styled.div`
   border-bottom: 2px solid #fff;
   margin-bottom: 20px;
 
+  /* 날짜 전용 커스터마이징 */
+  input[type="date"] {
+    color: transparent;
+    background-color: transparent;
+    padding-right: 2.5rem; /* 아이콘 안 겹치도록 */
+  }
+
+  input[type="date"]:focus,
+  input[type="date"]:valid {
+    color: white;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(2);
+    cursor: pointer;
+    opacity: 1;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    height: 1.2em;
+    width: 1.2em;
+    z-index: 1;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    filter: sepia(1) saturate(10000%) hue-rotate(0deg) brightness(0.9);
+  }
+
   label {
     position: absolute;
     top: 50%;
@@ -115,6 +192,7 @@ export const InputBox = styled.div`
   input:focus ~ label,
   input:valid ~ label {
     top: -5px;
+    font-size: 0.8em;
   }
 
   input {
@@ -124,16 +202,17 @@ export const InputBox = styled.div`
     border: none;
     outline: none;
     font-size: 1em;
-    padding: 0 15px 0 5px;
+    padding: 0 2.5rem 0 5px;
     color: #fff;
   }
 
   svg {
     position: absolute;
-    right: 8px;
+    top: 50%;
+    right: 0.74rem;
+    transform: translateY(-50%);
     color: #fff;
     font-size: 1.2em;
-    top: 20px;
   }
 `;
 
@@ -212,4 +291,50 @@ export const RightText = styled.div<{ $visible: boolean }>`
   pointer-events: none;
   transition: opacity 0.5s ease;
   opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
+`;
+
+// 로고 이미지
+export const Logo = styled.img<{ $visible: boolean }>`
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  width: 100px;
+  z-index: 10;
+
+  /* 애니메이션 */
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  visibility: ${(props) => (props.$visible ? "visible" : "hidden")};
+  transform: translateY(${(props) => (props.$visible ? "0" : "-20px")});
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+
+  &:hover {
+    filter: invert(1);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+// 로고 이미지2
+export const SubLogo = styled.img<{ $visible: boolean }>`
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 100px;
+  z-index: 10;
+
+  /* 애니메이션 */
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  visibility: ${(props) => (props.$visible ? "visible" : "hidden")};
+  transform: translateY(${(props) => (props.$visible ? "0" : "-20px")});
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+
+  &:hover {
+    filter: invert(1);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
