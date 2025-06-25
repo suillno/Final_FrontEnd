@@ -22,6 +22,7 @@ interface GameItem {
 
 // ===============================
 // 🔷 초기 찜목록 더미 데이터
+//     - 이미지 URL은 안전한 placehold.co 도메인 사용
 // ===============================
 const initialWishlist: GameItem[] = [
   {
@@ -29,27 +30,26 @@ const initialWishlist: GameItem[] = [
     title: "Elden Ring",
     price: 59900,
     discountRate: 20,
-    image: "https://via.placeholder.com/150x200?text=Elden+Ring",
+    image: "https://placehold.co/150x200?text=Elden+Ring",
   },
   {
     id: 2,
     title: "God of War",
     price: 49900,
-    image: "https://via.placeholder.com/150x200?text=God+of+War",
+    image: "https://placehold.co/150x200?text=God+of+War",
   },
   {
     id: 3,
     title: "Hades",
     price: 19900,
     discountRate: 10,
-    image: "https://via.placeholder.com/150x200?text=Hades",
+    image: "https://placehold.co/150x200?text=Hades",
   },
 ];
 
 // ===============================
-// 💅 styled-components 정의 (고급 스타일 적용)
+// 💅 styled-components 정의 (페이지 레이아웃 및 카드 스타일)
 // ===============================
-
 const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
@@ -68,6 +68,8 @@ const SectionBox = styled.div`
   border-radius: 12px;
   color: #fff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  margin-top: 100px;
+  margin-bottom: 100px;
 `;
 
 const HeaderRow = styled.div`
@@ -198,23 +200,30 @@ const EmptyMessage = styled.p`
   margin-top: 30px;
 `;
 
+// ===============================
+// 📦 WishList 컴포넌트 구현부
+// ===============================
 const WishList: React.FC = () => {
-  const { isSidebarOpen } = useOutletContext<LayoutContext>();
-  const navigate = useNavigate();
-  const [wishlist, setWishlist] = useState<GameItem[]>(initialWishlist);
+  const { isSidebarOpen } = useOutletContext<LayoutContext>(); // 레이아웃 컨텍스트
+  const navigate = useNavigate(); // 라우터 내비게이션
+  const [wishlist, setWishlist] = useState<GameItem[]>(initialWishlist); // 찜목록 상태
 
+  // 🔸 찜 해제 버튼 클릭 시 항목 제거
   const handleRemove = (id: number) => {
     setWishlist(wishlist.filter((item) => item.id !== id));
   };
 
+  // 🔸 장바구니 담기 버튼 클릭 시 알림
   const handleAddToCart = (game: GameItem) => {
     alert(`"${game.title}" 장바구니에 담았습니다.`);
   };
 
+  // 🔸 게임 이미지 클릭 시 상세페이지로 이동
   const handleViewDetail = (id: number) => {
     navigate(`/game/${id}`);
   };
 
+  // 🔸 상단 버튼 클릭 시 장바구니 페이지로 이동
   const handleGoToCart = () => {
     navigate("/member/CartPage");
   };
@@ -225,7 +234,7 @@ const WishList: React.FC = () => {
         <HeaderRow>
           <Title>찜한 게임 목록</Title>
           <CartMoveButton onClick={handleGoToCart}>
-            장바구니로 이동
+            장바구니로 이동ss
           </CartMoveButton>
         </HeaderRow>
 
@@ -245,6 +254,9 @@ const WishList: React.FC = () => {
                     src={game.image}
                     alt={game.title}
                     onClick={() => handleViewDetail(game.id)}
+                    onError={(e) => {
+                      e.currentTarget.src = "/fallback-image.png"; // 이미지 깨질 경우 대체 이미지
+                    }}
                   />
                   <GameInfo>
                     <GameTitle>{game.title}</GameTitle>

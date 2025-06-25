@@ -48,10 +48,10 @@ function Router() {
           <Route path="profile" element={<Profile />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="CartPage" element={<CartPage />} />
+          <Route path="WishList" element={<WishList />} />
         </Route>
 
         {/* 게임기능 */}
-        <Route path="game/WishList" element={<WishList />} />
         <Route path="game/GameYearList" element={<GameYearList />} />
         <Route path="game/:id" element={<GameDetail />} />
         <Route path="/searchgame" element={<SearchGame />} />
