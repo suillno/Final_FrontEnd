@@ -110,7 +110,7 @@ export default function Find() {
     <Section className={isFindId ? "find-id" : "find-pw"}>
       {/* 비밀번호 찾기 */}
       <Panel $active={isFindId}>
-        <FormBox>
+        <FormBox className={!isFindId ? "" : "active"}>
           <Form onSubmit={onSubmitFindPw}>
             <h2>비밀번호 찾기</h2>
             <InputBox>
@@ -147,7 +147,7 @@ export default function Find() {
       </Panel>
       {/* 아이디 찾기 폼 */}
       <Panel $active={!isFindId}>
-        <FormBox>
+        <FormBox className={isFindId ? "" : "active"}>
           <Form onSubmit={onSubmitFindId}>
             <h2>아이디 찾기</h2>
             <InputBox>
