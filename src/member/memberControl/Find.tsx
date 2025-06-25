@@ -20,6 +20,7 @@ import {
   ToggleText,
   LeftText,
   RightText,
+  Login,
 } from "../../style/Find.styles";
 
 // 아이콘
@@ -30,10 +31,11 @@ export default function Find() {
   const navigate = useNavigate();
 
   // 아이디찾기/비밀번호찾기 모드 전환 상태
-  const [isFindId, setIsFindId] = useState(true);
+  const [isFindId, setIsFindId] = useState(false);
 
   // 아이디찾기 폼 상태
   const [findIdForm, setFindIdForm] = useState({
+    name: "",
     email: "",
   });
 
@@ -106,31 +108,6 @@ export default function Find() {
 
   return (
     <Section className={isFindId ? "find-id" : "find-pw"}>
-      {/* 아이디 찾기 폼 */}
-      <Panel $active={!isFindId}>
-        <FormBox>
-          <Form onSubmit={onSubmitFindId}>
-            <h2>아이디 찾기</h2>
-            <InputBox>
-              <input
-                type="text"
-                id="findId-email"
-                required
-                value={findIdForm.email}
-                onChange={onChangeFindId}
-              />
-              <label htmlFor="email">이메일</label>
-              <IoMailOutline />
-            </InputBox>
-            <Button type="submit">아이디 찾기</Button>
-            <ToggleText>
-              아이디를 알고계신가요?
-              <span onClick={toggleMode}>비밀번호 찾기</span>
-            </ToggleText>
-          </Form>
-        </FormBox>
-      </Panel>
-
       {/* 비밀번호 찾기 */}
       <Panel $active={isFindId}>
         <FormBox>
@@ -162,11 +139,52 @@ export default function Find() {
             <ToggleText>
               아이디를 모르시나요?<span onClick={toggleMode}>아이디 찾기</span>
             </ToggleText>
+            <Login>
+              <Link to="/member/login">로그인 페이지로 돌아가기</Link>
+            </Login>
           </Form>
         </FormBox>
       </Panel>
-      <LeftText $visible={isFindId}>FIND PASSWORD</LeftText>
-      <RightText $visible={!isFindId}>FIND ID</RightText>
+      {/* 아이디 찾기 폼 */}
+      <Panel $active={!isFindId}>
+        <FormBox>
+          <Form onSubmit={onSubmitFindId}>
+            <h2>아이디 찾기</h2>
+            <InputBox>
+              <input
+                type="text"
+                id="findId-name"
+                required
+                value={findIdForm.name}
+                onChange={onChangeFindId}
+              />
+              <label htmlFor="name">사용자 이름</label>
+              <IoIdCardOutline />
+            </InputBox>
+            <InputBox>
+              <input
+                type="text"
+                id="findId-email"
+                required
+                value={findIdForm.email}
+                onChange={onChangeFindId}
+              />
+              <label htmlFor="email">이메일</label>
+              <IoMailOutline />
+            </InputBox>
+            <Button type="submit">아이디 찾기</Button>
+            <ToggleText>
+              아이디를 알고계신가요?
+              <span onClick={toggleMode}>비밀번호 찾기</span>
+            </ToggleText>
+            <Login>
+              <Link to="/member/login">로그인 페이지로 돌아가기</Link>
+            </Login>
+          </Form>
+        </FormBox>
+      </Panel>
+      <RightText $visible={isFindId}>FIND PASSWORD</RightText>
+      <LeftText $visible={!isFindId}>FIND ID</LeftText>
     </Section>
   );
 }

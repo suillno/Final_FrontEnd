@@ -150,7 +150,6 @@ export const Find = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
   margin: 5px 10px;
 
   a {
