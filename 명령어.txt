@@ -22,5 +22,8 @@ code .
 프로젝트 완료시
 yarn build
 
-차트그래프 그리기 위한 의존성 추가
+차트그래프 그리기 위한 의존성 추가 (어드민)
 yarn add recharts
+
+파티클을 위한 의존성 추가 (어드민 뒷쪽 배경)
+yarn add react-tsparticles tsparticles-slim
