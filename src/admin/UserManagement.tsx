@@ -12,17 +12,50 @@ interface LayoutContext {
 }
 
 // 파티클 옵션 설정
+// 파티클 옵션 설정
 const particlesOptions = {
-  fullScreen: { enable: true, zIndex: 0 },
-  background: { color: { value: "#1e1f24" } },
-  particles: {
-    number: { value: 50 },
-    size: { value: 2 },
-    color: { value: "#00eaff" },
-    move: { enable: true, speed: 0.5 },
-    links: { enable: true, color: "#00eaff", distance: 120 },
+  fullScreen: { enable: true, zIndex: 0 }, // 화면 전체에 표시되며, 가장 아래로
+  background: { color: { value: "#1e1f24" } }, // 배경색 유지
+  fpsLimit: 60,
+  interactivity: {
+    events: {
+      onHover: {
+        enable: true,
+        mode: "repulse", // 마우스 반응 효과
+      },
+      resize: true,
+    },
+    modes: {
+      repulse: {
+        distance: 100,
+        duration: 0.4,
+      },
+    },
   },
+  particles: {
+    number: {
+      value: window.innerWidth < 768 ? 30 : 60,
+      density: { enable: true, value_area: 800 },
+    },
+    size: { value: { min: 1, max: 3 } },
+    color: { value: "#00eaff" },
+    move: {
+      enable: true,
+      speed: 0.6,
+      outModes: { default: "bounce" as const },
+    },
+    links: {
+      enable: true,
+      color: "#00eaff",
+      distance: 120,
+      opacity: 0.4,
+    },
+    opacity: { value: 0.3 },
+  },
+  detectRetina: true,
 };
+
+
 
 // 전체 컨테이너
 const Container = styled.div.withConfig({
@@ -70,7 +103,6 @@ const UserManagement: React.FC = () => {
 
       {/* 메인 콘텐츠 */}
       <ContentWrapper>
-        <Title>회원 관리</Title>
         <UserList />
       </ContentWrapper>
     </Container>

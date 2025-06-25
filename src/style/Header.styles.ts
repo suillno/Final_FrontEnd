@@ -98,7 +98,7 @@ export const HideName = styled.a`
 `;
 
 // 드롭다운 스타일 (애니메이션 포함)
-export const Dropdown = styled.div<{ animateOut: boolean }>`
+export const Dropdown = styled.div<{ $animateOut: boolean }>`
   position: absolute;
   top: 50px;
   right: 0;
@@ -110,8 +110,8 @@ export const Dropdown = styled.div<{ animateOut: boolean }>`
   z-index: 2000;
 
   // 열림/닫힘에 따라 애니메이션 선택
-  animation: ${({ animateOut }) =>
-      animateOut ? dropdownFadeOut : dropdownFadeIn}
+  animation: ${({ $animateOut }) =>
+      $animateOut ? dropdownFadeOut : dropdownFadeIn}
     0.5s ease forwards;
 
   a {

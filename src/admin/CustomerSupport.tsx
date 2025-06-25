@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import * as Styled from "./customerSupport/CustomerSupport.styles";
 import { Inquiry, LayoutContext } from "./customerSupport/CustomerSupport.types";
@@ -7,8 +7,9 @@ import InquiryStatusModal from "./customerSupport/InquiryStatusModal";
 import { FaSearch } from "react-icons/fa";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
+import type { Engine } from "tsparticles-engine";
 
-// 초기 표시용 더미 문의 데이터 배열
+// 초기 더미 데이터
 const initialData: Inquiry[] = [
   { id: 1001, status: "처리중", username: "박건우", date: "2025-06-19", content: "서비스 이용 중 오류가 발생했습니다." },
   { id: 1002, status: "완료", username: "이규철", date: "2025-06-18", content: "환불 요청 드립니다." },
@@ -22,28 +23,32 @@ const initialData: Inquiry[] = [
   { id: 1010, status: "처리중", username: "김철수", date: "2025-06-10", content: "상품 불량 문의합니다." },
 ];
 
-const ITEMS_PER_PAGE = 10; // 페이지당 항목 수
+const ITEMS_PER_PAGE = 10;
 
 const CustomerSupport: React.FC = () => {
-  const { isSidebarOpen } = useOutletContext<LayoutContext>(); // 사이드바 상태
+  const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  // 상태 정의
-  const [inquiries, setInquiries] = useState<Inquiry[]>(initialData); // 전체 문의 목록
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null); // 선택된 필터 상태
-  const [search, setSearch] = useState(""); // 검색어
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
-  const [viewContent, setViewContent] = useState<string | null>(null); // 상세 보기용 content
-  const [editTarget, setEditTarget] = useState<Inquiry | null>(null); // 상태 변경 타겟
+  const [inquiries, setInquiries] = useState<Inquiry[]>(initialData);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [viewContent, setViewContent] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<Inquiry | null>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null); // 검색창 ref
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // 상태 필터 클릭 시 선택 상태 토글
+  // 파티클 초기화
+  const particlesInit = useCallback(async (engine: Engine) => {
+    await loadSlim(engine);
+  }, []);
+
+  // 상태 필터 토글
   const handleStatusSelect = (status: string) => {
     setSelectedStatus((prev) => (prev === status ? null : status));
     setCurrentPage(1);
   };
 
-  // 문의 상태 실제 변경 함수
+  // 상태 변경 핸들링
   const handleStatusChange = (newStatus: Inquiry["status"]) => {
     if (editTarget) {
       setInquiries((prev) =>
@@ -55,19 +60,14 @@ const CustomerSupport: React.FC = () => {
     }
   };
 
-  // 검색 실행 (Enter 혹은 아이콘 클릭)
-  const handleSearch = () => {
-    setCurrentPage(1);
-  };
+  const handleSearch = () => setCurrentPage(1);
 
-  // 필터 및 검색 조건에 따른 데이터 필터링
   const filteredData = inquiries.filter(
     (item) =>
       (!selectedStatus || item.status === selectedStatus) &&
       (item.username.includes(search) || item.content.includes(search))
   );
 
-  // 페이지네이션 계산
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -76,35 +76,47 @@ const CustomerSupport: React.FC = () => {
 
   return (
     <Styled.Container $isSidebarOpen={isSidebarOpen}>
-      {/* 파티클 배경 효과 */}
+      {/* 배경 파티클 (화면 전체 적용 + zIndex 0) */}
       <Particles
         id="tsparticles"
-        init={loadSlim}
+        init={particlesInit}
         options={{
-          background: { color: "#1e1f24" },
+          fullScreen: { enable: true, zIndex: 0 },
+          background: { color: { value: "#1e1f24" } },
           fpsLimit: 60,
           interactivity: {
             events: {
-              onClick: { enable: true, mode: "repulse" }
+              onHover: { enable: true, mode: "repulse" },
+              resize: true,
             },
-            modes: { repulse: { distance: 100 } }
+            modes: {
+              repulse: { distance: 100, duration: 0.4 },
+            },
           },
           particles: {
+            number: {
+              value: window.innerWidth < 768 ? 30 : 60,
+              density: { enable: true, value_area: 800 },
+            },
             color: { value: "#00eaff" },
-            links: { color: "#00eaff", distance: 100, enable: true },
-            move: { enable: true, speed: 1 },
+            links: {
+              enable: true,
+              color: "#00eaff",
+              distance: 120,
+              opacity: 0.4,
+            },
+            move: { enable: true, speed: 1.5 },
             size: { value: 2 },
-            number: { value: 30 }
+            opacity: { value: 0.3 },
           },
           detectRetina: true,
         }}
       />
 
+      {/* 메인 콘텐츠 */}
       <Styled.InnerWrapper>
-        {/* 제목 */}
-        <Styled.Title style={{marginTop: "100px"}}>고객 문의 관리</Styled.Title>
+        <Styled.Title style={{ marginTop: "100px" }}>고객 문의 관리</Styled.Title>
 
-        {/* 상태 필터 (대기/처리중/완료) */}
         <Styled.FilterBox>
           {["대기", "처리중", "완료"].map((status) => (
             <label key={status}>
@@ -118,7 +130,6 @@ const CustomerSupport: React.FC = () => {
           ))}
         </Styled.FilterBox>
 
-        {/* 검색창 */}
         <Styled.SearchBar>
           <Styled.SearchInput
             ref={inputRef}
@@ -134,7 +145,6 @@ const CustomerSupport: React.FC = () => {
           </Styled.SearchIcon>
         </Styled.SearchBar>
 
-        {/* 테이블 */}
         <Styled.Table>
           <thead>
             <tr>
@@ -168,7 +178,6 @@ const CustomerSupport: React.FC = () => {
           </tbody>
         </Styled.Table>
 
-        {/* 페이지네이션 */}
         <Styled.Pagination>
           {Array.from({ length: totalPages }, (_, i) => (
             <button
@@ -182,7 +191,6 @@ const CustomerSupport: React.FC = () => {
         </Styled.Pagination>
       </Styled.InnerWrapper>
 
-      {/* 상세 내용 모달 */}
       {viewContent && (
         <InquiryViewModal
           content={viewContent}
@@ -190,7 +198,6 @@ const CustomerSupport: React.FC = () => {
         />
       )}
 
-      {/* 상태 변경 모달 */}
       {editTarget && (
         <InquiryStatusModal
           target={editTarget}

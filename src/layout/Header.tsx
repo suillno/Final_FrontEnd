@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
         <LoginOut />
 
         {isDropdownVisible && (
-          <Dropdown animateOut={isAnimatingOut}>
+          <Dropdown $animateOut={isAnimatingOut}>
             <Link to="/member/profile">Profile</Link>
             <Link to="/member/dashboard">Dashboard</Link>
             <Link to="/member/library">Library</Link>
