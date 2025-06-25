@@ -76,7 +76,6 @@ const GameYearList: React.FC = () => {
     apiGetGameYear("2024", pageCount)
       .then((res) => {
         // 기존 게임 결과에 새 결과 추가
-        console.log("응답 데이터:", res);
         if (!res) return;
         const results = [...gameResponse.results, ...res.results];
         setGameResponse({ ...res, results });

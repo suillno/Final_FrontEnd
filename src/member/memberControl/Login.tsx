@@ -1,14 +1,15 @@
-// Login.tsx
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
 import axios from "axios";
-// Redux 액션 및 토큰 저장 유틸
+
+// Redux 상태 저장 액션 및 로컬 저장소 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
 import { setCurrentUser } from "../../components/auth/helper/storage";
-// 스타일 컴포넌트
+
+// 스타일 컴포넌트 불러오기
 import {
   Section,
   Panel,
@@ -25,34 +26,35 @@ import {
 // 아이콘
 import { IoIdCardOutline, IoLockClosedOutline } from "react-icons/io5";
 
+// 로그인 페이지 컴포넌트 정의
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 로그인/회원가입 모드 전환 상태
+  // 로그인/회원가입 모드 상태 (true면 로그인 화면)
   const [isSignIn, setIsSignIn] = useState(true);
 
   // 로그인 폼 상태
   const [loginForm, setLoginForm] = useState({
-    id: "",
-    password: "",
+    loginId: "",
+    loginPassword: "",
   });
 
   // 회원가입 폼 상태
   const [registerForm, setRegisterForm] = useState({
-    id: "",
-    password: "",
-    confirmPassword: "",
+    registerId: "",
+    registerPassword: "",
+    registerConfirmPassword: "",
   });
 
   // 디바이스 정보 상태
   const [deviceInfo, setDeviceInfo] = useState({
-    deviceId: uuidv4(),
+    deviceId: uuidv4(), // 랜덤 UUID 생성
     deviceType: "",
-    notificationToken: uuidv4(),
+    notificationToken: uuidv4(), // 알림 토큰 대체용 UUID
   });
 
-  // 운영체제 감지하여 deviceType 설정
+  // 브라우저의 OS명을 기반으로 deviceType 설정
   useEffect(() => {
     let device = "";
     switch (osName) {
@@ -71,37 +73,39 @@ export default function LoginPage() {
       default:
         device = "OTHERS";
     }
+
+    // deviceType 업데이트
     setDeviceInfo((prev) => ({
       ...prev,
       deviceType: device,
     }));
   }, []);
 
-  // 모드 전환
+  // 로그인/회원가입 모드 전환 함수
   const toggleMode = () => {
     setIsSignIn(!isSignIn);
   };
 
-  // 로그인 폼 입력값 변경
+  // 로그인 입력 필드 변경 핸들러
   const onChangeLogin = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setLoginForm({ ...loginForm, [id]: value });
   };
 
-  // 회원가입 폼 입력값 변경
+  // 회원가입 입력 필드 변경 핸들러
   const onChangeRegister = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setRegisterForm({ ...registerForm, [id]: value });
   };
 
-  // 로그인 요청 처리
+  // 로그인 폼 제출 처리
   const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      // 서버로 전송할 데이터 구성
+      // 서버로 보낼 로그인 데이터 구성
       const loginData = {
-        username: loginForm.id,
-        password: loginForm.password,
+        username: loginForm.loginId,
+        password: loginForm.loginPassword,
         deviceInfo: deviceInfo,
       };
 
@@ -112,18 +116,18 @@ export default function LoginPage() {
       );
       const { accessToken, tokenType } = res.data;
 
-      // 로그인 후 사용자 정보 조회
+      // 사용자 정보 요청
       const userRes = await axios.get("http://localhost:8080/api/user/me", {
         headers: {
           Authorization: `${tokenType}${accessToken}`,
         },
       });
 
-      // 토큰 및 사용자 정보 저장
+      // 사용자 정보 및 토큰 저장
       setCurrentUser(res.data);
       dispatch(setUserInfo(userRes.data));
 
-      // 홈으로 이동
+      // 로그인 성공 시 홈으로 이동
       navigate("/");
     } catch (err) {
       console.error("로그인 실패", err);
@@ -131,7 +135,7 @@ export default function LoginPage() {
     }
   };
 
-  // 회원가입 요청 처리 (현재는 콘솔 출력만)
+  // 회원가입 폼 제출 처리 (현재는 서버 연동 없음)
   const onSubmitRegister = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("회원가입 시도:", registerForm);
@@ -139,7 +143,7 @@ export default function LoginPage() {
 
   return (
     <Section className={isSignIn ? "sign-in" : "sign-up"}>
-      {/* 회원가입 폼 */}
+      {/* 회원가입 패널 */}
       <Panel $active={!isSignIn}>
         <FormBox>
           <Form onSubmit={onSubmitRegister}>
@@ -147,34 +151,34 @@ export default function LoginPage() {
             <InputBox>
               <input
                 type="text"
-                id="register-id"
+                id="registerId"
                 required
-                value={registerForm.id}
+                value={registerForm.registerId}
                 onChange={onChangeRegister}
               />
-              <label htmlFor="id">아이디</label>
+              <label htmlFor="registerId">아이디</label>
               <IoIdCardOutline />
             </InputBox>
             <InputBox>
               <input
                 type="password"
-                id="register-password"
+                id="registerPassword"
                 required
-                value={registerForm.password}
+                value={registerForm.registerPassword}
                 onChange={onChangeRegister}
               />
-              <label htmlFor="password">비밀번호</label>
+              <label htmlFor="registerPassword">비밀번호</label>
               <IoLockClosedOutline />
             </InputBox>
             <InputBox>
               <input
                 type="password"
-                id="confirmPassword"
+                id="registerConfirmPassword"
                 required
-                value={registerForm.confirmPassword}
+                value={registerForm.registerConfirmPassword}
                 onChange={onChangeRegister}
               />
-              <label htmlFor="confirmPassword">비밀번호 확인</label>
+              <label htmlFor="registerConfirmPassword">비밀번호 확인</label>
               <IoLockClosedOutline />
             </InputBox>
             <Button type="submit">회원가입</Button>
@@ -185,7 +189,7 @@ export default function LoginPage() {
         </FormBox>
       </Panel>
 
-      {/* 로그인 폼 */}
+      {/* 로그인 패널 */}
       <Panel $active={isSignIn}>
         <FormBox>
           <Form onSubmit={onSubmitLogin}>
@@ -193,23 +197,23 @@ export default function LoginPage() {
             <InputBox>
               <input
                 type="text"
-                id="login-id"
+                id="loginId"
                 required
-                value={loginForm.id}
+                value={loginForm.loginId}
                 onChange={onChangeLogin}
               />
-              <label htmlFor="id">아이디</label>
+              <label htmlFor="loginId">아이디</label>
               <IoIdCardOutline />
             </InputBox>
             <InputBox>
               <input
                 type="password"
-                id="login-password"
+                id="loginPassword"
                 required
-                value={loginForm.password}
+                value={loginForm.loginPassword}
                 onChange={onChangeLogin}
               />
-              <label htmlFor="password">비밀번호</label>
+              <label htmlFor="loginPassword">비밀번호</label>
               <IoLockClosedOutline />
             </InputBox>
             <Button type="submit">로그인</Button>
@@ -223,6 +227,8 @@ export default function LoginPage() {
           </Form>
         </FormBox>
       </Panel>
+
+      {/* 모드별 텍스트 */}
       <LeftText $visible={isSignIn}>WELCOME BACK!</LeftText>
       <RightText $visible={!isSignIn}>CREATE ACCOUNT</RightText>
     </Section>
