@@ -2,188 +2,125 @@ import React from "react";
 import styled from "styled-components";
 import { User } from "./UserService";
 
-// Props 타입 정의: 유저 정보(User)와 닫기 함수(onClose)를 받음
+// =======================
+// 스타일 컴포넌트 정의
+// =======================
+
+/**
+ * 모달의 배경 오버레이
+ * 클릭 시 모달을 닫을 수 있도록 전체 화면을 덮는 반투명한 배경
+ */
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); // 어두운 반투명 배경
+  z-index: 999; // 모달보다 한 단계 아래 레이어
+`;
+
+/**
+ * 모달 내용 박스
+ * 화면 중앙에 고정되며, 다크 테마 배경 및 그림자 처리 포함
+ */
+const ModalBox = styled.div`
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%); // 정확한 중앙 정렬
+  background: #2b2e33;             // 다크 배경
+  border: 1px solid #444;          // 외곽 테두리
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  z-index: 1000;                   // 오버레이 위에 위치
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); // 그림자 효과
+`;
+
+/**
+ * 모달 닫기 버튼
+ * 오른쪽 상단에 위치하며 마우스 오버 시 색상 강조
+ */
+const CloseButton = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  color: #aaa;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+  }
+`;
+
+/**
+ * 사용자 정보를 행 단위로 나열하기 위한 컨테이너
+ * 각 항목은 라벨(굵은 글씨)과 값으로 구성됨
+ */
+const InfoRow = styled.div`
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 0.95rem;
+
+  span {
+    font-weight: bold;
+    color: #00eaff;
+    margin-right: 0.5rem;
+  }
+`;
+
+// =======================
+// 컴포넌트 정의
+// =======================
+
+/**
+ * Props 타입 정의
+ * - user: 선택된 사용자 정보 (null일 수 있음)
+ * - onClose: 모달 닫기 이벤트 핸들러
+ */
 interface Props {
   user: User | null;
   onClose: () => void;
 }
 
-/* ===== 스타일 정의 (styled-components) ===== */
-
-// 화면 전체를 덮는 어두운 배경 오버레이
-const Overlay = styled.div`
-  position: fixed;
-  inset: 0; /* top, right, bottom, left 모두 0 */
-  background: rgba(0, 0, 0, 0.6); /* 반투명 검정 배경 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-// 모달 본체 (어두운 배경, 둥근 모서리, 그림자)
-const ModalContainer = styled.div`
-  background: #1f1f1f;
-  color: #fff;
-  width: 100%;
-  max-width: 900px;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-`;
-
-// 상단 타이틀 영역
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #444;
-  padding-bottom: 0.75rem;
-`;
-
-// 타이틀 텍스트
-const Title = styled.h2`
-  font-size: 1.5rem;
-  font-weight: bold;
-`;
-
-// 상단 ✕ 닫기 버튼
-const CloseIcon = styled.button`
-  font-size: 1.2rem;
-  color: #aaa;
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: #f87171; /* hover 시 붉은색 */
-  }
-`;
-
-// 유저 정보 전체 리스트를 감싸는 컨테이너
-const InfoList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  font-size: 1rem;
-`;
-
-// 각 유저 정보 라인 (레이블 + 값)
-const InfoRow = styled.div`
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #333;
-  padding-bottom: 0.5rem;
-`;
-
-// 정보 항목 이름
-const Label = styled.div`
-  width: 120px;
-  color: #aaa;
-  font-weight: 500;
-`;
-
-// 정보 값
-const Value = styled.div`
-  font-weight: 600;
-`;
-
-// 권한 / 상태 등 배지 스타일
-const Badge = styled.span<{ bg: string }>`
-  background-color: ${({ bg }) => bg};
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: white;
-`;
-
-// 하단 버튼 영역 (닫기 버튼 전용)
-const Footer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #444;
-`;
-
-// 닫기 버튼
-const CloseButton = styled.button`
-  background-color: #3b82f6;
-  color: #fff;
-  padding: 0.6rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: bold;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #2563eb;
-  }
-`;
-
-/* ===== 컴포넌트 정의 ===== */
+/**
+ * 유저 상세 정보를 표시하는 모달 컴포넌트
+ * props로 전달받은 user 객체가 존재할 경우만 렌더링됨
+ */
 const UserDetailModal: React.FC<Props> = ({ user, onClose }) => {
-  // 유저 정보가 없을 경우 렌더링하지 않음
+  // 유저 정보가 없으면 아무것도 렌더링하지 않음
   if (!user) return null;
 
   return (
-    <Overlay>
-      <ModalContainer>
-        {/* 상단 헤더 */}
-        <Header>
-          <Title>👤 유저 상세 정보</Title>
-          <CloseIcon onClick={onClose}>✕</CloseIcon>
-        </Header>
+    <>
+      {/* 배경 오버레이 클릭 시 모달 닫기 */}
+      <ModalOverlay onClick={onClose} />
 
-        {/* 유저 정보 리스트 */}
-        <InfoList>
-          <InfoRow>
-            <Label>ID</Label>
-            <Value>{user.id}</Value>
-          </InfoRow>
-          <InfoRow>
-            <Label>이름</Label>
-            <Value>{user.username}</Value>
-          </InfoRow>
-          <InfoRow>
-            <Label>이메일</Label>
-            <Value>{user.email}</Value>
-          </InfoRow>
-          <InfoRow>
-            <Label>권한</Label>
-            <Badge bg={user.role === "ADMIN" ? "#2563eb" : "#666"}>
-              🛡 {user.role}
-            </Badge>
-          </InfoRow>
-          <InfoRow>
-            <Label>상태</Label>
-            <Badge bg={user.status === "ACTIVE" ? "#16a34a" : "#dc2626"}>
-              {user.status === "ACTIVE" ? "✅ 활성" : "⛔ 정지"}
-            </Badge>
-          </InfoRow>
-          <InfoRow>
-            <Label>가입일</Label>
-            <Value>{user.createdAt || "2024-01-01"}</Value>
-          </InfoRow>
-          <InfoRow>
-            <Label>전화번호</Label>
-            <Value>{user.phone || "010-1234-5678"}</Value>
-          </InfoRow>
-          <InfoRow>
-            <Label>주소</Label>
-            <Value>{user.address || "서울특별시 강남구"}</Value>
-          </InfoRow>
-        </InfoList>
+      {/* 모달 내용 상자 */}
+      <ModalBox onClick={(e) => e.stopPropagation()}>
+        {/* 상단 제목 */}
+        <CloseButton onClick={onClose}>✖</CloseButton>
+        <h2 style={{ color: "#00eaff", marginBottom: "1.5rem" }}>
+          👤 유저 상세 정보
+        </h2>
 
-        {/* 하단 닫기 버튼 */}
-        <Footer>
-          <CloseButton onClick={onClose}>닫기</CloseButton>
-        </Footer>
-      </ModalContainer>
-    </Overlay>
+        {/* 각 항목별 사용자 정보 출력 */}
+        <InfoRow><span>ID:</span>{user.id}</InfoRow>
+        <InfoRow><span>이름:</span>{user.username}</InfoRow>
+        <InfoRow><span>이메일:</span>{user.email}</InfoRow>
+        <InfoRow><span>권한:</span>{user.role}</InfoRow>
+        <InfoRow>
+          <span>상태:</span>
+          {user.status === "ACTIVE" ? "✅ 활성" : "⛔ 정지"}
+        </InfoRow>
+        <InfoRow><span>전화번호:</span>{user.phone || "없음"}</InfoRow>
+        <InfoRow><span>주소:</span>{user.address || "없음"}</InfoRow>
+        <InfoRow><span>가입일:</span>{user.createdAt || "N/A"}</InfoRow>
+      </ModalBox>
+    </>
   );
 };
 

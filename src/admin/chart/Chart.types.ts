@@ -22,3 +22,4 @@ export interface VisitorCount {
   today: number;
   total: number;
 }
+

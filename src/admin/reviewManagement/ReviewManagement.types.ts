@@ -9,3 +9,4 @@ export interface Review {
 export interface LayoutContext {
   isSidebarOpen: boolean;
 }
+
