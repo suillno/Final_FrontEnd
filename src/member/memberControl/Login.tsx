@@ -145,7 +145,7 @@ export default function LoginPage() {
     <Section className={isSignIn ? "sign-in" : "sign-up"}>
       {/* 회원가입 패널 */}
       <Panel $active={!isSignIn}>
-        <FormBox>
+        <FormBox className={!isSignIn ? "active" : ""}>
           <Form onSubmit={onSubmitRegister}>
             <h2>회원가입</h2>
             <InputBox>
@@ -191,7 +191,7 @@ export default function LoginPage() {
 
       {/* 로그인 패널 */}
       <Panel $active={isSignIn}>
-        <FormBox>
+        <FormBox className={isSignIn ? "active" : ""}>
           <Form onSubmit={onSubmitLogin}>
             <h2>로그인</h2>
             <InputBox>

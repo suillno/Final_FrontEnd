@@ -49,7 +49,8 @@ export const Panel = styled.div<{ $active: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.7s ease;
+  position: relative;
+  /* transition: all 0.2s ease; */
   transform: translateX(
     ${(props: { $active: boolean }) => (props.$active ? "0%" : "100%")}
   );
@@ -69,6 +70,14 @@ export const FormBox = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 1s;
+  transition-delay: 1000ms;
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
 `;
 
 export const Form = styled.form`
@@ -187,7 +196,7 @@ export const LeftText = styled.div<{ $visible: boolean }>`
   color: rgba(255, 255, 255, 255);
   user-select: none;
   pointer-events: none;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.5s ease;
   opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
 `;
 
@@ -201,6 +210,6 @@ export const RightText = styled.div<{ $visible: boolean }>`
   color: rgba(255, 255, 255, 255);
   user-select: none;
   pointer-events: none;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.5s ease;
   opacity: ${(props: { $visible: any }) => (props.$visible ? 1 : 0)};
 `;

@@ -53,7 +53,7 @@ export const Panel = styled.div<{ $active: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.7s ease;
+  /* transition: all 0.7s ease; */
   transform: translateX(
     ${(props: { $active: boolean }) => (props.$active ? "0%" : "100%")}
   );
@@ -73,6 +73,14 @@ export const FormBox = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 1s;
+  transition-delay: 1000ms;
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
 `;
 
 export const Form = styled.form`
