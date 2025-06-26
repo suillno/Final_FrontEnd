@@ -23,38 +23,33 @@ import {
   RightText,
   Login,
 } from "../../style/Find.styles";
+import { Logo, SubLogo } from "../../style/Login.styles";
 
 // 아이콘
 import { IoIdCardOutline, IoMailOutline } from "react-icons/io5";
-import { Logo, SubLogo } from "../../style/Login.styles";
 
 export default function Find() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 아이디찾기/비밀번호찾기 모드 전환 상태
-  const [isFindId, setIsFindId] = useState(false);
+  const [isFindId, setIsFindId] = useState(false); // false = 비밀번호 찾기, true = 아이디 찾기
 
-  // 아이디찾기 폼 상태
   const [findIdForm, setFindIdForm] = useState({
     name: "",
     email: "",
   });
 
-  // 비밀번호 찾기 폼 상태
   const [findPwForm, setFindPwForm] = useState({
     id: "",
     email: "",
   });
 
-  // 디바이스 정보 상태
   const [deviceInfo, setDeviceInfo] = useState({
     deviceId: uuidv4(),
     deviceType: "",
     NotificationToken: uuidv4(),
   });
 
-  // 운영체제 감지하여 deviceType 설정
   useEffect(() => {
     let device = "";
     switch (osName) {
@@ -79,33 +74,26 @@ export default function Find() {
     }));
   }, []);
 
-  // 모드 전환
-  const toggleMode = () => {
-    setIsFindId(!isFindId);
-  };
+  const toggleMode = () => setIsFindId(!isFindId);
 
-  // 아이디찾기 폼 입력값 변경
   const onChangeFindId = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFindIdForm({ ...findIdForm, [id]: value });
   };
 
-  // 비밀번호찾기 폼 입력값 변경
   const onChangeFindPw = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFindPwForm({ ...findPwForm, [id]: value });
   };
 
-  // 아이디찾기 요청 처리 (현재는 콘솔 출력만)
-  const onSubmitFindPw = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitFindId = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("아이디찾기 시도:", findIdForm);
   };
 
-  // 아이디찾기 요청 처리 (현재는 콘솔 출력만)
-  const onSubmitFindId = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitFindPw = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("아이디찾기 시도:", findIdForm);
+    console.log("비밀번호찾기 시도:", findPwForm);
   };
 
   return (
@@ -113,7 +101,8 @@ export default function Find() {
       <Link className="md:hidden block m-6 hover:invert" to={"/"}>
         <img src={PGLogo} alt="PG로고" />
       </Link>
-      {/* 비밀번호 찾기 */}
+
+      {/* 비밀번호 찾기 패널 */}
       <Panel $active={isFindId}>
         <Link to="/">
           <Logo src={PGLogo} alt="로고" $visible={isFindId} />
@@ -124,7 +113,7 @@ export default function Find() {
             <InputBox>
               <input
                 type="text"
-                id="findPw-id"
+                id="id"
                 required
                 value={findPwForm.id}
                 onChange={onChangeFindPw}
@@ -135,7 +124,7 @@ export default function Find() {
             <InputBox>
               <input
                 type="text"
-                id="findPw-email"
+                id="email"
                 required
                 value={findPwForm.email}
                 onChange={onChangeFindPw}
@@ -145,7 +134,8 @@ export default function Find() {
             </InputBox>
             <Button type="submit">비밀번호 찾기</Button>
             <ToggleText>
-              아이디를 모르시나요?<span onClick={toggleMode}>아이디 찾기</span>
+              아이디를 모르시나요?
+              <span onClick={toggleMode}>아이디 찾기</span>
             </ToggleText>
             <Login>
               <Link to="/member/login">로그인 페이지로 돌아가기</Link>
@@ -153,7 +143,8 @@ export default function Find() {
           </Form>
         </FormBox>
       </Panel>
-      {/* 아이디 찾기 폼 */}
+
+      {/* 아이디 찾기 패널 */}
       <Panel $active={!isFindId}>
         <Link to="/">
           <SubLogo src={PGLogo} alt="로고" $visible={!isFindId} />
@@ -164,7 +155,7 @@ export default function Find() {
             <InputBox>
               <input
                 type="text"
-                id="findId-name"
+                id="name"
                 required
                 value={findIdForm.name}
                 onChange={onChangeFindId}
@@ -175,7 +166,7 @@ export default function Find() {
             <InputBox>
               <input
                 type="text"
-                id="findId-email"
+                id="email"
                 required
                 value={findIdForm.email}
                 onChange={onChangeFindId}
@@ -194,6 +185,7 @@ export default function Find() {
           </Form>
         </FormBox>
       </Panel>
+
       <RightText className="hidden md:block" $visible={isFindId}>
         FIND PASSWORD
       </RightText>

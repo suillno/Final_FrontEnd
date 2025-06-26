@@ -221,7 +221,7 @@ const GameDetail = () => {
                       <button className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2">
                         장바구니
                       </button>
-                      <button className="bg-white hover:bg-gray-100 text-black font-bold py-2 px-5 rounded shadow border border-gray-300">
+                      <button className="bg-white hover:bg-gray-400 text-black font-bold py-2 px-5 rounded shadow border border-gray-300">
                         위시리스트
                       </button>
                     </div>
