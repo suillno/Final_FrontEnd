@@ -29,9 +29,11 @@ import {
 
 // 아이콘
 import {
+  IoCheckmarkCircleOutline,
   IoIdCardOutline,
   IoLockClosedOutline,
   IoMailOutline,
+  IoPhonePortraitOutline,
 } from "react-icons/io5";
 
 // 로그인 페이지 컴포넌트 정의
@@ -249,6 +251,7 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmailCode">인증번호 입력</label>
+                <IoCheckmarkCircleOutline />
               </InputBox>
 
               {/* 휴대전화 */}
@@ -261,6 +264,7 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerPhone">휴대전화</label>
+                <IoPhonePortraitOutline />
               </InputBox>
               <Button type="submit">회원가입</Button>
               <ToggleText>
