@@ -1,4 +1,3 @@
-// 게임 상세 페이지 (GameDetail.tsx)
 import { useParams } from "react-router-dom";
 import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 import { useEffect, useState } from "react";
@@ -14,58 +13,54 @@ import styled from "styled-components";
 import Loader from "../components/common/Loader";
 import SteamPrice from "../components/api/SteamPrice";
 import SimpleSlider from "../components/common/Slick";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../components/auth/store/userInfo";
+import axios from "axios";
+import { getCurrentUser } from "../components/auth/helper/storage";
 
-// 본문 전체 영역 스타일 (이전 dominant_color 제거, 고정 배경색 사용)
+// 본문 전체 영역 스타일 정의
 const ContentContainer = styled.div`
   background-color: #1e1f24;
   border-radius: 12px;
-
   @media (max-width: 768px) {
     font-size: 0.875rem;
   }
-
   @media (max-width: 468px) {
     font-size: 0.7em;
     max-height: 180px;
   }
 `;
 
-// 게임 소개 텍스트 영역
+// 게임 설명 섹션
 const GameAbout = styled.div`
   margin: 5%;
   overflow-y: auto;
   max-height: 500px;
-
   @media (max-width: 768px) {
     max-height: 250px;
   }
-
   @media (max-width: 468px) {
     max-height: 200px;
   }
-
   h2 {
     @media (max-width: 768px) {
       font-size: 1.5rem;
     }
-
     @media (max-width: 468px) {
       font-size: 1.3em;
     }
   }
 `;
 
-// 내용 좌우 정렬, 모바일일 경우 세로 배치
+// 게임 소개와 상세 정보의 배치
 const AboutBetween = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 2rem;
-
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
   }
-
   @media (max-width: 468px) {
     flex-direction: column;
     align-items: center;
@@ -73,48 +68,45 @@ const AboutBetween = styled.div`
   }
 `;
 
-// 섹션 구분 줄 (하얀 반투명 선)
+// 구분 선 스타일
 const WhiteLine = styled.div`
   border-top: 1px solid rgba(255, 255, 255, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 `;
 
-// 모바일 환경 하단 여백 확보용
-const ShopMobile = styled.div`
-  @media (max-width: 768px) {
-    padding-bottom: 20%;
-  }
-`;
-
-// 게임 상세 페이지 컴포넌트
 const GameDetail = () => {
-  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
-  const { id } = useParams(); // 게임 ID 추출
-  const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult); // 게임 상세 정보
-  const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault); // 게임 이미지
+  const userInfo = useSelector(selectUserInfo); // 로그인 유저 정보
+  const { id } = useParams(); // URL에서 게임 ID 추출
+  const [isLoading, setIsLoading] = useState(false);
+  const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult); // 게임 정보
+  const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault); // 이미지 리스트
+  const [priceValue, setPriceValue] = useState(0); // 숫자 가격
+  const [priceText, setPriceText] = useState("로딩 중..."); // 표시용 문자열
+  const [rating, setRating] = useState(0); // 별점 상태
+  const [reviewText, setReviewText] = useState(""); // 리뷰 텍스트
+  const [reviews, setReviews] = useState<{ rating: number; text: string }[]>(
+    []
+  );
 
-  // 초기 mount 시 게임 상세 정보 및 이미지 요청
   useEffect(() => {
-    GetGameDetail();
+    fetchGameDetail();
   }, []);
 
-  // 상세 정보 및 이미지 API 요청
-  const GetGameDetail = () => {
+  // 상세 정보 및 이미지 요청
+  const fetchGameDetail = () => {
     if (!id) return;
     setIsLoading(true);
-
     apiGetGameImg(id).then((resImg) => setGameImg(resImg));
     apiGetGameDetail(id)
       .then((res) => setGameDetail(res))
       .finally(() => setIsLoading(false));
   };
 
-  // 리뷰 상태
-  const [rating, setRating] = useState<number>(0);
-  const [reviewText, setReviewText] = useState<string>("");
-  const [reviews, setReviews] = useState<{ rating: number; text: string }[]>(
-    []
-  );
+  // 가격 정보 수신 핸들러
+  const handlePriceFetch = (numeric: number, formatted: string) => {
+    setPriceValue(numeric);
+    setPriceText(formatted);
+  };
 
   // 리뷰 등록
   const submitReview = () => {
@@ -122,10 +114,46 @@ const GameDetail = () => {
       alert("평점과 리뷰를 모두 입력해 주세요.");
       return;
     }
-
     setReviews([...reviews, { rating, text: reviewText }]);
     setRating(0);
     setReviewText("");
+  };
+
+  // 장바구니 저장 요청
+  const cartSave = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+
+    const cartData = {
+      userName: userInfo.username,
+      gameId: gameDetail.id,
+      title: gameDetail.name,
+      backgroundImage: gameDetail.background_image,
+      price: priceValue,
+      salePrice: 0,
+    };
+
+    const token = getCurrentUser();
+    console.log(token);
+
+    if (token && token?.accessToken) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/game/member/cartsave",
+          cartData,
+          {
+            headers: {
+              Authorization: `${token.tokenType}${token.accessToken}`, // 토큰 포함
+            },
+          }
+        );
+        alert("장바구니에 담겼습니다!");
+      } catch (error) {
+        alert("장바구니 등록 중 오류가 발생했습니다.");
+      }
+    }
   };
 
   return (
@@ -169,7 +197,10 @@ const GameDetail = () => {
 
                   <div className="font-bold text-gray-400">정상가</div>
                   <div>
-                    <SteamPrice gameName={gameDetail.name} />
+                    <SteamPrice
+                      gameName={gameDetail.name}
+                      onPriceFetched={handlePriceFetch}
+                    />
                   </div>
 
                   <div className="font-bold text-gray-400">출시일</div>
@@ -218,7 +249,10 @@ const GameDetail = () => {
                   {/* 장바구니 & 위시리스트 버튼 */}
                   <div className="my-2 text-center">
                     <div className="inline-block whitespace-nowrap">
-                      <button className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2">
+                      <button
+                        onClick={cartSave}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
+                      >
                         장바구니
                       </button>
                       <button className="bg-white hover:bg-gray-400 text-black font-bold py-2 px-5 rounded shadow border border-gray-300">

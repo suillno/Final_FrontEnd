@@ -61,12 +61,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <MenuItem className="font-bold">
           <Link to="/">Home</Link>
         </MenuItem>
-        <MenuItem>Reviews</MenuItem>
-        <MenuItem className="font-bold">
-          <Link to="/member/security">suillno</Link>
-        </MenuItem>
-        <MenuItem>Wishlist</MenuItem>
-        <MenuItem>My Library</MenuItem>
       </Section>
 
       {/* 인기 게임 관련 섹션 */}

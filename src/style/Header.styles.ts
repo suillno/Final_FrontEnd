@@ -45,6 +45,11 @@ export const SidebarIcon = styled.img`
   width: 30px;
   height: 30px;
   filter: invert(1); // 흰색화 처리
+
+  &:hover {
+    filter: invert(87%) sepia(3%) saturate(72%) hue-rotate(197deg)
+      brightness(122%) contrast(67%);
+  }
 `;
 
 // 로고 이미지
@@ -87,13 +92,13 @@ export const HeaderRight = styled.div`
   }
 `;
 
-// 닉네임 텍스트 (모바일에서는 숨김)
+// 닉네임 텍스트
 export const HideName = styled.a`
   font-size: 1rem;
   cursor: pointer;
 
   @media (max-width: 768px) {
-    display: none;
+    font-size: 0.875rem;
   }
 `;
 

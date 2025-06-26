@@ -24,12 +24,16 @@ export const removeCurrentUser = (): void => {
 };
 
 // 사용자 정보 불러오기
-export const getCurrentUser = (): User | null => {
+export const getCurrentUser = () => {
+  let user: any = "";
   try {
-    const stored = localStorage.getItem("user");
-    return stored ? (JSON.parse(stored) as User) : null;
+    user =
+      localStorage.getItem("user") != null
+        ? JSON.parse(localStorage.getItem("user") || "")
+        : null;
   } catch (error) {
-    console.log("스토리지 로드 오류", error);
-    return null;
+    console.log(error);
+    user = null;
   }
+  return user;
 };

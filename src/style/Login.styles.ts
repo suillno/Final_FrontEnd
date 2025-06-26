@@ -175,7 +175,8 @@ export const InputBox = styled.div`
   }
 
   input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    filter: sepia(1) saturate(10000%) hue-rotate(0deg) brightness(0.9);
+    filter: invert(59%) sepia(10%) saturate(130%) hue-rotate(315deg)
+      brightness(91%) contrast(95%);
   }
 
   label {

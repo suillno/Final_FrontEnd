@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
 import sidebarIcon from "../img/sidebar.png";
 import PGLogo from "../img/PGLogo.png";
 import SearchBox from "../components/common/SearchBox";
