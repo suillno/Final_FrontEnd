@@ -214,7 +214,6 @@ const GameDetail = () => {
       salePrice: 0,
     };
     const token = getCurrentUser();
-    console.log(token);
 
     if (token && token?.accessToken) {
       try {
