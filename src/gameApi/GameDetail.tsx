@@ -198,6 +198,42 @@ const GameDetail = () => {
     }
   };
 
+  // 찜 저장 요청
+  const likeSave = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+
+    const likeData = {
+      userName: userInfo.username,
+      gameId: gameDetail.id,
+      title: gameDetail.name,
+      backgroundImage: gameDetail.background_image,
+      price: priceValue,
+      salePrice: 0,
+    };
+    const token = getCurrentUser();
+    console.log(token);
+
+    if (token && token?.accessToken) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/game/member/likesave",
+          likeData,
+          {
+            headers: {
+              Authorization: `${token.tokenType}${token.accessToken}`, // 토큰 포함
+            },
+          }
+        );
+        alert(response.data);
+      } catch (error) {
+        alert("장바구니 등록 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
   useEffect(() => {
     fetchGameDetail();
     fetchReviewList(); // 리뷰 목록도 함께 요청
@@ -302,7 +338,11 @@ const GameDetail = () => {
                       >
                         장바구니
                       </button>
-                      <button className="bg-white hover:bg-gray-400 text-black font-bold py-2 px-5 rounded shadow border border-gray-300">
+                      {/*찜버튼 */}
+                      <button
+                        onClick={likeSave}
+                        className="bg-white hover:bg-gray-400 text-black font-bold py-2 px-5 rounded shadow border border-gray-300"
+                      >
                         위시리스트
                       </button>
                     </div>
