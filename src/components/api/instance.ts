@@ -21,7 +21,7 @@ instanceBack.interceptors.request.use(
   (config) => {
     const fullUrl = `${config.baseURL}${config.url}`;
     console.log("[백엔드 요청] URL:", fullUrl);
-    // 🔐 토큰 자동 삽입
+    // 토큰 자동 삽입
     const token = getCurrentUser();
     if (token?.tokenType && token?.accessToken) {
       config.headers?.set(

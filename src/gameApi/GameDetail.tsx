@@ -24,6 +24,8 @@ import {
   WhiteLine,
 } from "../style/GameDetail.styles";
 import {
+  apiAddGameCart,
+  apiAddGameLike,
   apiAddGameReviews,
   apiGetGameReviews,
 } from "../components/api/backApi";
@@ -40,7 +42,12 @@ const GameDetail = () => {
   const [rating, setRating] = useState(0); // 별점 상태
   const [reviewText, setReviewText] = useState(""); // 리뷰 텍스트
   const [reviews, setReviews] = useState<
-    { userName: string; rating: number; content: string; createdAt: string }[]
+    {
+      userName: string;
+      rating: number;
+      content: string;
+      updatedAt: string;
+    }[]
   >([]);
 
   // 리뷰 목록 가져오기
@@ -84,23 +91,19 @@ const GameDetail = () => {
       alert("로그인 후 사용 가능합니다");
       return;
     }
-
     if (rating === 0 || reviewText.trim() === "") {
       alert("평점과 리뷰를 모두 입력해 주세요.");
       return;
     }
-
     const reviewData = {
       userName: userInfo.username,
       gameId: gameDetail.id,
       rating,
       content: reviewText,
     };
-
     try {
       const response = await apiAddGameReviews(reviewData); // API 호출
       alert(response);
-
       // 리뷰 목록 반영
       setReviews([
         ...reviews,
@@ -108,7 +111,7 @@ const GameDetail = () => {
           userName: userInfo.username,
           rating,
           content: reviewText,
-          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       ]);
       setRating(0);
@@ -125,7 +128,6 @@ const GameDetail = () => {
       alert("로그인 후 사용 가능합니다");
       return;
     }
-
     const cartData = {
       userName: userInfo.username,
       gameId: gameDetail.id,
@@ -134,23 +136,12 @@ const GameDetail = () => {
       price: priceValue,
       salePrice: 0,
     };
-
-    if (token && token?.accessToken) {
-      try {
-        const response = await axios.post(
-          "http://localhost:8080/game/member/cartsave",
-          cartData,
-          {
-            headers: {
-              Authorization: `${token.tokenType}${token.accessToken}`, // 토큰 포함
-            },
-          }
-        );
-        alert("장바구니에 담겼습니다!");
-        fetchReviewList();
-      } catch (error) {
-        alert("장바구니 등록 중 오류가 발생했습니다.");
-      }
+    try {
+      const response = await apiAddGameCart(cartData);
+      alert(response);
+      fetchReviewList();
+    } catch (error) {
+      alert("장바구니 등록 중 오류가 발생했습니다.");
     }
   };
 
@@ -169,26 +160,15 @@ const GameDetail = () => {
       price: priceValue,
       salePrice: 0,
     };
-    const token = getCurrentUser();
-
-    if (token && token?.accessToken) {
-      try {
-        const response = await axios.post(
-          "http://localhost:8080/game/member/likesave",
-          likeData,
-          {
-            headers: {
-              Authorization: `${token.tokenType}${token.accessToken}`, // 토큰 포함
-            },
-          }
-        );
-        alert(response.data);
-      } catch (error) {
-        alert("장바구니 등록 중 오류가 발생했습니다.");
-      }
+    try {
+      const response = await apiAddGameLike(likeData);
+      alert(response);
+    } catch (error) {
+      alert("장바구니 등록 중 오류가 발생했습니다.");
     }
   };
 
+  // 상태변경시 값 호출
   useEffect(() => {
     fetchGameDetail();
     fetchReviewList(); // 리뷰 목록도 함께 요청
@@ -374,7 +354,7 @@ const GameDetail = () => {
                           </div>
                           <div className="text-white mb-1">{rev.content}</div>
                           <div className="text-gray-500 text-xs">
-                            {new Date(rev.createdAt).toLocaleString()}
+                            {new Date(rev.updatedAt).toLocaleString()}
                           </div>
                         </li>
                       ))}

@@ -26,3 +26,37 @@ export const apiAddGameReviews = async (reviewData: {
     throw error;
   }
 };
+
+// 좋아요 저장
+export const apiAddGameLike = async (likeData: {
+  userName: string;
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+}) => {
+  try {
+    const res = await instanceBack.post("/member/likesave", likeData);
+    return res.data;
+  } catch (error) {
+    console.error("좋아요 저장 실패");
+  }
+};
+
+// 게임 카트 등록
+export const apiAddGameCart = async (cartData: {
+  userName: string;
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+}) => {
+  try {
+    const res = await instanceBack.post("/member/cartsave", cartData);
+    return res.data;
+  } catch (error) {
+    console.error("좋아요 저장 실패");
+  }
+};
