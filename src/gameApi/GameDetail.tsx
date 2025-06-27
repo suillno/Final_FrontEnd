@@ -75,6 +75,7 @@ const WhiteLine = styled.div`
 `;
 
 const GameDetail = () => {
+  const token = getCurrentUser(); // 토큰정보 가져오기
   const userInfo = useSelector(selectUserInfo); // 로그인 유저 정보
   const { id } = useParams(); // URL에서 게임 ID 추출
   const [isLoading, setIsLoading] = useState(false);
@@ -84,13 +85,24 @@ const GameDetail = () => {
   const [priceText, setPriceText] = useState("로딩 중..."); // 표시용 문자열
   const [rating, setRating] = useState(0); // 별점 상태
   const [reviewText, setReviewText] = useState(""); // 리뷰 텍스트
-  const [reviews, setReviews] = useState<{ rating: number; text: string }[]>(
-    []
-  );
+  const [reviews, setReviews] = useState<
+    { rating: number; content: string; createdAt: string }[]
+  >([]);
 
-  useEffect(() => {
-    fetchGameDetail();
-  }, []);
+  // 리뷰 목록 가져오기
+  const fetchReviewList = async () => {
+    if (!id) {
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/game/member/review?gameId=${id}`
+      );
+      setReviews(response.data); // 서버에서 받은 리뷰 배열
+    } catch (err) {
+      console.error("리뷰 목록 가져오기 실패", err);
+    }
+  };
 
   // 상세 정보 및 이미지 요청
   const fetchGameDetail = () => {
@@ -109,14 +121,46 @@ const GameDetail = () => {
   };
 
   // 리뷰 등록
-  const submitReview = () => {
+  const submitReview = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
     if (rating === 0 || reviewText.trim() === "") {
       alert("평점과 리뷰를 모두 입력해 주세요.");
       return;
     }
-    setReviews([...reviews, { rating, text: reviewText }]);
-    setRating(0);
-    setReviewText("");
+
+    const reviewData = {
+      userName: userInfo.username,
+      gameId: gameDetail.id,
+      rating: rating,
+      content: reviewText,
+    };
+    if (token && token?.accessToken) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/game/member/reviewsave",
+          reviewData,
+          {
+            headers: {
+              Authorization: `${token.tokenType}${token.accessToken}`, // 토큰 포함
+            },
+          }
+        );
+        alert("리뷰를 등록하였습니다!");
+
+        // 리뷰 목록에 반영
+        setReviews([
+          ...reviews,
+          { rating, content: reviewText, createdAt: new Date().toISOString() },
+        ]);
+        setRating(0);
+        setReviewText("");
+      } catch (error) {
+        alert("등록 중 오류가 발생했습니다.");
+      }
+    }
   };
 
   // 장바구니 저장 요청
@@ -135,9 +179,6 @@ const GameDetail = () => {
       salePrice: 0,
     };
 
-    const token = getCurrentUser();
-    console.log(token);
-
     if (token && token?.accessToken) {
       try {
         const response = await axios.post(
@@ -150,11 +191,17 @@ const GameDetail = () => {
           }
         );
         alert("장바구니에 담겼습니다!");
+        fetchReviewList();
       } catch (error) {
         alert("장바구니 등록 중 오류가 발생했습니다.");
       }
     }
   };
+
+  useEffect(() => {
+    fetchGameDetail();
+    fetchReviewList(); // 리뷰 목록도 함께 요청
+  }, [id]);
 
   return (
     <>
@@ -287,6 +334,7 @@ const GameDetail = () => {
 
                 {/* 리뷰 작성 */}
                 <textarea
+                  spellCheck="false"
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
                   placeholder="게임에 대한 후기를 남겨주세요..."
@@ -315,12 +363,21 @@ const GameDetail = () => {
                       {reviews.map((rev, idx) => (
                         <li key={idx} className="bg-white/10 p-3 rounded">
                           <div className="text-yellow-400 mb-1">
-                            {"★".repeat(rev.rating)}
-                            <span className="text-gray-400 text-sm">
+                            {"★".repeat(rev.rating)}{" "}
+                            <span className="text-gray-400">
                               ({rev.rating}점)
                             </span>
                           </div>
-                          <div className="text-white">{rev.text}</div>
+                          <div className="text-white mb-1">{rev.content}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(rev.createdAt).toLocaleString("ko-KR", {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
                         </li>
                       ))}
                     </ul>

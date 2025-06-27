@@ -8,6 +8,8 @@ import store from "./components/auth/store/store"; // Redux 스토어 객체 imp
 import { BrowserRouter } from "react-router-dom"; // 라우팅 기능 제공
 import { persistStore } from "redux-persist"; // 저장된 상태 관리 설정
 import { PersistGate } from "redux-persist/integration/react"; // 저장된 상태가 로드될 때까지 UI 렌더링 보류
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // Redux persist용 persistor 생성 (스토어 상태 저장 관리)
 const persistor = persistStore(store);
