@@ -151,9 +151,46 @@ export default function LoginPage() {
   };
 
   // 회원가입 폼 제출 처리 (현재는 서버 연동 없음)
-  const onSubmitRegister = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("회원가입 시도:", registerForm);
+
+    // 1. 유효성 검사(비밀번호 일치 여부)
+    if (
+      registerForm.registerPassword !== registerForm.registerConfirmPassword
+    ) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    try {
+      // 2. 서버에 보낼 회원가입 데이터 구성
+      const registerData = {
+        username: registerForm.registerId,
+        password: registerForm.registerPassword,
+        name: registerForm.registerName,
+        birth: registerForm.registerBirth,
+        email: registerForm.registerEmail,
+        emailCode: registerForm.registerEmailCode,
+        phone: registerForm.registerPhone,
+        deviceInfo: deviceInfo,
+      };
+
+      // 3. 서버에 POST 요청 보내기
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/login",
+        registerData
+      );
+
+      // 4. 성공처리
+      console.log("회원가입 성공:", res.data);
+      alert("회원가입이 완료되었습니다.");
+      setIsSignIn(true); // 로그인화면 전환
+    } catch (err) {
+      // 5. 실패처리
+      console.error("회원가입 실패", err);
+      alert("회원가입 중 문제가 발생하였습니다. 다시 확인해주세요.");
+    }
   };
 
   return (
