@@ -17,62 +17,16 @@ import { useSelector } from "react-redux";
 import { selectUserInfo } from "../components/auth/store/userInfo";
 import axios from "axios";
 import { getCurrentUser } from "../components/auth/helper/storage";
-
-// 본문 전체 영역 스타일 정의
-const ContentContainer = styled.div`
-  background-color: #1e1f24;
-  border-radius: 12px;
-  @media (max-width: 768px) {
-    font-size: 0.875rem;
-  }
-  @media (max-width: 468px) {
-    font-size: 0.7em;
-    max-height: 180px;
-  }
-`;
-
-// 게임 설명 섹션
-const GameAbout = styled.div`
-  margin: 5%;
-  overflow-y: auto;
-  max-height: 500px;
-  @media (max-width: 768px) {
-    max-height: 250px;
-  }
-  @media (max-width: 468px) {
-    max-height: 200px;
-  }
-  h2 {
-    @media (max-width: 768px) {
-      font-size: 1.5rem;
-    }
-    @media (max-width: 468px) {
-      font-size: 1.3em;
-    }
-  }
-`;
-
-// 게임 소개와 상세 정보의 배치
-const AboutBetween = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-  }
-  @media (max-width: 468px) {
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.7em;
-  }
-`;
-
-// 구분 선 스타일
-const WhiteLine = styled.div`
-  border-top: 1px solid rgba(255, 255, 255, 0.5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-`;
+import {
+  ContentContainer,
+  GameAbout,
+  AboutBetween,
+  WhiteLine,
+} from "../style/GameDetail.styles";
+import {
+  apiAddGameReviews,
+  apiGetGameReviews,
+} from "../components/api/backApi";
 
 const GameDetail = () => {
   const token = getCurrentUser(); // 토큰정보 가져오기
@@ -86,21 +40,25 @@ const GameDetail = () => {
   const [rating, setRating] = useState(0); // 별점 상태
   const [reviewText, setReviewText] = useState(""); // 리뷰 텍스트
   const [reviews, setReviews] = useState<
-    { rating: number; content: string; createdAt: string }[]
+    { userName: string; rating: number; content: string; createdAt: string }[]
   >([]);
 
   // 리뷰 목록 가져오기
   const fetchReviewList = async () => {
-    if (!id) {
-      return;
-    }
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/game/member/review?gameId=${id}`
-      );
-      setReviews(response.data); // 서버에서 받은 리뷰 배열
-    } catch (err) {
-      console.error("리뷰 목록 가져오기 실패", err);
+    if (!id) return;
+
+    const data = await apiGetGameReviews(id);
+    if (data) {
+      setReviews(data);
+      if (userInfo.username) {
+        const myReview = data.find(
+          (rev: { userName: string }) => rev.userName === userInfo.username
+        );
+        if (myReview) {
+          setReviewText(myReview.content);
+          setRating(myReview.rating);
+        }
+      }
     }
   };
 
@@ -126,6 +84,7 @@ const GameDetail = () => {
       alert("로그인 후 사용 가능합니다");
       return;
     }
+
     if (rating === 0 || reviewText.trim() === "") {
       alert("평점과 리뷰를 모두 입력해 주세요.");
       return;
@@ -134,32 +93,29 @@ const GameDetail = () => {
     const reviewData = {
       userName: userInfo.username,
       gameId: gameDetail.id,
-      rating: rating,
+      rating,
       content: reviewText,
     };
-    if (token && token?.accessToken) {
-      try {
-        const response = await axios.post(
-          "http://localhost:8080/game/member/reviewsave",
-          reviewData,
-          {
-            headers: {
-              Authorization: `${token.tokenType}${token.accessToken}`, // 토큰 포함
-            },
-          }
-        );
-        alert("리뷰를 등록하였습니다!");
 
-        // 리뷰 목록에 반영
-        setReviews([
-          ...reviews,
-          { rating, content: reviewText, createdAt: new Date().toISOString() },
-        ]);
-        setRating(0);
-        setReviewText("");
-      } catch (error) {
-        alert("등록 중 오류가 발생했습니다.");
-      }
+    try {
+      const response = await apiAddGameReviews(reviewData); // API 호출
+      alert(response);
+
+      // 리뷰 목록 반영
+      setReviews([
+        ...reviews,
+        {
+          userName: userInfo.username,
+          rating,
+          content: reviewText,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+      setRating(0);
+      setReviewText("");
+      await fetchReviewList(); // 리뷰 목록 다시 불러오기
+    } catch (error) {
+      alert("등록 중 오류가 발생했습니다.");
     }
   };
 
@@ -384,7 +340,9 @@ const GameDetail = () => {
                   onClick={submitReview}
                   className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded"
                 >
-                  등록하기
+                  {reviews.some((r) => r.userName === userInfo.username)
+                    ? "수정하기"
+                    : "등록하기"}
                 </button>
 
                 {/* 리뷰 리스트 출력 */}
@@ -400,13 +358,24 @@ const GameDetail = () => {
                     <ul className="space-y-4">
                       {reviews.map((rev, idx) => (
                         <li key={idx} className="bg-white/10 p-3 rounded">
+                          {/* 작성자 이름 */}
+                          <div className="text-sm text-gray-500 mb-1">
+                            {" "}
+                            <span className="font-semibold text-white">
+                              {rev.userName}
+                            </span>
+                          </div>
                           <div className="text-yellow-400 mb-1">
                             {"★".repeat(rev.rating)}
                             <span className="text-gray-400 text-sm">
+                              {" "}
                               ({rev.rating}점)
                             </span>
                           </div>
-                          <div className="text-white">{rev.content}</div>
+                          <div className="text-white mb-1">{rev.content}</div>
+                          <div className="text-gray-500 text-xs">
+                            {new Date(rev.createdAt).toLocaleString()}
+                          </div>
                         </li>
                       ))}
                     </ul>

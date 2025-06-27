@@ -1,7 +1,6 @@
 // 🔧 src/components/api/api.ts
 
 import { instance } from "./instance";
-import axios from "axios";
 
 /**
  * RAWG 게임 리스트 조회 (Spring 프록시)
