@@ -38,6 +38,57 @@ instanceBack.interceptors.request.use(
   }
 );
 
+// AxiosRequestConfig 타입 확장
+declare module "axios" {
+  export interface InternalAxiosRequestConfig<D = any> {
+    _retryCount?: number;
+  }
+}
+
+// 회원동작처리 저장
+export const instanceAuth = axios.create({
+  baseURL: process.env.REACT_APP_API_HOST,
+  timeout: 5000,
+});
+
+instanceBack.interceptors.request.use(
+  (config) => {
+    const fullUrl = `${config.baseURL}${config.url}`;
+    console.log("[백엔드 요청] URL:", fullUrl);
+    // 토큰 자동 삽입
+    const token = getCurrentUser();
+    if (token?.tokenType && token?.accessToken) {
+      config.headers?.set(
+        "Authorization",
+        `${token.tokenType}${token.accessToken}`
+      );
+    }
+
+    return config;
+  },
+  (error) => {
+    console.error("[백엔드 요청 오류]", error);
+    return Promise.reject(error);
+  }
+);
+
+// 응답 인터셉터 (재시도 없음)
+instanceBack.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (error: AxiosError) => {
+    console.error("[백엔드 응답 오류]", error);
+
+    // 필요하면 사용자 알림도 가능
+    if (error.response?.data && (error.response.data as any).status_message) {
+      alert((error.response.data as any).status_message);
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 // 응답 인터셉터 (재시도 없음)
 instanceBack.interceptors.response.use(
   (response: AxiosResponse) => {

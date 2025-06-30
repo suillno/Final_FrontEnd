@@ -1,14 +1,21 @@
+// LoginPage.tsx
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
-import axios from "axios";
 import PGLogo from "../../img/PGLogo.png";
 
-// Redux 상태 저장 액션 및 로컬 저장소 유틸
+// 상태 저장 및 로컬 저장소 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
 import { setCurrentUser } from "../../components/auth/helper/storage";
+
+// API 함수 호출
+import {
+  apiRegisterUser,
+  apiCheckUsername,
+  apiCheckEmail,
+} from "../../components/api/backApi";
 
 // 스타일 컴포넌트 불러오기
 import {
@@ -25,6 +32,7 @@ import {
   Logo,
   SubLogo,
   SignPanel,
+  CheckButton,
 } from "../../style/Login.styles";
 
 // 아이콘
@@ -33,15 +41,15 @@ import {
   IoIdCardOutline,
   IoLockClosedOutline,
   IoMailOutline,
-  IoPhonePortraitOutline,
+  IoCalendar,
 } from "react-icons/io5";
+import axios from "axios";
 
-// 로그인 페이지 컴포넌트 정의
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 로그인/회원가입 모드 상태 (true면 로그인 화면)
+  // 로그인/회원가입 모드 상태
   const [isSignIn, setIsSignIn] = useState(true);
 
   // 로그인 폼 상태
@@ -52,24 +60,23 @@ export default function LoginPage() {
 
   // 회원가입 폼 상태
   const [registerForm, setRegisterForm] = useState({
-    registerId: "", // 아이디
-    registerPassword: "", // 비밀번호
-    registerConfirmPassword: "", // 비밀번호 확인
-    registerName: "", // 이름
-    registerBirth: "", // 생년월일 (예: "1995-08-15")
-    registerEmail: "", // 본인확인 이메일
-    registerEmailCode: "", // 이메일 인증번호
-    registerPhone: "", // 휴대전화 번호
+    registerId: "",
+    registerPassword: "",
+    registerConfirmPassword: "",
+    registerName: "",
+    registerBirth: "",
+    registerEmail: "",
+    registerEmailCode: "",
   });
 
   // 디바이스 정보 상태
   const [deviceInfo, setDeviceInfo] = useState({
-    deviceId: uuidv4(), // 랜덤 UUID 생성
+    deviceId: uuidv4(),
     deviceType: "",
-    notificationToken: uuidv4(), // 알림 토큰 대체용 UUID
+    notificationToken: uuidv4(),
   });
 
-  // 브라우저의 OS명을 기반으로 deviceType 설정
+  // OS 기반 deviceType 설정
   useEffect(() => {
     let device = "";
     switch (osName) {
@@ -88,108 +95,92 @@ export default function LoginPage() {
       default:
         device = "OTHERS";
     }
-
-    // deviceType 업데이트
-    setDeviceInfo((prev) => ({
-      ...prev,
-      deviceType: device,
-    }));
+    setDeviceInfo((prev) => ({ ...prev, deviceType: device }));
   }, []);
 
-  // 로그인/회원가입 모드 전환 함수
-  const toggleMode = () => {
-    setIsSignIn(!isSignIn);
-  };
+  // 로그인/회원가입 전환
+  const toggleMode = () => setIsSignIn(!isSignIn);
 
-  // 로그인 입력 필드 변경 핸들러
+  // 입력값 변경 핸들러
   const onChangeLogin = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setLoginForm({ ...loginForm, [id]: value });
   };
-
-  // 회원가입 입력 필드 변경 핸들러
   const onChangeRegister = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setRegisterForm({ ...registerForm, [id]: value });
   };
 
-  // 로그인 폼 제출 처리
+  // 아이디 중복 확인
+  const checkUsername = async () => {
+    if (!registerForm.registerId) return alert("아이디를 입력하세요.");
+    try {
+      const res = await apiCheckUsername(registerForm.registerId);
+      alert(res.data);
+    } catch (err) {
+      alert("아이디 중복 확인 실패");
+    }
+  };
+
+  // 이메일 중복 확인
+  const checkEmail = async () => {
+    if (!registerForm.registerEmail) return alert("이메일을 입력하세요.");
+    try {
+      const res = await apiCheckEmail(registerForm.registerEmail);
+      alert(res.data);
+    } catch (err) {
+      alert("이메일 중복 확인 실패");
+    }
+  };
+
+  // 로그인 처리
   const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      // 서버로 보낼 로그인 데이터 구성
       const loginData = {
         username: loginForm.loginId,
         password: loginForm.loginPassword,
-        deviceInfo: deviceInfo,
+        deviceInfo,
       };
-
-      // 로그인 요청
       const res = await axios.post(
         "http://localhost:8080/api/auth/login",
         loginData
       );
       const { accessToken, tokenType } = res.data;
-
-      // 사용자 정보 요청
       const userRes = await axios.get("http://localhost:8080/api/user/me", {
-        headers: {
-          Authorization: `${tokenType}${accessToken}`,
-        },
+        headers: { Authorization: `${tokenType}${accessToken}` },
       });
-
-      // 사용자 정보 및 토큰 저장
       setCurrentUser(res.data);
       dispatch(setUserInfo(userRes.data));
-
-      // 로그인 성공 시 홈으로 이동
       navigate("/");
     } catch (err) {
-      console.error("로그인 실패", err);
-      alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+      alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
     }
   };
 
-  // 회원가입 폼 제출 처리 (현재는 서버 연동 없음)
+  // 회원가입 처리
   const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("회원가입 시도:", registerForm);
-
-    // 1. 유효성 검사(비밀번호 일치 여부)
     if (
       registerForm.registerPassword !== registerForm.registerConfirmPassword
     ) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
     }
-
     try {
-      // 2. 서버에 보낼 회원가입 데이터 구성
       const registerData = {
         username: registerForm.registerId,
         password: registerForm.registerPassword,
         name: registerForm.registerName,
         birth: registerForm.registerBirth,
         email: registerForm.registerEmail,
-        emailCode: registerForm.registerEmailCode,
-        phone: registerForm.registerPhone,
-        deviceInfo: deviceInfo,
+        roleNum: 1, // 기본 회원 등급
       };
-
-      // 3. 서버에 POST 요청 보내기
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        registerData
-      );
-
-      // 4. 성공처리
-      console.log("회원가입 성공:", res.data);
-      alert("회원가입이 완료되었습니다.");
-      setIsSignIn(true); // 로그인화면 전환
+      const res = await apiRegisterUser(registerData);
+      alert(res);
+      setIsSignIn(true);
     } catch (err) {
-      // 5. 실패처리
-      console.error("회원가입 실패", err);
-      alert("회원가입 중 문제가 발생하였습니다. 다시 확인해주세요.");
+      alert("회원가입 중 오류 발생");
     }
   };
 
@@ -207,6 +198,7 @@ export default function LoginPage() {
           <FormBox className={!isSignIn ? "active" : ""}>
             <Form onSubmit={onSubmitRegister}>
               <h2>회원가입</h2>
+              {/* 아이디 입력 + 중복확인 */}
               <InputBox>
                 <input
                   type="text"
@@ -217,6 +209,9 @@ export default function LoginPage() {
                 />
                 <label htmlFor="registerId">아이디</label>
                 <IoIdCardOutline />
+                <CheckButton type="button" onClick={checkUsername}>
+                  중복확인
+                </CheckButton>
               </InputBox>
               <InputBox>
                 <input
@@ -275,6 +270,9 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmail">본인확인 이메일</label>
+                <CheckButton type="button" onClick={checkEmail}>
+                  중복확인
+                </CheckButton>
                 <IoMailOutline />
               </InputBox>
 
@@ -291,18 +289,6 @@ export default function LoginPage() {
                 <IoCheckmarkCircleOutline />
               </InputBox>
 
-              {/* 휴대전화 */}
-              <InputBox>
-                <input
-                  type="tel"
-                  id="registerPhone"
-                  required
-                  value={registerForm.registerPhone}
-                  onChange={onChangeRegister}
-                />
-                <label htmlFor="registerPhone">휴대전화</label>
-                <IoPhonePortraitOutline />
-              </InputBox>
               <Button type="submit">회원가입</Button>
               <ToggleText>
                 계정이 있으신가요? <span onClick={toggleMode}>로그인</span>

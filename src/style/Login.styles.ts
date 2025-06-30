@@ -339,3 +339,22 @@ export const SubLogo = styled.img<{ $visible: boolean }>`
     display: none;
   }
 `;
+
+export const CheckButton = styled.button`
+  position: absolute;
+  right: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #fff;
+    color: #000;
+  }
+`;
