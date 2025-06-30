@@ -37,10 +37,10 @@ export const apiAddGameLike = async (likeData: {
   salePrice: number;
 }) => {
   try {
-    const res = await instanceBack.post("/member/likesave", likeData);
+    const res = await instanceBack.post("/member/like/save", likeData);
     return res.data;
   } catch (error) {
-    console.error("좋아요 저장 실패");
+    return "ERROR: 좋아요 저장 중 서버 오류가 발생했습니다.";
   }
 };
 
@@ -54,9 +54,9 @@ export const apiAddGameCart = async (cartData: {
   salePrice: number;
 }) => {
   try {
-    const res = await instanceBack.post("/member/cartsave", cartData);
+    const res = await instanceBack.post("/member/cart/save", cartData);
     return res.data;
   } catch (error) {
-    console.error("좋아요 저장 실패");
+    console.error("장바구니 저장 실패");
   }
 };

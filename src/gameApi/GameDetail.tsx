@@ -138,10 +138,21 @@ const GameDetail = () => {
     };
     try {
       const response = await apiAddGameCart(cartData);
-      alert(response);
-      fetchReviewList();
+      // 문자열 앞 SUCCESS 및 ERROR 자르고 배열의 두 요소를 각각 변수에 담음
+      const [status, message] = response
+        // 문자열을 ":" 기준으로 분리합니다.
+        .split(":")
+        // 배열의 각 요소에 대해 trim()을 적용해서 앞뒤 공백 제거
+        .map((s: string) => s.trim());
+
+      if (status === "SUCCESS") {
+        alert(message); // 성공 메세지
+      } else {
+        alert("에러: " + message);
+      }
     } catch (error) {
-      alert("장바구니 등록 중 오류가 발생했습니다.");
+      console.error("찜 오류", error);
+      alert("찜 목록 등록 중 오류가 발생했습니다.");
     }
   };
 
@@ -161,10 +172,22 @@ const GameDetail = () => {
       salePrice: 0,
     };
     try {
-      const response = await apiAddGameLike(likeData);
-      alert(response);
+      const response = await apiAddGameLike(likeData); // e.g. "SUCCESS: 찜이 취소되었습니다."
+      // 문자열 앞 SUCCESS 및 ERROR 자르고 배열의 두 요소를 각각 변수에 담음
+      const [status, message] = response
+        // 문자열을 ":" 기준으로 분리합니다.
+        .split(":")
+        // 배열의 각 요소에 대해 trim()을 적용해서 앞뒤 공백 제거
+        .map((s: string) => s.trim());
+
+      if (status === "SUCCESS") {
+        alert(message); // "찜이 취소되었습니다." 등
+      } else {
+        alert("에러: " + message); // "에러: 중복 등록" 등
+      }
     } catch (error) {
-      alert("장바구니 등록 중 오류가 발생했습니다.");
+      console.error("찜 오류", error);
+      alert("찜 목록 등록 중 오류가 발생했습니다.");
     }
   };
 
