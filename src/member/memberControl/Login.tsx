@@ -196,8 +196,8 @@ export default function LoginPage() {
         </Link>
         <div className="h-[600px] overflow-auto">
           <FormBox className={!isSignIn ? "active" : ""}>
+            <h2>회원가입</h2>
             <Form onSubmit={onSubmitRegister}>
-              <h2>회원가입</h2>
               {/* 아이디 입력 + 중복확인 */}
               <InputBox>
                 <input
