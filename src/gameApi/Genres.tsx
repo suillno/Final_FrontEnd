@@ -1,47 +1,74 @@
 import styled from "styled-components";
-import gameImg from "../img/game.jpg";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, Link } from "react-router-dom";
 import React, { useRef, useEffect, useState } from "react";
+import { apiGetGameGenres } from "../components/api/api";
+import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
+import GameCard from "../components/api/GameCard";
+import Loader, { LoaderButton } from "../components/common/Loader";
 
-// 레이아웃 컨텍스트 타입
+// 레이아웃 사이드바 상태 확인용 타입 정의
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// 🔹 페이지 타이틀
-const MainTitle = styled.h2<{ isSidebarOpen: boolean }>`
-  font-size: 4vw;
-  line-height: 50px;
-  font-weight: 700;
-  padding-bottom: 1em;
-  margin-right: 5%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "250px" : "5%")};
+// 페이지 상단 타이틀 스타일
+const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
+  font-size: 3.5vw;
+  font-weight: 900;
+  margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
   transition: margin-left 0.3s ease;
+  background: linear-gradient(90deg, #6dd5fa, #2980b9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+  animation: wave 2s infinite ease-in-out;
+
+  @keyframes wave {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(1.5deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    75% {
+      transform: rotate(-1.5deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 5%;
+    font-size: 6vw;
+  }
+`;
+
+// 전체 컨텐츠 컨테이너
+const GenresContainer = styled.div<{ $isSidebarOpen: boolean }>`
+  margin-right: 5%;
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "5%")};
+  transition: margin-left 0.3s ease;
+
   @media (max-width: 768px) {
     margin: 0 5%;
   }
 `;
 
-// 🔹 전체 컨테이너
-const GenresContainer = styled.div<{ isSidebarOpen: boolean }>`
-  margin-right: 5%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "5%")};
-  transition: margin-left 0.3s ease;
-  @media (max-width: 768px) {
-    margin: 0 5%;
-  }
-`;
-
-// 🔹 장르 버튼 스크롤 리스트
+// 장르 버튼 가로 스크롤 영역
 const GenreListWrapper = styled.div`
   overflow-x: auto;
   margin-bottom: 20px;
 
-  /* 스크롤 숨기기 */
   &::-webkit-scrollbar {
     display: none;
   }
-  scrollbar-width: none; /* Firefox */
+
+  scrollbar-width: none;
 
   ul {
     display: flex;
@@ -49,15 +76,16 @@ const GenreListWrapper = styled.div`
     gap: 10px;
     padding: 10px 0;
 
-    /* 스크롤 숨기기 */
     &::-webkit-scrollbar {
       display: none;
     }
-    scrollbar-width: none; /* Firefox */
+
+    scrollbar-width: none;
   }
 
   li {
     flex: 0 0 auto;
+
     button {
       min-width: 150px;
       border-radius: 5px;
@@ -66,7 +94,7 @@ const GenreListWrapper = styled.div`
       color: white;
       font-size: 14px;
 
-      // 마우스 호버시 색변경
+      // 마우스 호버 시 반전 효과
       &:hover {
         filter: invert(1);
       }
@@ -74,63 +102,91 @@ const GenreListWrapper = styled.div`
   }
 `;
 
-// 🔹 게임 이미지 영역
-const GameImg = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+// 게임 카드 그리드 레이아웃
+const GameGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-
-  img {
-    width: calc(33.333% - 20px);
-    max-width: 100%;
-    border-radius: 8px;
-    background-color: #555;
-  }
-
-  @media (max-width: 768px) {
-    img {
-      width: 100%;
-    }
-  }
 `;
 
 const Genres = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [games, setGames] = useState<any[]>([]);
+  // 표시용 장르명 (한글)
+  const [selectedLabel, setSelectedLabel] = useState<string>("액션");
 
-  // 장르 버튼 동작
-  const GenreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const genre = e.currentTarget.value;
-    console.log(genre);
-    // setSelectedGenre(genre); api 호출
-  };
+  // RAWG API 요청용 장르 슬러그
+  const [selectedSlug, setSelectedSlug] = useState<string>("action");
 
-  // 🔹 RAWG API에서 사용하는 장르 슬러그(영문) 배열
-  const genresEn = [
-    "racing", // 레이싱
-    "shooter", // 슈팅
-    "adventure", // 어드벤처
-    "action", // 액션
-    "rpg", // 롤플레잉 (RPG)
-    "fighting", // 격투
-    "puzzle", // 퍼즐
-    "strategy", // 전략
-    "arcade", // 아케이드
-    "simulation", // 시뮬레이션
-    "sports", // 스포츠
-    "card", // 카드
-    "family", // 패밀리
-    "board-games", // 보드 게임
-    "educational", // 교육
-    "casual", // 캐주얼
-    "indie", // 인디
-    "massively-multiplayer", // 대규모 멀티플레이어
-    "platformer", // 플랫폼
+  // 게임 API 응답 상태
+  const [gameResponse, setGameResponse] =
+    useState<GameResponse>(defaultGameResponse);
+
+  // 현재 페이지 번호
+  const [pageCount, setPageCount] = useState<number>(1);
+
+  // 로딩 상태
+  const [isLoading, setIsLoading] = useState(false);
+  const [firstLoading, setfirstLoading] = useState(false);
+
+  // 장르 목록 (label: 한글, value: RAWG 슬러그)
+  const genreList = [
+    { label: "레이싱", value: "racing" },
+    { label: "슈팅", value: "shooter" },
+    { label: "어드벤처", value: "adventure" },
+    { label: "액션", value: "action" },
+    { label: "롤플레잉 (RPG)", value: "role-playing-games-rpg" },
+    { label: "격투", value: "fighting" },
+    { label: "퍼즐", value: "puzzle" },
+    { label: "전략", value: "strategy" },
+    { label: "아케이드", value: "arcade" },
+    { label: "시뮬레이션", value: "simulation" },
+    { label: "스포츠", value: "sports" },
+    { label: "카드", value: "card" },
+    { label: "패밀리", value: "family" },
+    { label: "보드 게임", value: "board-games" },
+    { label: "교육", value: "educational" },
+    { label: "캐주얼", value: "casual" },
+    { label: "인디", value: "indie" },
+    { label: "대규모 멀티플레이어", value: "massively-multiplayer" },
+    { label: "플랫폼", value: "platformer" },
   ];
 
+  // 장르 버튼 클릭 시 처리
+  const GenreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const label = e.currentTarget.dataset.label as string;
+    const slug = e.currentTarget.value;
+    setSelectedLabel(label);
+    setSelectedSlug(slug);
+    setPageCount(1);
+    setGameResponse(defaultGameResponse);
+  };
+
+  // 장르나 페이지가 바뀔 때 게임 목록 불러오기
+  useEffect(() => {
+    if (!selectedSlug) return;
+    // 첫 로딩일 경우에만 firstLoading true
+    if (pageCount === 1) {
+      setfirstLoading(true);
+    } else {
+      setIsLoading(true);
+    }
+    apiGetGameGenres(selectedSlug, pageCount)
+      .then((res) => {
+        const results =
+          pageCount === 1
+            ? res.results
+            : [...gameResponse.results, ...res.results];
+        setGameResponse({ ...res, results });
+      })
+      .finally(() => {
+        setfirstLoading(false);
+        setIsLoading(false);
+      });
+  }, [selectedSlug, pageCount]);
+
+  // 마우스 휠로 장르 버튼 가로 스크롤 이동 처리
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -145,29 +201,64 @@ const Genres = () => {
     return () => el.removeEventListener("wheel", handleWheel);
   }, []);
 
+  // 더보기 버튼 클릭 시 페이지 번호 증가
+  const pageNext = () => setPageCount((prev) => prev + 1);
+
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
-      <MainTitle isSidebarOpen={isSidebarOpen}>Top picks</MainTitle>
-      <GenresContainer isSidebarOpen={isSidebarOpen}>
-        {/* 장르 버튼 스크롤 리스트 */}
+      {/* 장르 타이틀 */}
+      <MainTitle $isSidebarOpen={isSidebarOpen}>
+        장르: {selectedLabel}
+      </MainTitle>
+
+      <GenresContainer $isSidebarOpen={isSidebarOpen}>
+        {/* 장르 버튼 영역 */}
         <GenreListWrapper ref={scrollRef}>
           <ul>
-            {genresEn.map((genre, i) => (
+            {genreList.map((genre, i) => (
               <li key={i}>
-                <button type="button" value={genre} onClick={GenreClick}>
-                  {genre}
+                <button
+                  type="button"
+                  value={genre.value}
+                  data-label={genre.label}
+                  onClick={GenreClick}
+                >
+                  {genre.label}
                 </button>
               </li>
             ))}
           </ul>
         </GenreListWrapper>
 
-        {/* 이미지 목록 */}
-        <GameImg>
-          {Array.from({ length: 6 }, (_, i) => (
-            <img src={gameImg} alt="게임 이미지" key={i} />
+        {/* 게임 카드 출력 영역 */}
+        <GameGrid>
+          {gameResponse?.results?.map((item: GameResult, idx: number) => (
+            <Link to={`/game/${item.id}`} key={idx}>
+              <GameCard item={item} />
+            </Link>
           ))}
-        </GameImg>
+        </GameGrid>
+
+        {/* 초기 전체 로딩 상태일 때 */}
+        {firstLoading ? (
+          <Loader />
+        ) : (
+          // 더보기 버튼 or 로딩 버튼
+          <div className="flex justify-center mt-8 h-35">
+            {isLoading ? (
+              <LoaderButton />
+            ) : (
+              <button
+                type="button"
+                className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+                style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
+                onClick={pageNext}
+              >
+                더보기
+              </button>
+            )}
+          </div>
+        )}
       </GenresContainer>
     </div>
   );

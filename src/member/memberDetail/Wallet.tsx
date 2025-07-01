@@ -16,14 +16,14 @@ interface LayoutContext {
 }
 
 // 📦 페이지 전체 wrapper - 사이드바 열림 여부에 따라 margin-left 조절
-const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
+const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   padding: 2em;
   background-color: #1e1f24;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
@@ -193,7 +193,7 @@ const Wallet: React.FC = () => {
   };
 
   return (
-    <PageWrapper isSidebarOpen={isSidebarOpen}>
+    <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <WalletBox>
         <Title>내 지갑</Title>
         <BalanceBox>{balance.toLocaleString()}₩</BalanceBox>

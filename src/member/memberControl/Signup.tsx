@@ -1,11 +1,13 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
 import {
+  IoCalendar,
   IoIdCardOutline,
   IoLockClosedOutline,
   IoMailOutline,
+  IoManOutline,
 } from "react-icons/io5";
-import bgImage from "../../img/g2.png";
+import bgImage from "../../img/g2.jpg";
 
 const Section = styled.section`
   display: flex;
@@ -31,7 +33,7 @@ const Section = styled.section`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.2);
     z-index: -1;
   }
 `;
@@ -39,7 +41,7 @@ const Section = styled.section`
 const FormBox = styled.div`
   position: relative;
   width: 400px;
-  height: 700px;
+  height: 800px;
   background-color: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
@@ -129,6 +131,8 @@ type SignupForm = {
   password: string;
   confirmPassword: string;
   email: string;
+  name: string;
+  birthDate: string;
 };
 
 export default function Signup() {
@@ -137,6 +141,8 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
     email: "",
+    name: "",
+    birthDate: "",
   });
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -161,6 +167,30 @@ export default function Signup() {
       <FormBox>
         <Form onSubmit={onSubmit}>
           <h2>회원가입</h2>
+
+          <InputBox>
+            <input
+              type="text"
+              id="name"
+              required
+              value={form.name}
+              onChange={onChange}
+            />
+            <label htmlFor="name">이름</label>
+            <IoManOutline />
+          </InputBox>
+
+          <InputBox>
+            <input
+              type="text"
+              id="birthDate"
+              required
+              value={form.birthDate}
+              onChange={onChange}
+            />
+            <label htmlFor="birthDate">생년월일</label>
+            <IoCalendar />
+          </InputBox>
 
           <InputBox>
             <input
@@ -203,7 +233,7 @@ export default function Signup() {
               type="email"
               id="email"
               required
-              value={form.email}
+              value={form.name}
               onChange={onChange}
             />
             <label htmlFor="email">이메일</label>

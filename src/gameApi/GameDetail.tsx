@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { apiGetGameDetail } from "../components/api/api";
+import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 import { useEffect, useState } from "react";
 import { BsFillCartCheckFill } from "react-icons/bs";
 import { AiFillLike } from "react-icons/ai";
@@ -9,11 +9,11 @@ import {
   GameResult,
   platformIcons,
   platformBorderColors,
+  GameShortImgResponse,
+  GameImgDefault,
 } from "../types/types";
 import styled from "styled-components";
 import Loader from "../components/common/Loader";
-<<<<<<< Updated upstream
-=======
 import SteamPrice from "../components/api/SteamPrice";
 import SimpleSlider from "../components/common/Slick";
 import { useSelector } from "react-redux";
@@ -33,61 +33,146 @@ import {
   apiCheckGameCart,
   apiCheckGameLike,
   apiGetGameReviews,
+  apiGetGameReviews,
 } from "../components/api/backApi";
->>>>>>> Stashed changes
 
-// 본문 컨테이너 영역 (dominant_color를 연하게 배경으로 사용)
-const ContentContainer = styled.div<{ bgColor: string }>`
-  background-color: ${({ bgColor }) =>
-    `${bgColor}20`}; // 연한 배경색 (투명도 적용)
-  border-radius: 12px;
-
-  @media (max-width: 768px) {
-    font-size: 0.875rem; // 줄이고 싶다면 여기 유지
-  }
-
-  @media (max-width: 468px) {
-    font-size: 0.7em;
-    max-height: 180px;
-  }
-`;
-
-// About 영역 스타일 (styled-components 활용)
-const GameAbout = styled.div`
-  margin: 5% 5%;
-  max-height: 220px;
-  overflow-y: auto;
-
-  h2 {
-    @media (max-width: 768px) {
-      font-size: 1.5rem; // 줄이고 싶다면 여기 유지
-    }
-
-    @media (max-width: 468px) {
-      font-size: 1.3em;
-    }
-  }
-`;
-
-const TextHidden = styled.div`
-  display: block;
-`;
-
-// GameDetail 컴포넌트
 const GameDetail = () => {
-  // 로딩 상태 관리
+  const token = getCurrentUser(); // 토큰정보 가져오기
+  const userInfo = useSelector(selectUserInfo); // 로그인 유저 정보
+  const { id } = useParams(); // URL에서 게임 ID 추출
   const [isLoading, setIsLoading] = useState(false);
+  const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult); // 게임 정보
+  const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault); // 이미지 리스트
+  const [priceValue, setPriceValue] = useState(0); // 숫자 가격
+  const [priceText, setPriceText] = useState("로딩 중..."); // 표시용 문자열
+  const [rating, setRating] = useState(0); // 별점 상태
+  const [reviewText, setReviewText] = useState(""); // 리뷰 텍스트
+  const [reviews, setReviews] = useState<
+    {
+      userName: string;
+      rating: number;
+      content: string;
+      updatedAt: string;
+    }[]
+  >([]);
 
-  // URL 파라미터에서 game id 추출
-  const params = useParams();
-  const { id } = params;
+  // 리뷰 목록 가져오기
+  const fetchReviewList = async () => {
+    if (!id) return;
 
-<<<<<<< Updated upstream
+    const data = await apiGetGameReviews(id);
+    if (data) {
+      setReviews(data);
+      if (userInfo.username) {
+        const myReview = data.find(
+          (rev: { userName: string }) => rev.userName === userInfo.username
+        );
+        if (myReview) {
+          setReviewText(myReview.content);
+          setRating(myReview.rating);
+        }
+      }
+    }
+  };
+
+  // 상세 정보 및 이미지 요청
+  const fetchGameDetail = () => {
+    if (!id) return;
+    setIsLoading(true);
+    apiGetGameImg(id).then((resImg) => setGameImg(resImg));
+    apiGetGameDetail(id)
+      .then((res) => setGameDetail(res))
+      .finally(() => setIsLoading(false));
+  };
+
+  // 가격 정보 수신 핸들러
+  const handlePriceFetch = (numeric: number, formatted: string) => {
+    setPriceValue(numeric);
+    setPriceText(formatted);
+  };
+
+  // 리뷰 등록
+  const submitReview = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+    if (rating === 0 || reviewText.trim() === "") {
+      alert("평점과 리뷰를 모두 입력해 주세요.");
+      return;
+    }
+    const reviewData = {
+      userName: userInfo.username,
+      gameId: gameDetail.id,
+      rating,
+      content: reviewText,
+    };
+    try {
+      const response = await apiAddGameReviews(reviewData); // API 호출
+      alert(response);
+      // 리뷰 목록 반영
+      setReviews([
+        ...reviews,
+        {
+          userName: userInfo.username,
+          rating,
+          content: reviewText,
+          updatedAt: new Date().toISOString(),
+        },
+      ]);
+      setRating(0);
+      setReviewText("");
+      await fetchReviewList(); // 리뷰 목록 다시 불러오기
+    } catch (error) {
+      alert("등록 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 장바구니 저장 요청
+  const cartSave = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+    const cartData = {
+      userName: userInfo.username,
+      gameId: gameDetail.id,
+      title: gameDetail.name,
+      backgroundImage: gameDetail.background_image,
+      price: priceValue,
+      salePrice: 0,
+    };
+    try {
+      const response = await apiAddGameCart(cartData);
+      // 문자열 앞 SUCCESS 및 ERROR 자르고 배열의 두 요소를 각각 변수에 담음
+      const [status, message] = response
+        // 문자열을 ":" 기준으로 분리합니다.
+        .split(":")
+        // 배열의 각 요소에 대해 trim()을 적용해서 앞뒤 공백 제거
+        .map((s: string) => s.trim());
+
+      if (status === "SUCCESS") {
+        alert(message); // 성공 메세지
+      } else {
+        alert("에러: " + message);
+      }
+    } catch (error) {
+      console.error("찜 오류", error);
+      alert("찜 목록 등록 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 찜 저장 요청
+  const likeSave = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+
   // 게임 상세 정보 상태 초기화
   const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult);
 
   // 컴포넌트 mount 시 상세정보 호출
-=======
     const data = await apiGetGameReviews(id);
     if (data) {
       setReviews(data);
@@ -118,7 +203,7 @@ const GameDetail = () => {
       const res = await apiGetGameDetail(id);
       setGameDetail(res); // ← 이게 먼저 실행돼야 함
 
-      // ✅ gameDetail 설정 후에 찜/카트 상태 체크
+      // gameDetail 설정 후에 찜/카트 상태 체크
       if (userInfo?.username) {
         await CheckLikeAndCartStatus(res); // res는 GameResult
       }
@@ -234,12 +319,34 @@ const GameDetail = () => {
       if (status === "SUCCESS") {
         alert(message); // "찜이 취소되었습니다." 등
         setLikeActive((prev) => !prev);
+
+    const likeData = {
+      userName: userInfo.username,
+      gameId: gameDetail.id,
+      title: gameDetail.name,
+      backgroundImage: gameDetail.background_image,
+      price: priceValue,
+      salePrice: 0,
+    };
+    try {
+      const response = await apiAddGameLike(likeData); // e.g. "SUCCESS: 찜이 취소되었습니다."
+      // 문자열 앞 SUCCESS 및 ERROR 자르고 배열의 두 요소를 각각 변수에 담음
+      const [status, message] = response
+        // 문자열을 ":" 기준으로 분리합니다.
+        .split(":")
+        // 배열의 각 요소에 대해 trim()을 적용해서 앞뒤 공백 제거
+        .map((s: string) => s.trim());
+
+      if (status === "SUCCESS") {
+        alert(message); // "찜이 취소되었습니다." 등
+
       } else {
         alert("에러: " + message); // "에러: 중복 등록" 등
       }
     } catch (error) {
       console.error("찜 오류", error);
       alert("찜 목록 등록 중 오류가 발생했습니다.");
+
     }
   };
 
@@ -256,7 +363,6 @@ const GameDetail = () => {
   };
 
   // 상태변경시 값 호출
->>>>>>> Stashed changes
   useEffect(() => {
     GetGameDetail();
   }, []);
@@ -274,16 +380,20 @@ const GameDetail = () => {
     }
   };
 
+  // 상태변경시 값 호출
+  useEffect(() => {
+    fetchGameDetail();
+    fetchReviewList(); // 리뷰 목록도 함께 요청
+  }, [id]);
+
   return (
     <>
-      {/* 로딩 중일 때 Loader 표시 */}
       {isLoading ? (
         <Loader />
       ) : (
         <div className="mt-12 w-full min-h-screen bg-black text-white flex justify-center">
-          {/* 본문 영역 전체 */}
           <div className="max-w-[80%] mx-auto w-full">
-            {/* 상단 헤더 이미지 영역 */}
+            {/* 상단 배경 이미지 영역 */}
             <div
               className="w-full h-[250px] bg-cover bg-center"
               style={{ backgroundImage: `url(${gameDetail.background_image})` }}
@@ -293,19 +403,105 @@ const GameDetail = () => {
               </div>
             </div>
 
-            {/* 본문 내용 - dominant_color 적용 */}
-            <ContentContainer bgColor={gameDetail.dominant_color}>
-              {/* 좋아요 및 장바구니 버튼 */}
-              <div className="flex flex-col items-center my-10">
-                <div className="flex gap-4">
-                  <button className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-full font-bold text-white">
-                    ❤️ 좋아요
-                  </button>
-                  <button className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-full font-bold text-white">
-                    🛒 장바구니
-                  </button>
+            {/* 본문 콘텐츠 */}
+            <ContentContainer>
+              <AboutBetween>
+                {/* 게임 소개 (About) */}
+                <GameAbout className="md:w-2/3">
+                  <h2 className="text-2xl font-bold mb-2">About</h2>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: gameDetail.description,
+                    }}
+                  />
+                </GameAbout>
+
+                {/* 상세 정보 영역 */}
+                <WhiteLine className="md:w-1/3 md:mt-10 grid grid-cols-2 gap-y-1 text-sm max-w-[300px] max-h-[700px]">
+                  {/* 이미지 슬라이더 */}
+                  {gameImg.results.length > 0 && (
+                    <WhiteLine className="col-span-2 mb-2">
+                      <SimpleSlider images={gameImg.results} />
+                    </WhiteLine>
+                  )}
+
+                  <div className="font-bold text-gray-400">정상가</div>
+                  <div>
+                    <SteamPrice
+                      gameName={gameDetail.name}
+                      onPriceFetched={handlePriceFetch}
+                    />
+                  </div>
+
+                  <div className="font-bold text-gray-400">출시일</div>
+                  <div>{gameDetail.released}</div>
+
+                  <div className="font-bold text-gray-400">평점</div>
+                  <div>
+                    {gameDetail.rating} / {gameDetail.rating_top}
+                  </div>
+
+                  <div className="font-bold text-gray-400">메타크리틱</div>
+                  <div>{gameDetail.metacritic ?? "없음"}</div>
+
+                  <div className="font-bold text-gray-400">플레이타임</div>
+                  <div>{gameDetail.playtime}시간</div>
+
+                  <div className="font-bold text-gray-400">장르</div>
+                  <div>{gameDetail.genres.map((g) => g.name).join(", ")}</div>
+
+                  <div className="font-bold text-gray-400">플랫폼</div>
+                  <div className="flex gap-1 flex-wrap">
+                    {gameDetail.parent_platforms.map((p) => {
+                      const slug = p.platform.slug;
+                      const platformName = platformIcons[slug];
+                      if (!platformName) return null;
+                      return (
+                        <span
+                          key={slug}
+                          className="inline-block text-[11px] font-semibold px-2 rounded border"
+                          style={{
+                            border: `1px solid ${
+                              platformBorderColors[slug] || "#ccc"
+                            }`,
+                            color: "#fff",
+                            height: "20px",
+                            lineHeight: "20px",
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          {platformName}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {/* 장바구니 & 위시리스트 버튼 */}
+                  <div className="my-2 text-center">
+                    <div className="inline-block whitespace-nowrap">
+                      <button
+                        onClick={cartSave}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
+                      >
+                        장바구니
+                      </button>
+                      <button
+                        onClick={likeSave}
+                        className="bg-white hover:bg-gray-400 text-black font-bold py-2 px-5 rounded shadow border border-gray-300"
+                      >
+                        위시리스트
+                      </button>
+                    </div>
+                  </div>
+                </WhiteLine>
+              </AboutBetween>
+
+              {/* 리뷰 영역 */}
+              <div className="max-w-4xl mx-auto mt-12 p-4 bg-white/5 rounded-xl">
+                <div className="font-bold text-lg text-gray-300 mb-3">
+                  리뷰 남기기
                 </div>
-              </div>
+
 
               {/* About 영역 (HTML description 파싱 출력) */}
               <GameAbout>
@@ -322,11 +518,9 @@ const GameDetail = () => {
                 <div className="font-bold text-gray-400">출시일</div>
                 <div>{gameDetail.released}</div>
 
-<<<<<<< Updated upstream
                 <div className="font-bold text-gray-400">평점</div>
                 <div>
                   {gameDetail.rating} / {gameDetail.rating_top}
-=======
                   <div className="font-bold text-gray-400">출시일</div>
                   <div>{gameDetail.released}</div>
 
@@ -406,48 +600,85 @@ const GameDetail = () => {
               <div className="max-w-4xl mx-auto mt-12 p-4 bg-white/5 rounded-xl">
                 <div className="font-bold text-lg text-gray-300 mb-3">
                   리뷰 남기기
->>>>>>> Stashed changes
+
+                {/* 별점 선택 */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-white font-semibold">평점:</div>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <span
+                      key={num}
+                      onClick={() => setRating(num)}
+                      className={`cursor-pointer text-2xl ${
+                        num <= rating ? "text-yellow-400" : "text-gray-600"
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
                 </div>
 
-                <div className="font-bold text-gray-400">메타크리틱</div>
-                <div>{gameDetail.metacritic ?? "없음"}</div>
+                {/* 리뷰 작성 */}
+                <textarea
+                  spellCheck="false"
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="게임에 대한 후기를 남겨주세요..."
+                  className="w-full h-24 p-3 rounded bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring focus:border-yellow-400 mb-4 resize-none"
+                />
 
-                <div className="font-bold text-gray-400">플레이타임</div>
-                <div>{gameDetail.playtime}시간</div>
+                {/* 등록 버튼 */}
+                <button
+                  onClick={submitReview}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded"
+                >
+                  {reviews.some((r) => r.userName === userInfo.username)
+                    ? "수정하기"
+                    : "등록하기"}
+                </button>
 
-                <div className="font-bold text-gray-400">장르</div>
-                <div>{gameDetail.genres.map((g) => g.name).join(", ")}</div>
-
-                <div className="font-bold text-gray-400">플랫폼</div>
-                {/* 플랫폼에 약어 + 색상 적용 */}
-                <div className="flex gap-1 flex-wrap">
-                  {gameDetail.parent_platforms.map((p) => {
-                    const slug = p.platform.slug;
-                    const platformName = platformIcons[slug];
-                    if (!platformName) return null; // 등록되지 않은 slug는 제외
-                    return (
-                      <span
-                        key={slug}
-                        className="text-xs font-semibold px-2 py-0.5 rounded"
-                        style={{
-                          border: `1px solid ${
-                            platformBorderColors[slug] || "#ccc"
-                          }`,
-                          color: "#fff",
-                        }}
-                      >
-                        {platformName}
-                      </span>
-                    );
-                  })}
+                {/* 리뷰 리스트 출력 */}
+                <div className="mt-8">
+                  <div className="font-bold text-lg text-gray-300 mb-3">
+                    리뷰 목록
+                  </div>
+                  {reviews.length === 0 ? (
+                    <div className="text-gray-400">
+                      아직 작성된 리뷰가 없습니다.
+                    </div>
+                  ) : (
+                    <ul className="space-y-4">
+                      {reviews.map((rev, idx) => (
+                        <li key={idx} className="bg-white/10 p-3 rounded">
+                          {/* 작성자 이름 */}
+                          <div className="text-sm text-gray-500 mb-1">
+                            {" "}
+                            <span className="font-semibold text-white">
+                              {rev.userName}
+                            </span>
+                          </div>
+                          <div className="text-yellow-400 mb-1">
+                            {"★".repeat(rev.rating)}
+                            <span className="text-gray-400 text-sm">
+                              {" "}
+                              ({rev.rating}점)
+                            </span>
+                          </div>
+                          <div className="text-white mb-1">{rev.content}</div>
+                          <div className="text-gray-500 text-xs">
+                            {new Date(rev.updatedAt).toLocaleString()}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
 
               {/* 구매 스토어 영역 */}
-              <div className="max-w-4xl mx-auto mt-8">
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">구매 스토어</div>
                 <div className="flex flex-wrap gap-3">
-                  {gameDetail.stores.map((s, idx) => (
+                  {gameDetail?.stores?.map((s, idx) => (
                     <a
                       key={idx}
                       href={`https://${s.store.domain}`}
@@ -461,8 +692,8 @@ const GameDetail = () => {
                 </div>
               </div>
 
-              {/* 태그 영역 */}
-              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden sm:block">
+              {/* 태그 출력 */}
+              <div className="max-w-4xl mx-auto mt-8 text-sm sm:text-base md:text-lg hidden md:block">
                 <div className="font-bold text-gray-400 mb-2">태그</div>
                 <div className="flex flex-wrap gap-2">
                   {gameDetail.tags.slice(0, 20).map((t, idx) => (

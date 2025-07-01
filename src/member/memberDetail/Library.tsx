@@ -18,7 +18,7 @@ interface LayoutContext {
 // === 스타일 정의 영역 ===
 
 // 전체 페이지 래퍼 - 사이드바 열림 여부에 따라 좌측 여백 조정
-const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
+const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -26,7 +26,7 @@ const PageWrapper = styled.div<{ isSidebarOpen: boolean }>`
   padding: 2em;
   background-color: #121317;
   box-sizing: border-box;
-  margin-left: ${(props) => (props.isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
@@ -43,6 +43,7 @@ const LibraryBox = styled.div`
   padding: 40px;
   color: #fff;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  margin-top: 150px;
 `;
 
 // 페이지 타이틀
@@ -187,7 +188,7 @@ const Library: React.FC = () => {
   };
 
   return (
-    <PageWrapper isSidebarOpen={isSidebarOpen}>
+    <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <LibraryBox>
         <Title>내 게임 라이브러리</Title>
 

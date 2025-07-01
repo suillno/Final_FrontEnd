@@ -1,4 +1,4 @@
-import { instanceBack } from "./instance";
+import { instanceBack, instanceAuth } from "./instance";
 
 // 리뷰 목록 가져오기
 export const apiGetGameReviews = async (gameId: string) => {
@@ -61,6 +61,7 @@ export const apiAddGameCart = async (cartData: {
   }
 };
 
+
 export const apiCheckGameCart = async (userName: string, gameId: number) => {
   try {
     const res = await instanceBack.get(`/member/review/checkCart/${gameId}`);
@@ -78,5 +79,46 @@ export const apiCheckGameLike = async (userName: string, gameId: number) => {
   } catch (error) {
     console.error("위시리스트 여부 확인 실패", error);
     return false;
+
+// 회원가입 요청
+export const apiRegisterUser = async (registerData: {
+  username: string;
+  password: string;
+  name: string;
+  email: string;
+  birth: string;
+  roleNum: number;
+}) => {
+  try {
+    const res = await instanceAuth.post("/auth/register", registerData);
+    return res.data; // { success: true, message: "등록되었습니다." }
+  } catch (error) {
+    console.error("회원가입 실패", error);
+    throw error;
+  }
+};
+
+// 아이디 중복 확인
+export const apiCheckUsername = async (username: string) => {
+  try {
+    const res = await instanceAuth.get("/auth/check/username", {
+      params: { username },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error("아이디 확인 중 오류");
+  }
+};
+
+// 이메일 중복 확인
+export const apiCheckEmail = async (email: string) => {
+  try {
+    const res = await instanceAuth.get("/auth/check/email", {
+      params: { email },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error("이메일 확인 중 오류");
+
   }
 };

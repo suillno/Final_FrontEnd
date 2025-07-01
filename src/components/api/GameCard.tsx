@@ -14,7 +14,7 @@ import SteamPrice from "./SteamPrice";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import dayjs from "dayjs";
-import { CalenderSvg } from "../../img/SvgImg";
+import { CalenderSvg, PriceSvg } from "../../img/SvgImg";
 
 // 카드 전체 레이아웃 스타일 정의
 const Card = styled.div`
@@ -125,9 +125,14 @@ const GameCard: React.FC<Props> = ({ item }) => {
         </div>
 
         {/* 가격 컴포넌트 */}
-        <SteamPrice gameName={item.name} />
+        <div className="text-sm mt-1">
+          <span className="flex items-center gap-1">
+            {/* 동그라미 안에 화폐 아이콘 */}
+            <PriceSvg />
+            가격: <SteamPrice gameName={item.name} />
+          </span>
+        </div>
       </Info>
-
       {/* Hover 시 오버레이 정보 */}
       <Overlay>
         <div>
