@@ -128,23 +128,24 @@ export const FormBox = styled.div`
   }
 `;
 
+export const H2 = styled.p`
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   height: 100%;
-
-  h2 {
-    font-size: 2em;
-    color: #fff;
-    text-align: center;
-    margin-bottom: 20px;
-  }
 `;
 
 export const InputBox = styled.div`
   position: relative;
+  z-index: 20;
   width: 100%;
   border-bottom: 2px solid #fff;
   margin-bottom: 20px;
@@ -205,6 +206,13 @@ export const InputBox = styled.div`
     font-size: 1em;
     padding: 0 2.5rem 0 5px;
     color: #fff;
+    background-color: transparent;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input:-webkit-autofill {
+    -webkit-text-fill-color: #fff !important;
+    box-shadow: transparent inset !important;
   }
 
   svg {
