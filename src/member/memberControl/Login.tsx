@@ -33,6 +33,7 @@ import {
   SubLogo,
   SignPanel,
   CheckButton,
+  H2,
 } from "../../style/Login.styles";
 
 // 아이콘
@@ -196,7 +197,7 @@ export default function LoginPage() {
         </Link>
         <div className="h-[600px] overflow-auto">
           <FormBox className={!isSignIn ? "active" : ""}>
-            <h2>회원가입</h2>
+            <H2>회원가입</H2>
             <Form onSubmit={onSubmitRegister}>
               {/* 아이디 입력 + 중복확인 */}
               <InputBox>
@@ -304,8 +305,8 @@ export default function LoginPage() {
           <SubLogo src={PGLogo} alt="PG로고" $visible={isSignIn} />
         </Link>
         <FormBox className={isSignIn ? "active" : ""}>
+          <H2>로그인</H2>
           <Form onSubmit={onSubmitLogin}>
-            <h2>로그인</h2>
             <InputBox>
               <input
                 type="text"

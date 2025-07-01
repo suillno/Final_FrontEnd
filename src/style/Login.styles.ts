@@ -128,19 +128,19 @@ export const FormBox = styled.div`
   }
 `;
 
+export const H2 = styled.p`
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   height: 100%;
-
-  h2 {
-    font-size: 2em;
-    color: #fff;
-    text-align: center;
-    margin-bottom: 20px;
-  }
 `;
 
 export const InputBox = styled.div`
