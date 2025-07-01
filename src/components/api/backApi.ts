@@ -61,6 +61,25 @@ export const apiAddGameCart = async (cartData: {
   }
 };
 
+
+export const apiCheckGameCart = async (userName: string, gameId: number) => {
+  try {
+    const res = await instanceBack.get(`/member/review/checkCart/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("찜 여부 확인 실패", error);
+    return false;
+  }
+};
+
+export const apiCheckGameLike = async (userName: string, gameId: number) => {
+  try {
+    const res = await instanceBack.get(`/member/review/checkLike/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("위시리스트 여부 확인 실패", error);
+    return false;
+
 // 회원가입 요청
 export const apiRegisterUser = async (registerData: {
   username: string;
@@ -100,6 +119,7 @@ export const apiCheckEmail = async (email: string) => {
     return res.data;
   } catch (err) {
     throw new Error("이메일 확인 중 오류");
+
   }
 };
 
