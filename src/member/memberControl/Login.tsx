@@ -34,6 +34,7 @@ import {
   SignPanel,
   CheckButton,
   H2,
+  Div,
 } from "../../style/Login.styles";
 
 // 아이콘
@@ -195,9 +196,13 @@ export default function LoginPage() {
         <Link to={"/"}>
           <Logo src={PGLogo} alt="PG로고" $visible={!isSignIn} />
         </Link>
-        <div className="h-[600px] overflow-auto">
+        <Div
+          className={
+            isSignIn ? "h-[600px] sign-in" : "h-[600px] sign-up active"
+          }
+        >
+          <H2>회원가입</H2>
           <FormBox className={!isSignIn ? "active" : ""}>
-            <H2>회원가입</H2>
             <Form onSubmit={onSubmitRegister}>
               {/* 아이디 입력 + 중복확인 */}
               <InputBox>
@@ -289,14 +294,13 @@ export default function LoginPage() {
                 <label htmlFor="registerEmailCode">인증번호 입력</label>
                 <IoCheckmarkCircleOutline />
               </InputBox>
-
-              <Button type="submit">회원가입</Button>
-              <ToggleText>
-                계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
-              </ToggleText>
             </Form>
+            <Button type="submit">회원가입</Button>
+            <ToggleText>
+              계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
+            </ToggleText>
           </FormBox>
-        </div>
+        </Div>
       </SignPanel>
 
       {/* 로그인 패널 */}
@@ -304,9 +308,9 @@ export default function LoginPage() {
         <Link to={"/"}>
           <SubLogo src={PGLogo} alt="PG로고" $visible={isSignIn} />
         </Link>
-        <FormBox className={isSignIn ? "active" : ""}>
-          <H2>로그인</H2>
+        <FormBox className={isSignIn ? "active" : ""} $isLogin={isSignIn}>
           <Form onSubmit={onSubmitLogin}>
+            <H2>로그인</H2>
             <InputBox>
               <input
                 type="text"
