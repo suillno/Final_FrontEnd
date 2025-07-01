@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 import { useEffect, useState } from "react";
+import { BsFillCartCheckFill } from "react-icons/bs";
+import { AiFillLike } from "react-icons/ai";
 import {
   defaultGameResult,
   GameResult,
@@ -28,6 +30,8 @@ import {
   apiAddGameLike,
   apiAddGameReviews,
   apiGetGameReviews,
+  apiCheckGameCart,
+  apiCheckGameLike,
 } from "../components/api/backApi";
 
 const GameDetail = () => {
@@ -41,6 +45,9 @@ const GameDetail = () => {
   const [priceText, setPriceText] = useState("로딩 중..."); // 표시용 문자열
   const [rating, setRating] = useState(0); // 별점 상태
   const [reviewText, setReviewText] = useState(""); // 리뷰 텍스트
+  // 찜, 위시리스트
+  const [cartActive, setCartActive] = useState(false);
+  const [likeActive, setLikeActive] = useState(false);
   const [reviews, setReviews] = useState<
     {
       userName: string;
@@ -70,13 +77,26 @@ const GameDetail = () => {
   };
 
   // 상세 정보 및 이미지 요청
-  const fetchGameDetail = () => {
+  const fetchGameDetail = async () => {
     if (!id) return;
     setIsLoading(true);
-    apiGetGameImg(id).then((resImg) => setGameImg(resImg));
-    apiGetGameDetail(id)
-      .then((res) => setGameDetail(res))
-      .finally(() => setIsLoading(false));
+
+    try {
+      const resImg = await apiGetGameImg(id);
+      setGameImg(resImg);
+
+      const res = await apiGetGameDetail(id);
+      setGameDetail(res); // ← 이게 먼저 실행돼야 함
+
+      // gameDetail 설정 후에 찜/카트 상태 체크
+      if (userInfo?.username) {
+        await CheckLikeAndCartStatus(res); // res는 GameResult
+      }
+    } catch (error) {
+      console.error("게임 정보 불러오기 실패", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 가격 정보 수신 핸들러
@@ -146,6 +166,8 @@ const GameDetail = () => {
         .map((s: string) => s.trim());
 
       if (status === "SUCCESS") {
+        // 장바구니 저장 상태 확인
+        await CheckLikeAndCartStatus(gameDetail);
         alert(message); // 성공 메세지
       } else {
         alert("에러: " + message);
@@ -156,7 +178,7 @@ const GameDetail = () => {
     }
   };
 
-  // 찜 저장 요청
+  // 위시리스트 저장 요청
   const likeSave = async () => {
     if (!userInfo.username) {
       alert("로그인 후 사용 가능합니다");
@@ -181,6 +203,8 @@ const GameDetail = () => {
         .map((s: string) => s.trim());
 
       if (status === "SUCCESS") {
+        // 상태 확인
+        await CheckLikeAndCartStatus(gameDetail);
         alert(message); // "찜이 취소되었습니다." 등
       } else {
         alert("에러: " + message); // "에러: 중복 등록" 등
@@ -188,6 +212,19 @@ const GameDetail = () => {
     } catch (error) {
       console.error("찜 오류", error);
       alert("찜 목록 등록 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 장바구니, 위시리스트 등록여부 조회
+  const CheckLikeAndCartStatus = async (game: GameResult) => {
+    if (!userInfo.username || !game?.id) return;
+    try {
+      const likeRes = await apiCheckGameLike(userInfo.username, game.id);
+      const cartRes = await apiCheckGameCart(userInfo.username, game.id);
+      setLikeActive(Boolean(likeRes));
+      setCartActive(Boolean(cartRes));
+    } catch (error) {
+      console.error("찜/장바구니 상태 확인 중 오류: ", error);
     }
   };
 
@@ -292,15 +329,28 @@ const GameDetail = () => {
                     <div className="inline-block whitespace-nowrap">
                       <button
                         onClick={cartSave}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
+                        className="group hover:bg-black-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
                       >
-                        장바구니
+                        {/* //////////////////////////////////////// */}
+                        <div>
+                          <BsFillCartCheckFill
+                            className={`text-2xl w-20 group-hover:text-green-500 transition-colors duration-200 ${
+                              cartActive ? "text-green-500" : "text-white"
+                            }`}
+                          />
+                        </div>
                       </button>
                       <button
                         onClick={likeSave}
-                        className="bg-white hover:bg-gray-400 text-black font-bold py-2 px-5 rounded shadow border border-gray-300"
+                        className="group hover:bg-black-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
                       >
-                        위시리스트
+                        <div>
+                          <AiFillLike
+                            className={`text-2xl w-20 group-hover:text-red-500 transition-colors duration-200 ${
+                              likeActive ? "text-red-500" : "text-white"
+                            }`}
+                          />
+                        </div>
                       </button>
                     </div>
                   </div>

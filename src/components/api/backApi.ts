@@ -102,3 +102,25 @@ export const apiCheckEmail = async (email: string) => {
     throw new Error("이메일 확인 중 오류");
   }
 };
+
+// 장바구니 조회하기
+export const apiCheckGameCart = async (userName: string, gameId: number) => {
+  try {
+    const res = await instanceBack.get(`/member/review/checkCart/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("찜 여부 확인 실패", error);
+    return false;
+  }
+};
+
+// 위시리스트 조회하기
+export const apiCheckGameLike = async (userName: string, gameId: number) => {
+  try {
+    const res = await instanceBack.get(`/member/review/checkLike/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("위시리스트 여부 확인 실패", error);
+    return false;
+  }
+};
