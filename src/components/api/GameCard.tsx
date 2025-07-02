@@ -1,6 +1,6 @@
 // GameCard.tsx
 // 게임 카드 컴포넌트: 각 게임의 이미지, 타이틀, 플랫폼, 평점, 가격, 장르 등의 정보를 보여줌
-
+import PGLogoContents from "../../img/PGLogoContents.png";
 import React from "react";
 import styled from "styled-components";
 import {
@@ -69,11 +69,20 @@ const GameCard: React.FC<Props> = ({ item }) => {
     <Card>
       {/* 게임 이미지 */}
       <img
-        src={`https://media.rawg.io/media/resize/640/-/${
-          item.background_image.split("/media/")[1]
-        }`}
+        src={
+          item.background_image
+            ? `https://media.rawg.io/media/resize/640/-/${
+                item.background_image.split("/media/")[1]
+              }`
+            : PGLogoContents // 이미지 없을 때 대체 이미지
+        }
         alt={item.name}
-        className="w-full h-[174px] md:h-[300px] bg-[#555] object-cover"
+        style={{
+          width: "640px",
+          height: "100%",
+
+          objectFit: "cover", // 또는 "contain"
+        }}
       />
 
       {/* 기본 정보 표시 영역 */}

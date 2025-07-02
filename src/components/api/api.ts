@@ -146,3 +146,24 @@ export const apiGetGameTime = async (GameTime: string, pageNext: number) => {
     return null;
   }
 };
+
+/**
+ * 게임 플렛폼 조회
+ * @param platformId
+ * @param pageNext
+ * @returns
+ */
+export const apiGetGamesByPlatform = async (
+  platformId: number | string,
+  pageNext: number
+) => {
+  try {
+    const res = await instance.get("/game/gamePlatform", {
+      params: { platforms: platformId, page: pageNext },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("백엔드 API 호출 실패", error);
+    return null;
+  }
+};
