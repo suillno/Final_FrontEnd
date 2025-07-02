@@ -29,7 +29,7 @@ function App() {
           cancelButtonText: "취소",
           reverseButtons: true,
         })
-        .then((result) => result.isConfirmed);
+        .then((result: { isConfirmed: any }) => result.isConfirmed);
     };
   }, []);
 
