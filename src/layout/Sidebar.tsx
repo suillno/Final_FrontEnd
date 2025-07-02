@@ -79,10 +79,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
       {/* 탐색 관련 섹션 */}
       <Section>
-        <SectionTitle>Browse</SectionTitle>
-        <MenuItem>Platforms</MenuItem>
-        <MenuItem>Stores</MenuItem>
-        <MenuItem>Collections</MenuItem>
+        <SectionTitle>GameVerse</SectionTitle>
+        <MenuItem>
+          <Link to="/game/GamePsList">PlayStation</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/game/GameNsList">Nintendo</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/game/GamePcList">PC</Link>
+        </MenuItem>
+        <MenuItem>
+          <Link to="/game/GameXboxList">Xbox</Link>
+        </MenuItem>
       </Section>
 
       {/* 관리자 전용 메뉴 섹션 */}
