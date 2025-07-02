@@ -105,19 +105,49 @@ export const SignPanel = styled.div<{ $active: boolean }>`
   }
 `;
 
-export const FormBox = styled.div`
-  width: 375px;
-  height: 500px;
+export const FormBox = styled.div<{ $isLogin?: boolean }>`
+  width: 410px;
+  height: 470px;
   max-height: 600px;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   background-color: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  padding: 40px;
   backdrop-filter: blur(15px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 1s;
+  transition-delay: 1000ms;
+
+  ${(props) =>
+    props.$isLogin &&
+    `
+     border: 2px solid rgba(255, 255, 255, 0.5);
+     border-radius: 20px;
+     padding: 40px;
+     justify-content: center;
+     padding-bottom: 20px;
+    `}
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+`;
+
+export const H2 = styled.p`
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+export const Div = styled.div`
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  padding: 40px;
+  overflow: hidden;
   opacity: 0;
   visibility: hidden;
   transition: all 1s;
@@ -128,23 +158,25 @@ export const FormBox = styled.div`
   }
 `;
 
-export const Form = styled.form`
+export const Form = styled.form<{ $isLogin?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   height: 100%;
-
-  h2 {
-    font-size: 2em;
-    color: #fff;
-    text-align: center;
-    margin-bottom: 20px;
-  }
+  ${(props) =>
+    !props.$isLogin &&
+    `
+     overflow-y: auto;
+     max-height: 430px;
+     padding-right: 4px;
+    //  margin-bottom: 50px;
+    `}
 `;
 
 export const InputBox = styled.div`
   position: relative;
+  z-index: 20;
   width: 100%;
   border-bottom: 2px solid #fff;
   margin-bottom: 20px;
@@ -205,6 +237,13 @@ export const InputBox = styled.div`
     font-size: 1em;
     padding: 0 2.5rem 0 5px;
     color: #fff;
+    background-color: transparent;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input:-webkit-autofill {
+    -webkit-text-fill-color: #fff !important;
+    box-shadow: transparent inset !important;
   }
 
   svg {
@@ -227,7 +266,7 @@ export const Button = styled.button`
   cursor: pointer;
   font-size: 1em;
   font-weight: 600;
-  margin-top: 5px;
+  margin-top: 10px;
 
   &:hover {
     background: #fff;
@@ -254,6 +293,7 @@ export const Find = styled.div`
 export const ToggleText = styled.p`
   color: #fff;
   margin-top: 10px;
+  text-align: center;
 
   span {
     font-weight: bold;

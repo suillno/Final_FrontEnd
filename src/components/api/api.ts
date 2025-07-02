@@ -20,21 +20,6 @@ export const apiGetGameList = async (pageNext: number) => {
 };
 
 /**
- * RAWG 상세 게임 정보 조회
- * @param gameId
- * @returns
- */
-export const apiGetGameDetail = async (gameId: string) => {
-  try {
-    const res = await instance.get(`/game/detail/${gameId}`);
-    return res.data;
-  } catch (error) {
-    console.error("게임 상세 호출 에러", error);
-    return null;
-  }
-};
-
-/**
  * 게임 장르별조회
  * @param Genres
  * @param pageNext
@@ -65,6 +50,21 @@ export const apiGetGameImg = async (gameId: string) => {
     return res.data;
   } catch (error) {
     console.error("게임 검색 호출 에러", error);
+    return null;
+  }
+};
+
+/**
+ * RAWG 상세 게임 정보 조회
+ * @param gameId
+ * @returns
+ */
+export const apiGetGameDetail = async (gameId: string) => {
+  try {
+    const res = await instance.get(`/game/detail/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("게임 상세 호출 에러", error);
     return null;
   }
 };
