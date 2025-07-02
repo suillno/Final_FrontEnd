@@ -163,7 +163,6 @@ const GameDetail = () => {
                 <h2 className="text-5xl font-bold">{gameDetail.name}</h2>
               </div>
             </div>
-
             <ContentContainer>
               <GameInfo
                 gameDetail={gameDetail}

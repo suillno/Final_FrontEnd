@@ -16,6 +16,8 @@ import SteamPrice from "../api/SteamPrice";
 import SimpleSlider from "../common/Slick";
 import { BsFillCartCheckFill } from "react-icons/bs";
 import { AiFillLike } from "react-icons/ai";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../auth/store/userInfo";
 
 interface Props {
   gameDetail: GameResult;
@@ -36,6 +38,11 @@ const GameInfo = ({
   cartActive,
   likeActive,
 }: Props) => {
+  const userInfo = useSelector(selectUserInfo); // 로그인 유저 정보 가져오기
+  const isAdmin = userInfo.roles.some(
+    (role: { id: number; role: string }) => role.role === "ROLE_ADMIN"
+  ); // 관리자 여부 판별
+  console.log(userInfo.roles);
   return (
     <AboutBetween>
       {/* 게임 설명 */}
@@ -108,27 +115,44 @@ const GameInfo = ({
 
         {/* 장바구니 & 찜 버튼 */}
         <div className="my-2 text-center col-span-2">
-          <div className="inline-block whitespace-nowrap">
+          <div className="flex justify-center items-center gap-2 col-span-2 my-2">
+            {/* 장바구니 버튼 */}
             <button
               onClick={onCartClick}
-              className="group hover:bg-black-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
+              className="group bg-transparent hover:bg-black-700 text-white font-bold p-2 rounded shadow"
             >
               <BsFillCartCheckFill
-                className={`text-2xl w-20 group-hover:text-green-500 transition-colors duration-200 ${
+                className={`text-2xl transition-colors duration-200 ${
                   cartActive ? "text-green-500" : "text-white"
                 }`}
               />
             </button>
+
+            {/* 찜 버튼 */}
             <button
               onClick={onLikeClick}
-              className="group hover:bg-black-700 text-white font-bold py-2 px-5 rounded shadow mr-2"
+              className="group bg-transparent hover:bg-black-700 text-white font-bold p-2 rounded shadow"
             >
               <AiFillLike
-                className={`text-2xl w-20 group-hover:text-red-500 transition-colors duration-200 ${
+                className={`text-2xl transition-colors duration-200 ${
                   likeActive ? "text-red-500" : "text-white"
                 }`}
               />
             </button>
+
+            {/* 관리자만 보이는 할인 적용 버튼 (아이콘형) */}
+            {isAdmin && (
+              <button
+                type="button"
+                className="bg-blue-700 hover:bg-blue-800 text-white font-bold p-2 rounded shadow"
+                onClick={() => {
+                  console.log("관리자: 할인가격 적용 클릭");
+                }}
+                title="할인가격 적용"
+              >
+                💲
+              </button>
+            )}
           </div>
         </div>
       </WhiteLine>

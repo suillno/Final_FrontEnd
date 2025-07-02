@@ -134,11 +134,6 @@ const CartPage: React.FC = () => {
 
   // 🔸 장바구니 목록 불러오기
   const fetchCartItems = async () => {
-    if (!username) {
-      setError("로그인이 필요합니다.");
-      return;
-    }
-
     try {
       const data = await apiGetCartList(username);
       setCart(data);

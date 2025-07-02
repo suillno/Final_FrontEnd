@@ -255,7 +255,7 @@ export default function LoginPage() {
         >
           <H2>회원가입</H2>
           <FormBox className={!isSignIn ? "active" : ""}>
-            <Form onSubmit={onSubmitRegister}>
+            <Form id="register-form" onSubmit={onSubmitRegister}>
               {/* 아이디 입력 + 중복확인 */}
               <InputBox>
                 <input
@@ -350,7 +350,9 @@ export default function LoginPage() {
                 <IoCheckmarkCircleOutline />
               </InputBox>
             </Form>
-            <Button type="submit">회원가입</Button>
+            <Button type="submit" form="register-form">
+              회원가입
+            </Button>
             <ToggleText>
               계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
             </ToggleText>
