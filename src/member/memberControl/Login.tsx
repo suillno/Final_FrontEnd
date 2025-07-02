@@ -135,6 +135,45 @@ export default function LoginPage() {
     }
   };
 
+  // 이메일 인증 처리
+
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const verifyEmailCode = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/email/verify",
+        {
+          email: registerForm.registerEmail,
+          code: registerForm.registerEmailCode,
+        }
+      );
+      alert(res.data);
+      setIsEmailVerified(true);
+    } catch (err) {
+      alert("인증 실패");
+    }
+  };
+
+  const sendEmailVerification = async () => {
+    if (!registerForm.registerEmail) {
+      alert("이메일을 입력해주세요.");
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/email/send",
+        {
+          email: registerForm.registerEmail,
+        }
+      );
+      alert(res.data.message || "인증코드가 전송되었습니다!");
+    } catch (err) {
+      alert("이메일 인증코드 전송 실패!");
+    }
+  };
+
   // 로그인 처리
   const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -169,6 +208,19 @@ export default function LoginPage() {
       alert("비밀번호가 일치하지 않습니다.");
       return;
     }
+
+    if (!isEmailVerified) {
+      alert("이메일 인증을 먼저 완료해주세요.");
+      return;
+    }
+
+    if (
+      registerForm.registerPassword !== registerForm.registerConfirmPassword
+    ) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
     try {
       const registerData = {
         username: registerForm.registerId,
@@ -292,6 +344,9 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmailCode">인증번호 입력</label>
+                <CheckButton type="button" onClick={sendEmailVerification}>
+                  인증코드 전송
+                </CheckButton>
                 <IoCheckmarkCircleOutline />
               </InputBox>
             </Form>
