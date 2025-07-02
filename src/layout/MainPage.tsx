@@ -6,6 +6,7 @@ import { apiGetGameList } from "../components/api/api";
 import Loader, { LoaderButton } from "../components/common/Loader";
 import { Link, useOutletContext, useLocation } from "react-router-dom";
 import GameCard from "../components/api/GameCard";
+import mainBanner from "../img/mainBanner.png";
 
 // 레이아웃 컨텍스트 타입 (사이드바 열림 여부)
 interface LayoutContext {
@@ -27,7 +28,9 @@ const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
 const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3.5vw;
   font-weight: 900;
+  max-width: 90%;
   margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
+  margin-bottom: 2%;
   transition: margin-left 0.3s ease;
   background: linear-gradient(90deg, #ff512f, #dd2476);
   -webkit-background-clip: text;
@@ -97,7 +100,9 @@ const MainPage: React.FC = () => {
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
-      <MainTitle $isSidebarOpen={isSidebarOpen}>🔥 Top Picks</MainTitle>
+      <MainTitle $isSidebarOpen={isSidebarOpen}>
+        <img src={mainBanner} />
+      </MainTitle>
 
       {/* 게임 카드 목록 */}
       <MainContainer
