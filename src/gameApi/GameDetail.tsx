@@ -2,7 +2,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
 import {
   defaultGameResult,
   GameResult,
@@ -104,43 +103,14 @@ const GameDetail = () => {
     setPriceText(formatted);
   };
 
-  // 장바구니 저장
-  const cartSave = async () => {
+  // 장바구니/찜 통합 저장 함수
+  const handleSave = async (type: "cart" | "like") => {
     if (!userInfo.username) {
       alert("로그인 후 사용 가능합니다");
       return;
     }
-    const cartData = {
-      userName: userInfo.username,
-      gameId: gameDetail.id,
-      title: gameDetail.name,
-      backgroundImage: gameDetail.background_image,
-      price: priceValue,
-      salePrice: 0,
-    };
-    try {
-      const response = await apiAddGameCart(cartData);
-      const [status, message] = response
-        .split(":")
-        .map((s: string) => s.trim());
-      if (status === "SUCCESS") {
-        alert(message);
-        setCartActive((prev) => !prev);
-      } else {
-        alert("에러: " + message);
-      }
-    } catch (error) {
-      alert("장바구니 등록 오류");
-    }
-  };
 
-  // 찜 저장
-  const likeSave = async () => {
-    if (!userInfo.username) {
-      alert("로그인 후 사용 가능합니다");
-      return;
-    }
-    const likeData = {
+    const data = {
       userName: userInfo.username,
       gameId: gameDetail.id,
       title: gameDetail.name,
@@ -148,19 +118,27 @@ const GameDetail = () => {
       price: priceValue,
       salePrice: 0,
     };
+
     try {
-      const response = await apiAddGameLike(likeData);
+      const apiCall = type === "cart" ? apiAddGameCart : apiAddGameLike;
+
+      const response = await apiCall(data);
       const [status, message] = response
         .split(":")
         .map((s: string) => s.trim());
+
       if (status === "SUCCESS") {
         alert(message);
-        setLikeActive((prev) => !prev);
+        if (type === "cart") {
+          setCartActive((prev) => !prev);
+        } else {
+          setLikeActive((prev) => !prev);
+        }
       } else {
         alert("에러: " + message);
       }
     } catch (error) {
-      alert("찜 등록 오류");
+      alert(type === "cart" ? "장바구니 등록 오류" : "찜 등록 오류");
     }
   };
 
@@ -191,8 +169,8 @@ const GameDetail = () => {
                 gameDetail={gameDetail}
                 gameImg={gameImg}
                 onPriceFetched={handlePriceFetch}
-                onCartClick={cartSave}
-                onLikeClick={likeSave}
+                onCartClick={() => handleSave("cart")}
+                onLikeClick={() => handleSave("like")}
                 cartActive={cartActive}
                 likeActive={likeActive}
               />

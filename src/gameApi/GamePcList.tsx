@@ -1,24 +1,24 @@
-// MainPage.tsx
+// GamePsList.tsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { defaultGameResponse, GameResponse, GameResult } from "../types/types";
-import { apiGetGameList } from "../components/api/api";
+import { apiGetGamesByPlatform, apiGetGameTime } from "../components/api/api";
 import Loader, { LoaderButton } from "../components/common/Loader";
-import { Link, useOutletContext, useLocation } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import GameCard from "../components/api/GameCard";
-import mainBanner from "../img/mainBanner.png";
 
-// 레이아웃 컨텍스트 타입 (사이드바 열림 여부)
+// 헤더에서 입력받은 값이 있으면 타이틀로 서치 동작
+
+// 레이아웃 컨텍스트 타입 (사이드바 열림 여부 확인용)
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// 메인 콘텐츠 컨테이너 스타일 (사이드바 여닫힘에 따라 margin 조정)
+// 메인 그리드 컨테이너 스타일 정의
 const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
   margin-right: 5%;
   margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "5%")};
   transition: margin-left 0.3s ease;
-
   @media (max-width: 768px) {
     margin: 0 5%;
   }
@@ -28,11 +28,9 @@ const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
 const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3.5vw;
   font-weight: 900;
-  max-width: 90%;
   margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
-  margin-bottom: 2%;
   transition: margin-left 0.3s ease;
-  background: linear-gradient(90deg, #ff512f, #dd2476);
+  background: linear-gradient(90deg, #4a90e2, #4a90e2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
@@ -57,33 +55,37 @@ const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   }
 `;
 
-// 메인 페이지 컴포넌트
-const MainPage: React.FC = () => {
-  // 레이아웃에서 context로 전달된 사이드바 상태 가져오기
+// 메인 페이지 컴포넌트 정의
+const GamePcList: React.FC = () => {
+  // 레이아웃에서 사이드바 열림 여부 가져오기
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
+  // 게임 목록, 페이지, 로딩 상태 관리
   const [gameResponse, setGameResponse] =
     useState<GameResponse>(defaultGameResponse);
   const [pageCount, setPageCount] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [firstLoading, setfirstLoading] = useState(false);
 
-  // 페이지 증가
+  // 페이지 증가 함수 (더보기 버튼 클릭 시 호출)
   const pageNext = () => setPageCount((prev) => prev + 1);
 
-  // 게임 리스트 불러오기
-  // 더보기 요청 시
-  const getGameList = (page: number) => {
+  // RAWG API 호출하여 게임 리스트 불러오기
+  const getPlatformList = (pageCount: number) => {
     // 첫 로딩일 경우에만 firstLoading true
-    if (page === 1) {
+    if (pageCount === 1) {
       setfirstLoading(true);
     } else {
       setIsLoading(true);
     }
-    apiGetGameList(page)
+    apiGetGamesByPlatform(4, pageCount)
       .then((res) => {
+        if (!res) return;
+        // 기존 게임 결과에 새 결과 추가
         const results =
-          page === 1 ? res.results : [...gameResponse.results, ...res.results];
+          pageCount === 1
+            ? res.results
+            : [...gameResponse.results, ...res.results];
         setGameResponse({ ...res, results });
       })
       .finally(() => {
@@ -92,23 +94,22 @@ const MainPage: React.FC = () => {
       });
   };
 
-  // 페이지 변경 시 API 호출
+  // 페이지 변경될 때마다 게임 리스트 불러오기
   useEffect(() => {
-    getGameList(pageCount);
+    getPlatformList(pageCount);
   }, [pageCount]);
 
   return (
     <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
       {/* 상단 제목 */}
-      <MainTitle $isSidebarOpen={isSidebarOpen}>
-        <img src={mainBanner} />
-      </MainTitle>
+      <MainTitle $isSidebarOpen={isSidebarOpen}>🔵 PC</MainTitle>
 
-      {/* 게임 카드 목록 */}
+      {/* 게임 카드 목록 영역 */}
       <MainContainer
         $isSidebarOpen={isSidebarOpen}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
       >
+        {/* 값이 null 일때를 대비 옵셔널 체이닝사용 */}
         {gameResponse?.results?.map((item: GameResult, idx: number) => (
           <Link to={`/game/${item.id}`} key={idx}>
             <GameCard item={item} />
@@ -140,4 +141,4 @@ const MainPage: React.FC = () => {
   );
 };
 
-export default MainPage;
+export default GamePcList;

@@ -19,9 +19,14 @@ import Chart from "../admin/Chart";
 import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
 import GameLongPlayList from "../gameApi/GameLongPlayList";
+
 import Auth from "../components/auth/helper/Auth";
 import { NotFound } from "../components/error/NotFound";
 import Find from "../member/memberControl/Find";
+import GameNsList from "../gameApi/GameNsList";
+import GamePcList from "../gameApi/GamePcList";
+import GamePsList from "../gameApi/GamePsList";
+import GameXboxList from "../gameApi/GameXboxList";
 // DB에있는 권한 확인
 const ROLES = {
   ROLE_SYSTEM: 1,
@@ -55,6 +60,12 @@ function Router() {
         <Route path="/searchgame" element={<SearchGame />} />
         <Route path="game/Genres" element={<Genres />} />
         <Route path="/game/GameLongPlayList" element={<GameLongPlayList />} />
+
+        {/* 콘솔 장르 */}
+        <Route path="/game/GameNsList" element={<GameNsList />} />
+        <Route path="/game/GamePcList" element={<GamePcList />} />
+        <Route path="game/GamePsList" element={<GamePsList />} />
+        <Route path="game/GameXboxList" element={<GameXboxList />} />
 
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport />} />

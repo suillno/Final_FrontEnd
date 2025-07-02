@@ -3,16 +3,50 @@ import { useOutletContext } from "react-router-dom";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import * as Styled from "./reviewManagement/ReviewManagement.styles";
-import { LayoutContext, Review } from "./reviewManagement/ReviewManagement.types";
+import {
+  LayoutContext,
+  Review,
+} from "./reviewManagement/ReviewManagement.types";
 import ReviewDetailModal from "./reviewManagement/ReviewDetailModal";
 
 // 초기 리뷰 더미 데이터
 const initialReviews: Review[] = [
-  { id: 1, userId: "userA", gameTitle: "Elden Ring", content: "정말 재미있어요!", reportCount: 0 },
-  { id: 2, userId: "userB", gameTitle: "GTA V", content: "욕설이 많아요", reportCount: 2 },
-  { id: 3, userId: "userC", gameTitle: "Zelda", content: "역시 갓겜입니다.", reportCount: 0 },
-  { id: 4, userId: "userD", gameTitle: "The Witcher 3", content: "버그 너무 많음", reportCount: 3 },
-  { id: 5, userId: "userE", gameTitle: "Cyberpunk 2077", content: "최적화가 필요해요. 너무 무거움. 버그도 많고 고쳐야 될 점이 많습니다.", reportCount: 1 },
+  {
+    id: 1,
+    userId: "userA",
+    gameTitle: "Elden Ring",
+    content: "정말 재미있어요!",
+    reportCount: 0,
+  },
+  {
+    id: 2,
+    userId: "userB",
+    gameTitle: "GTA V",
+    content: "욕설이 많아요",
+    reportCount: 2,
+  },
+  {
+    id: 3,
+    userId: "userC",
+    gameTitle: "Zelda",
+    content: "역시 갓겜입니다.",
+    reportCount: 0,
+  },
+  {
+    id: 4,
+    userId: "userD",
+    gameTitle: "The Witcher 3",
+    content: "버그 너무 많음",
+    reportCount: 3,
+  },
+  {
+    id: 5,
+    userId: "userE",
+    gameTitle: "Cyberpunk 2077",
+    content:
+      "최적화가 필요해요. 너무 무거움. 버그도 많고 고쳐야 될 점이 많습니다.",
+    reportCount: 1,
+  },
 ];
 
 const ITEMS_PER_PAGE = 10; // 한 페이지에 보여줄 리뷰 수
@@ -29,8 +63,9 @@ const ReviewManagement: React.FC = () => {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null); // 상세보기용 선택된 리뷰
 
   // 리뷰 삭제 함수
-  const handleDelete = (id: number) => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
+  const handleDelete = async (id: number) => {
+    const confirmed = await window.confirm("정말 삭제하시겠습니까?");
+    if (confirmed) {
       setReviews((prev) => prev.filter((review) => review.id !== id));
     }
   };
@@ -38,7 +73,9 @@ const ReviewManagement: React.FC = () => {
   // 필터링: 검색어 + 신고 여부 체크
   const filtered = reviews
     .filter((r) =>
-      (r.userId + r.gameTitle + r.content).toLowerCase().includes(search.toLowerCase())
+      (r.userId + r.gameTitle + r.content)
+        .toLowerCase()
+        .includes(search.toLowerCase())
     )
     .filter((r) => (filterReported ? r.reportCount > 0 : true));
 
@@ -69,7 +106,10 @@ const ReviewManagement: React.FC = () => {
           background: { color: "#0e0f11" },
           fpsLimit: 60,
           interactivity: {
-            events: { onHover: { enable: true, mode: "repulse" }, resize: true },
+            events: {
+              onHover: { enable: true, mode: "repulse" },
+              resize: true,
+            },
           },
           particles: {
             color: { value: "#00eaff" },
@@ -139,7 +179,11 @@ const ReviewManagement: React.FC = () => {
                   {review.content.length > 30 ? (
                     <>
                       {review.content.slice(0, 30)}...
-                      <Styled.MoreButton onClick={() => setSelectedReview(review)}>+</Styled.MoreButton>
+                      <Styled.MoreButton
+                        onClick={() => setSelectedReview(review)}
+                      >
+                        +
+                      </Styled.MoreButton>
                     </>
                   ) : (
                     review.content
@@ -147,7 +191,9 @@ const ReviewManagement: React.FC = () => {
                 </td>
                 <td>{review.reportCount}</td>
                 <td>
-                  <Styled.DeleteButton onClick={() => handleDelete(review.id)}>삭제</Styled.DeleteButton>
+                  <Styled.DeleteButton onClick={() => handleDelete(review.id)}>
+                    삭제
+                  </Styled.DeleteButton>
                 </td>
               </tr>
             ))}
