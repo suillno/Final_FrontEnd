@@ -1,5 +1,14 @@
 import { instanceBack, instanceAuth } from "./instance";
 
+// 🔸 장바구니 아이템 타입 정의 (이 파일 또는 공용 types.ts로 분리 가능)
+export interface CartItem {
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+}
+
 // 리뷰 목록 가져오기
 export const apiGetGameReviews = async (gameId: string) => {
   try {
@@ -122,5 +131,16 @@ export const apiCheckEmail = async (email: string) => {
     return res.data;
   } catch (err) {
     throw new Error("이메일 확인 중 오류");
+  }
+};
+
+// 🔸 장바구니 전체 리스트 불러오기
+export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
+  try {
+    const res = await instanceBack.get(`/member/cart/list/${username}`);
+    return res.data;
+  } catch (error) {
+    console.error("장바구니 목록 불러오기 실패", error);
+    throw error;
   }
 };
