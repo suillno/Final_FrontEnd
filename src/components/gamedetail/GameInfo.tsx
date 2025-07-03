@@ -139,6 +139,7 @@ const GameInfo = ({
                     await onDiscountApply(0); // 할인 해제
                   } else {
                     const percent = await (window as any).promptDiscount();
+<<<<<<< Updated upstream
                     if (percent === null) return;
                     if (isNaN(percent) || percent < 0 || percent > 100) {
                       alert("0부터 100 사이의 숫자를 입력하세요.");
@@ -149,6 +150,14 @@ const GameInfo = ({
                       );
                       onDiscountApply(salePrice);
                     }
+=======
+
+                    if (percent === null) return;
+                    const salePrice = Math.round(
+                      steamPrice * (1 - percent / 100)
+                    );
+                    await onDiscountApply(salePrice);
+>>>>>>> Stashed changes
                   }
                 }}
               >

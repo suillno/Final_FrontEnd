@@ -35,17 +35,28 @@ function App() {
 
   (window as any).promptDiscount = async () => {
     const { value: percent } = await customSwal.fire({
+<<<<<<< Updated upstream
       title: "할인율 입력",
       input: "number",
       inputLabel: "0부터 100 사이의 숫자를 입력해주세요",
       inputPlaceholder: "예: 25",
+=======
+      title: "할인가 가격",
+      input: "number",
+      inputLabel: "0부터 100 사이의 숫자를 입력해주세요",
+      inputPlaceholder: "예: 10",
+>>>>>>> Stashed changes
       showCancelButton: true,
       confirmButtonText: "적용",
       cancelButtonText: "취소",
       inputValidator: (value) => {
         const num = parseFloat(value);
         if (!value || isNaN(num) || num < 0 || num > 100) {
+<<<<<<< Updated upstream
           return "0부터 100 사이의 숫자를 입력해주세요.";
+=======
+          return "0부터 100사이 숫자를 입력해주세요.";
+>>>>>>> Stashed changes
         }
       },
     });
