@@ -12,6 +12,7 @@ import {
 import Loader from "../components/common/Loader";
 import {
   apiAddGameCart,
+  apiAddGameDiscount,
   apiAddGameLike,
   apiAddGameReviews,
   apiCheckGameCart,
@@ -103,8 +104,10 @@ const GameDetail = () => {
     setPriceText(formatted);
   };
 
-  // 장바구니/찜 통합 저장 함수
-  const handleSave = async (type: "cart" | "like") => {
+  const handleSave = async (
+    type: "cart" | "like" | "discount",
+    salePriceValue: number = 0 // 기본 0
+  ) => {
     if (!userInfo.username) {
       alert("로그인 후 사용 가능합니다");
       return;
@@ -116,29 +119,34 @@ const GameDetail = () => {
       title: gameDetail.name,
       backgroundImage: gameDetail.background_image,
       price: priceValue,
-      salePrice: 0,
+      released: gameDetail.released,
+      esrbRating: gameDetail.esrb_rating?.name || "정보 없음",
+      salePrice: salePriceValue || 0, // ✅ 전달된 할인가 입력
     };
 
     try {
-      const apiCall = type === "cart" ? apiAddGameCart : apiAddGameLike;
+      let response = "";
+      if (type === "cart") {
+        response = await apiAddGameCart(data);
+      } else if (type === "like") {
+        response = await apiAddGameLike(data);
+      } else if (type === "discount") {
+        response = await apiAddGameDiscount(data); // 별도 API
+      }
 
-      const response = await apiCall(data);
       const [status, message] = response
         .split(":")
         .map((s: string) => s.trim());
 
       if (status === "SUCCESS") {
         alert(message);
-        if (type === "cart") {
-          setCartActive((prev) => !prev);
-        } else {
-          setLikeActive((prev) => !prev);
-        }
+        if (type === "cart") setCartActive((prev) => !prev);
+        else if (type === "like") setLikeActive((prev) => !prev);
       } else {
         alert("에러: " + message);
       }
     } catch (error) {
-      alert(type === "cart" ? "장바구니 등록 오류" : "찜 등록 오류");
+      alert("요청 처리 중 오류 발생");
     }
   };
 
@@ -170,6 +178,7 @@ const GameDetail = () => {
                 onPriceFetched={handlePriceFetch}
                 onCartClick={() => handleSave("cart")}
                 onLikeClick={() => handleSave("like")}
+                onDiscountApply={(price) => handleSave("discount", price)}
                 cartActive={cartActive}
                 likeActive={likeActive}
               />

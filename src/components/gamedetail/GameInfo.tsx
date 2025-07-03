@@ -25,6 +25,7 @@ interface Props {
   onPriceFetched: (numeric: number, formatted: string) => void;
   onCartClick: () => void;
   onLikeClick: () => void;
+  onDiscountApply: (salePrice: number) => void;
   cartActive: boolean;
   likeActive: boolean;
 }
@@ -35,6 +36,7 @@ const GameInfo = ({
   onPriceFetched,
   onCartClick,
   onLikeClick,
+  onDiscountApply,
   cartActive,
   likeActive,
 }: Props) => {
@@ -42,7 +44,6 @@ const GameInfo = ({
   const isAdmin = userInfo.roles.some(
     (role: { id: number; role: string }) => role.role === "ROLE_ADMIN"
   ); // 관리자 여부 판별
-  console.log(userInfo.roles);
   return (
     <AboutBetween>
       {/* 게임 설명 */}
@@ -146,7 +147,13 @@ const GameInfo = ({
                 type="button"
                 className="bg-blue-700 hover:bg-blue-800 text-white font-bold p-2 rounded shadow"
                 onClick={() => {
-                  console.log("관리자: 할인가격 적용 클릭");
+                  const input = prompt("할인가격을 입력하세요 (숫자만):");
+                  const parsed = parseInt(input || "", 10);
+                  if (!isNaN(parsed) && parsed >= 0) {
+                    onDiscountApply(parsed); // ✅ 숫자 전달
+                  } else {
+                    alert("유효한 숫자를 입력하세요.");
+                  }
                 }}
                 title="할인가격 적용"
               >

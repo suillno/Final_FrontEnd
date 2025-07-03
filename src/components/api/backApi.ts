@@ -70,6 +70,26 @@ export const apiAddGameCart = async (cartData: {
   }
 };
 
+// 게임 할인가 적용
+export const apiAddGameDiscount = async (discountData: {
+  userName: string;
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+  released: string;
+  esrbRating: string;
+}) => {
+  try {
+    const res = await instanceBack.post("/member/discount/apply", discountData);
+    return res.data;
+  } catch (error) {
+    console.error("할인가 저장 실패", error);
+    return "ERROR: 할인가 저장 실패";
+  }
+};
+
 // 장바구니 조회
 export const apiCheckGameCart = async (userName: string, gameId: number) => {
   try {
@@ -134,7 +154,7 @@ export const apiCheckEmail = async (email: string) => {
   }
 };
 
-// 🔸 장바구니 전체 리스트 불러오기
+// 장바구니 전체 리스트 불러오기
 export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
   try {
     const res = await instanceBack.get(`/member/cart/list/${username}`);
