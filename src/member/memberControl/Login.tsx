@@ -71,6 +71,9 @@ export default function LoginPage() {
     registerEmailCode: "",
   });
 
+  // 이메일 인증코드
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
   // 디바이스 정보 상태
   const [deviceInfo, setDeviceInfo] = useState({
     deviceId: uuidv4(),
@@ -135,20 +138,35 @@ export default function LoginPage() {
     }
   };
 
-  // 이메일 인증 처리
+  // 이메일 인증번호 요청 버튼
+  const sendEmailAuthCode = async () => {
+    try {
+      const res = await axios.post("http://localhost:8080/api/auth/mail", {
+        params: {
+          mailTo: registerForm.registerEmail,
+          subject: "인증메일",
+          mailType: "emailAuth",
+          username: registerForm.registerName,
+        },
+      });
+      alert("인증 메일이 발송되었습니다!");
+    } catch (err) {
+      alert("이메일 발송 실패");
+    }
+  };
 
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  // 인증번호 검증
 
   const verifyEmailCode = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/auth/email/verify",
+        "http://localhost:8080/api/auth/mail/verify",
         {
-          email: registerForm.registerEmail,
-          code: registerForm.registerEmailCode,
+          mailTo: registerForm.registerEmail,
+          authCode: registerForm.registerEmailCode,
         }
       );
-      alert(res.data);
+      alert(res.data); // 인증 성공
       setIsEmailVerified(true);
     } catch (err) {
       alert("인증 실패");
@@ -162,12 +180,11 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/email/send",
-        {
-          email: registerForm.registerEmail,
-        }
-      );
+      const res = await axios.post("http://localhost:8080/api/auth/mail", {
+        mailTo: registerForm.registerEmail,
+        username: registerForm.registerName,
+        mailType: "emailAuth",
+      });
       alert(res.data.message || "인증코드가 전송되었습니다!");
     } catch (err) {
       alert("이메일 인증코드 전송 실패!");
@@ -230,11 +247,15 @@ export default function LoginPage() {
         email: registerForm.registerEmail,
         roleNum: 1, // 기본 회원 등급
       };
+      console.log(registerData);
       const res = await apiRegisterUser(registerData);
-      alert(res);
+      alert("회원가입 성공!");
       setIsSignIn(true);
     } catch (err) {
       alert("회원가입 중 오류 발생");
+      if (axios.isAxiosError(err)) {
+        console.error("회원가입 실패", err.response?.data);
+      }
     }
   };
 
@@ -328,8 +349,11 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmail">본인확인 이메일</label>
-                <CheckButton type="button" onClick={checkEmail}>
+                {/* <CheckButton type="button" onClick={checkEmail}>
                   중복확인
+                </CheckButton> */}
+                <CheckButton type="button" onClick={sendEmailVerification}>
+                  인증코드 전송
                 </CheckButton>
                 <IoMailOutline />
               </InputBox>
@@ -344,8 +368,8 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmailCode">인증번호 입력</label>
-                <CheckButton type="button" onClick={sendEmailVerification}>
-                  인증코드 전송
+                <CheckButton type="button" onClick={verifyEmailCode}>
+                  인증번호 확인
                 </CheckButton>
                 <IoCheckmarkCircleOutline />
               </InputBox>
