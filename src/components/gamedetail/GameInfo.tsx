@@ -156,25 +156,22 @@ const GameInfo = ({
               />
             </button>
 
+            {/* 할인적용버튼 */}
             {isAdmin ? (
               <button
                 className="group bg-transparent hover:bg-blue-800 text-white font-bold p-2 rounded shadow ml-2"
                 title="할인등록"
-                onClick={() => {
+                onClick={async () => {
                   if (discountActive) {
-                    onDiscountApply(0); // 할인 해제
+                    await onDiscountApply(0);
                   } else {
-                    const input = prompt("할인율을 입력하세요 (0~100):");
-                    const percent = parseFloat(input || "");
+                    const percent = await (window as any).promptDiscount();
+                    if (percent === null) return;
 
-                    if (isNaN(percent) || percent < 0 || percent > 100) {
-                      alert("0부터 100 사이의 숫자를 입력하세요.");
-                    } else {
-                      const salePrice = Math.round(
-                        steamPrice * (1 - percent / 100)
-                      );
-                      onDiscountApply(salePrice);
-                    }
+                    const salePrice = Math.round(
+                      steamPrice * (1 - percent / 100)
+                    );
+                    await onDiscountApply(salePrice);
                   }
                 }}
               >
