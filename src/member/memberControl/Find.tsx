@@ -89,6 +89,7 @@ export default function Find() {
   const onSubmitFindId = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("아이디찾기 시도:", findIdForm);
+    alert("이메일로 아이디가 전송되었습니다.");
   };
 
   const onSubmitFindPw = (e: FormEvent<HTMLFormElement>) => {
