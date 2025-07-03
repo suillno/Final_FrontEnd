@@ -15,6 +15,7 @@ import {
   apiRegisterUser,
   apiCheckUsername,
   apiCheckEmail,
+  apiSendEmailVerification,
 } from "../../components/api/backApi";
 
 // 스타일 컴포넌트 불러오기
@@ -178,16 +179,17 @@ export default function LoginPage() {
       alert("이메일을 입력해주세요.");
       return;
     }
-
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/mail", {
+      const emailData = {
         mailTo: registerForm.registerEmail,
         username: registerForm.registerName,
         mailType: "emailAuth",
-      });
-      alert(res.data.message || "인증코드가 전송되었습니다!");
+      };
+      const res = await apiSendEmailVerification(emailData);
+      console.log(res);
+      alert(res.message || "인증코드가 전송되었습니다!");
     } catch (err) {
-      alert("이메일 인증코드 전송 실패!");
+      alert("인증코드 발송 실패");
     }
   };
 
@@ -211,6 +213,7 @@ export default function LoginPage() {
       setCurrentUser(res.data);
       dispatch(setUserInfo(userRes.data));
       navigate("/");
+      console.log("로그인 요청 바디:", loginData);
     } catch (err) {
       alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
     }

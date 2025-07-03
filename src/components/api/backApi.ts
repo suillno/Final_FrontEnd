@@ -165,6 +165,20 @@ export const apiCheckEmail = async (email: string) => {
   }
 };
 
+// 이메일 인증코드 전송
+export const apiSendEmailVerification = async (emailData: {
+  mailTo: string;
+  username: string;
+  mailType: string;
+}) => {
+  try {
+    const res = await instanceAuth.post("/auth/mail", emailData);
+    return res.data;
+  } catch (err) {
+    throw new Error("이메일 확인 중 오류");
+  }
+};
+
 // 장바구니 전체 리스트 불러오기
 export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
   try {
