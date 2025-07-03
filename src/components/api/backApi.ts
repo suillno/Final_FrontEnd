@@ -7,6 +7,8 @@ export interface CartItem {
   backgroundImage: string;
   price: number;
   salePrice: number;
+  released: string;
+  esrbRating: string;
 }
 
 // 리뷰 목록 가져오기
@@ -159,6 +161,20 @@ export const apiCheckEmail = async (email: string) => {
     const res = await instanceAuth.get("/auth/check/email", {
       params: { email },
     });
+    return res.data;
+  } catch (err) {
+    throw new Error("이메일 확인 중 오류");
+  }
+};
+
+// 이메일 인증코드 전송
+export const apiSendEmailVerification = async (emailData: {
+  mailTo: string;
+  username: string;
+  mailType: string;
+}) => {
+  try {
+    const res = await instanceAuth.post("/auth/mail", emailData);
     return res.data;
   } catch (err) {
     throw new Error("이메일 확인 중 오류");

@@ -26,7 +26,7 @@ export function overrideAlertConfirmPrompt() {
   (window as any).promptDiscount = async () => {
     const { value: percent } = await customSwal.fire({
       title: "할인율 입력",
-      input: "number",
+      input: "text",
       inputLabel: "0부터 100 사이의 숫자를 입력해주세요",
       inputPlaceholder: "예: 10",
       showCancelButton: true,
