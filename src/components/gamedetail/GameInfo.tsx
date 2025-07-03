@@ -1,6 +1,6 @@
 // GameInfo.tsx - 게임 상세 정보 및 소개 컴포넌트
 // 장바구니와 찜 아이콘은 상태(cartActive, likeActive)에 따라 색상이 변경됨
-import React from "react";
+import React, { useState } from "react";
 import {
   GameResult,
   GameShortImgResponse,
@@ -18,6 +18,7 @@ import { BsFillCartCheckFill } from "react-icons/bs";
 import { AiFillLike } from "react-icons/ai";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../auth/store/userInfo";
+import { FaTags } from "react-icons/fa";
 
 interface Props {
   gameDetail: GameResult;
@@ -28,6 +29,7 @@ interface Props {
   onDiscountApply: (salePrice: number) => void;
   cartActive: boolean;
   likeActive: boolean;
+  discountActive: boolean;
 }
 
 const GameInfo = ({
@@ -39,11 +41,22 @@ const GameInfo = ({
   onDiscountApply,
   cartActive,
   likeActive,
+  discountActive,
 }: Props) => {
   const userInfo = useSelector(selectUserInfo); // 로그인 유저 정보 가져오기
   const isAdmin = userInfo.roles.some(
     (role: { id: number; role: string }) => role.role === "ROLE_ADMIN"
   ); // 관리자 여부 판별
+
+  const [steamPrice, setSteamPrice] = useState(0);
+  const [priceText, setPriceText] = useState("");
+
+  const handlePriceFetched = (numeric: number, formatted: string) => {
+    setSteamPrice(numeric);
+    setPriceText(formatted);
+    onPriceFetched(numeric, formatted);
+  };
+
   return (
     <AboutBetween>
       {/* 게임 설명 */}
@@ -69,7 +82,7 @@ const GameInfo = ({
         <div>
           <SteamPrice
             gameName={gameDetail.name}
-            onPriceFetched={onPriceFetched}
+            onPriceFetched={handlePriceFetched}
           />
         </div>
 
@@ -120,46 +133,58 @@ const GameInfo = ({
             {/* 장바구니 버튼 */}
             <button
               onClick={onCartClick}
-              className="group bg-transparent hover:bg-black-700 text-white font-bold p-2 rounded shadow"
+              className="group bg-transparent  hover:bg-blue-800 text-white font-bold p-2 rounded shadow"
             >
               <BsFillCartCheckFill
                 className={`text-2xl transition-colors duration-200 ${
                   cartActive ? "text-green-500" : "text-white"
                 }`}
+                title="장바구니"
               />
             </button>
 
             {/* 찜 버튼 */}
             <button
               onClick={onLikeClick}
-              className="group bg-transparent hover:bg-black-700 text-white font-bold p-2 rounded shadow"
+              className="group bg-transparent  hover:bg-blue-800 text-white font-bold p-2 rounded shadow ml-2"
             >
               <AiFillLike
                 className={`text-2xl transition-colors duration-200 ${
                   likeActive ? "text-red-500" : "text-white"
                 }`}
+                title="좋아요"
               />
             </button>
 
-            {/* 관리자만 보이는 할인 적용 버튼 (아이콘형) */}
-            {isAdmin && (
+            {isAdmin ? (
               <button
-                type="button"
-                className="bg-blue-700 hover:bg-blue-800 text-white font-bold p-2 rounded shadow"
+                className="group bg-transparent hover:bg-blue-800 text-white font-bold p-2 rounded shadow ml-2"
+                title="할인등록"
                 onClick={() => {
-                  const input = prompt("할인가격을 입력하세요 (숫자만):");
-                  const parsed = parseInt(input || "", 10);
-                  if (!isNaN(parsed) && parsed >= 0) {
-                    onDiscountApply(parsed); // ✅ 숫자 전달
+                  if (discountActive) {
+                    onDiscountApply(0); // 할인 해제
                   } else {
-                    alert("유효한 숫자를 입력하세요.");
+                    const input = prompt("할인율을 입력하세요 (0~100):");
+                    const percent = parseFloat(input || "");
+
+                    if (isNaN(percent) || percent < 0 || percent > 100) {
+                      alert("0부터 100 사이의 숫자를 입력하세요.");
+                    } else {
+                      const salePrice = Math.round(
+                        steamPrice * (1 - percent / 100)
+                      );
+                      onDiscountApply(salePrice);
+                    }
                   }
                 }}
-                title="할인가격 적용"
               >
-                💲
+                <FaTags
+                  className={`text-2xl transition-colors duration-200 ${
+                    discountActive ? "text-blue-400" : "text-white"
+                  }`}
+                />
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       </WhiteLine>

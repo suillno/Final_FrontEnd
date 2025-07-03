@@ -93,7 +93,7 @@ export const apiAddGameDiscount = async (discountData: {
 // 장바구니 조회
 export const apiCheckGameCart = async (userName: string, gameId: number) => {
   try {
-    const res = await instanceBack.get(`/member/review/checkCart/${gameId}`);
+    const res = await instanceBack.get(`/member/cart/checkCart/${gameId}`);
     return res.data;
   } catch (error) {
     console.error("찜 여부 확인 실패", error);
@@ -104,7 +104,18 @@ export const apiCheckGameCart = async (userName: string, gameId: number) => {
 // 좋아요 조회
 export const apiCheckGameLike = async (userName: string, gameId: number) => {
   try {
-    const res = await instanceBack.get(`/member/review/checkLike/${gameId}`);
+    const res = await instanceBack.get(`/member/like/checkLike/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("위시리스트 여부 확인 실패", error);
+    return false;
+  }
+};
+
+// 장바구니, 좋아요, 할인기능 통합 조회
+export const apiCheckAll = async (userName: string, gameId: number) => {
+  try {
+    const res = await instanceBack.get(`/member/status/checkAll/${gameId}`);
     return res.data;
   } catch (error) {
     console.error("위시리스트 여부 확인 실패", error);
