@@ -15,6 +15,7 @@ import {
   apiAddGameDiscount,
   apiAddGameLike,
   apiAddGameReviews,
+  apiCheckAll,
   apiCheckGameCart,
   apiCheckGameLike,
   apiGetGameReviews,
@@ -44,6 +45,7 @@ const GameDetail = () => {
   const [reviewText, setReviewText] = useState("");
   const [cartActive, setCartActive] = useState(false);
   const [likeActive, setLikeActive] = useState(false);
+  const [discountActive, setDiscountActive] = useState(false);
   const [reviews, setReviews] = useState<
     { userName: string; rating: number; content: string; updatedAt: string }[]
   >([]);
@@ -89,10 +91,12 @@ const GameDetail = () => {
   const CheckLikeAndCartStatus = async (game: GameResult) => {
     if (!userInfo.username || !game?.id) return;
     try {
-      const likeRes = await apiCheckGameLike(userInfo.username, game.id);
-      const cartRes = await apiCheckGameCart(userInfo.username, game.id);
-      setLikeActive(Boolean(likeRes));
-      setCartActive(Boolean(cartRes));
+      // const likeRes = await apiCheckGameLike(userInfo.username, game.id);
+      // const cartRes = await apiCheckGameCart(userInfo.username, game.id);
+      const checkAll = await apiCheckAll(userInfo.username, game.id);
+      setLikeActive(Boolean(checkAll.like));
+      setCartActive(Boolean(checkAll.cart));
+      setDiscountActive(Boolean(checkAll.discount));
     } catch (error) {
       console.error("찜/장바구니 상태 확인 오류", error);
     }
@@ -121,7 +125,7 @@ const GameDetail = () => {
       price: priceValue,
       released: gameDetail.released,
       esrbRating: gameDetail.esrb_rating?.name || "정보 없음",
-      salePrice: salePriceValue || 0, // ✅ 전달된 할인가 입력
+      salePrice: salePriceValue || 0,
     };
 
     try {
@@ -142,6 +146,7 @@ const GameDetail = () => {
         alert(message);
         if (type === "cart") setCartActive((prev) => !prev);
         else if (type === "like") setLikeActive((prev) => !prev);
+        else if (type === "discount") setDiscountActive((prev) => !prev);
       } else {
         alert("에러: " + message);
       }
@@ -181,6 +186,7 @@ const GameDetail = () => {
                 onDiscountApply={(price) => handleSave("discount", price)}
                 cartActive={cartActive}
                 likeActive={likeActive}
+                discountActive={discountActive}
               />
               <GameReviewSection
                 userName={userInfo.username}
