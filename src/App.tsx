@@ -33,6 +33,24 @@ function App() {
     };
   }, []);
 
+  (window as any).promptDiscount = async () => {
+    const { value: price } = await customSwal.fire({
+      title: "할인가 가격",
+      input: "number",
+      inputLabel: "숫자만 입력해주세요",
+      inputPlaceholder: "예: 5000",
+      showCancelButton: true,
+      confirmButtonText: "적용",
+      cancelButtonText: "취소",
+      inputValidator: (value) => {
+        if (!value || parseInt(value) < 0) {
+          return "0 이상의 숫자를 입력해주세요.";
+        }
+      },
+    });
+    return price !== undefined ? parseInt(price, 10) : null;
+  };
+
   return (
     <>
       <GlobalReset />
