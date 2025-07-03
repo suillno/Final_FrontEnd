@@ -8,17 +8,14 @@ import {
 } from "../../components/api/backApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import GameActionButtons from "../../components/gamedetail/GameActionButtons"; // 🔹 공용 버튼
+import GameActionButtons from "../../components/gamedetail/GameActionButtons";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../../components/auth/store/userInfo";
 
 // 🔷 Layout에서 전달되는 context 타입 정의
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
-
-const getCurrentUser = () => {
-  const user = localStorage.getItem("currentUser");
-  return user ? JSON.parse(user) : null;
-};
 
 /* ======================= 💅 Styled-components ======================= */
 
@@ -81,18 +78,44 @@ const Info = styled.div`
 const GameTitle = styled.h3`
   font-size: 20px;
   font-weight: bold;
+  margin-bottom: 6px;
+`;
+
+const SubInfo = styled.div`
+  font-size: 14px;
+  color: #aaa;
+  margin-top: 4px;
+  line-height: 1.6;
 `;
 
 const PriceBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  min-width: 150px;
+  min-width: 160px;
 `;
 
 const Price = styled.div`
   font-size: 16px;
   color: #ccc;
+`;
+
+const OriginalPrice = styled.div`
+  font-size: 14px;
+  color: #888;
+  text-decoration: line-through;
+`;
+
+const SalePrice = styled.div`
+  font-size: 16px;
+  color: #00eaff;
+  font-weight: bold;
+`;
+
+const DiscountRate = styled.span`
+  font-size: 13px;
+  color: #ff6b6b;
+  margin-left: 6px;
 `;
 
 const TotalBar = styled.div`
@@ -129,11 +152,15 @@ const CartPage: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const user = getCurrentUser();
-  const username = user?.username;
+  const userInfo = useSelector(selectUserInfo);
+  const username = userInfo?.username;
 
-  // 🔸 장바구니 목록 불러오기
   const fetchCartItems = async () => {
+    if (!username) {
+      setError("로그인이 필요합니다.");
+      return;
+    }
+
     try {
       const data = await apiGetCartList(username);
       setCart(data);
@@ -147,7 +174,6 @@ const CartPage: React.FC = () => {
     fetchCartItems();
   }, [username]);
 
-  // ❌ 삭제 기능 (확인 + Toast + API 연동)
   const handleRemove = async (item: CartItem) => {
     const confirmed = window.confirm(
       `"${item.title}" 을(를) 장바구니에서 삭제하시겠습니까?`
@@ -178,9 +204,17 @@ const CartPage: React.FC = () => {
     }
   };
 
-  const originalTotal = cart.reduce((sum, item) => sum + item.price, 0);
+  // 🔢 할인율 계산 함수
+  const getDiscountRate = (price: number, salePrice: number): number => {
+    if (price <= 0 || salePrice <= 0) return 0;
+    return Math.floor(((price - salePrice) / price) * 100);
+  };
 
-  // 🔸 오류 또는 비로그인
+  // ✅ 총합 계산: 할인 있으면 salePrice, 없으면 price 사용
+  const finalTotal = cart.reduce((sum, item) => {
+    return sum + (item.salePrice >= 1 ? item.salePrice : item.price);
+  }, 0);
+
   if (error) {
     return (
       <PageWrapper $isSidebarOpen={isSidebarOpen}>
@@ -193,7 +227,6 @@ const CartPage: React.FC = () => {
     );
   }
 
-  // 🔸 빈 장바구니
   if (cart.length === 0) {
     return (
       <PageWrapper $isSidebarOpen={isSidebarOpen}>
@@ -208,7 +241,6 @@ const CartPage: React.FC = () => {
     );
   }
 
-  // 🔸 실제 장바구니 UI
   return (
     <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <SectionBox>
@@ -220,9 +252,30 @@ const CartPage: React.FC = () => {
               <Image src={item.backgroundImage} alt={item.title} />
               <Info>
                 <GameTitle>{item.title}</GameTitle>
+                <SubInfo>
+                  📅 출시일: {item.released || "정보 없음"}
+                  <br />
+                  🔞 연령등급: {item.esrbRating || "정보 없음"}
+                  <br />
+                  💰 정가: ₩ {item.price.toLocaleString()}
+                </SubInfo>
               </Info>
               <PriceBox>
-                <Price>₩ {item.price.toLocaleString()}</Price>
+                {item.salePrice >= 1 ? (
+                  <>
+                    <OriginalPrice>
+                      ₩ {item.price.toLocaleString()}
+                    </OriginalPrice>
+                    <SalePrice>
+                      ₩ {item.salePrice.toLocaleString()}
+                      <DiscountRate>
+                        -{getDiscountRate(item.price, item.salePrice)}%
+                      </DiscountRate>
+                    </SalePrice>
+                  </>
+                ) : (
+                  <Price>₩ {item.price.toLocaleString()}</Price>
+                )}
                 <GameActionButtons
                   showDeleteButton
                   onDeleteClick={() => handleRemove(item)}
@@ -232,7 +285,7 @@ const CartPage: React.FC = () => {
           ))}
         </List>
 
-        <TotalBar>총 합계: ₩ {originalTotal.toLocaleString()}</TotalBar>
+        <TotalBar>총 합계: ₩ {finalTotal.toLocaleString()}</TotalBar>
 
         <CheckoutButton onClick={() => alert("결제 기능 준비 중입니다.")}>
           💳 결제하기

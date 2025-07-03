@@ -7,6 +7,8 @@ export interface CartItem {
   backgroundImage: string;
   price: number;
   salePrice: number;
+  released: string;
+  esrbRating: string;
 }
 
 // 리뷰 목록 가져오기
