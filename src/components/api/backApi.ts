@@ -191,3 +191,14 @@ export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
     throw error;
   }
 };
+export const apiFindUserId = async (email: string, name: string) => {
+  return await instanceAuth
+    .post("/auth/findId", { email, name })
+    .then((res) => res.data);
+};
+
+export const apiFindUserPw = async (email: string, username: string) => {
+  return await instanceAuth
+    .post("/auth/changePw", { email, username })
+    .then((res) => res.data);
+};
