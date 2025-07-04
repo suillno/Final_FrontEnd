@@ -124,3 +124,40 @@ export const apiCheckEmail = async (email: string) => {
     throw new Error("이메일 확인 중 오류");
   }
 };
+
+// 이메일 인증코드 전송
+export const apiSendEmailVerification = async (emailData: {
+  mailTo: string;
+  username: string;
+  mailType: string;
+}) => {
+  try {
+    const res = await instanceAuth.post("/auth/mail", emailData);
+    return res.data;
+  } catch (err) {
+    throw new Error("이메일 확인 중 오류");
+  }
+};
+
+// 장바구니 전체 리스트 불러오기
+export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
+  try {
+    const res = await instanceBack.get(`/member/cart/list/${username}`);
+    return res.data;
+  } catch (error) {
+    console.error("장바구니 목록 불러오기 실패", error);
+    throw error;
+  }
+};
+// 아이디 찾기
+export const apiFindUserId = async (email: string, name: string) => {
+  return await instanceAuth
+    .post("/auth/findId", { email, name })
+    .then((res) => res.data);
+};
+
+export const apiFindUserPw = async (email: string, username: string) => {
+  return await instanceAuth
+    .post("/auth/changePw", { email, username })
+    .then((res) => res.data);
+};

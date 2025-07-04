@@ -27,6 +27,12 @@ import { Logo, SubLogo } from "../../style/Login.styles";
 
 // 아이콘
 import { IoIdCardOutline, IoMailOutline } from "react-icons/io5";
+import {
+  apiFindUserId,
+  apiFindUserPw,
+  apiSendEmailVerification,
+} from "../../components/api/backApi";
+import customSwal from "../../style/customSwal.styles";
 
 export default function Find() {
   const dispatch = useDispatch();
@@ -40,7 +46,7 @@ export default function Find() {
   });
 
   const [findPwForm, setFindPwForm] = useState({
-    id: "",
+    username: "",
     email: "",
   });
 
@@ -86,14 +92,44 @@ export default function Find() {
     setFindPwForm({ ...findPwForm, [id]: value });
   };
 
-  const onSubmitFindId = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitFindId = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("아이디찾기 시도:", findIdForm);
+
+    try {
+      await apiFindUserId(findIdForm.email, findIdForm.name);
+      customSwal.fire({
+        html: "이메일로 아이디가 전송되었습니다.",
+        confirmButtonText: "확인",
+        showCancelButton: false,
+        didClose() {
+          navigate("/member/login");
+        },
+      });
+    } catch (error) {
+      console.error("전송실패", error);
+      alert("아이디 전송에 실패했습니다. 이메일 주소를 확인해주세요");
+    }
   };
 
-  const onSubmitFindPw = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitFindPw = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("비밀번호찾기 시도:", findPwForm);
+
+    try {
+      await apiFindUserPw(findPwForm.email, findPwForm.username);
+      customSwal.fire({
+        html: "이메일로 임시 비밀번호가 전송되었습니다.",
+        confirmButtonText: "확인",
+        showCancelButton: false,
+        didClose() {
+          navigate("/member/login");
+        },
+      });
+    } catch (error) {
+      console.error("전송실패", error);
+      alert("비밀번호 전송에 실패했습니다. 이메일 주소를 확인해주세요");
+    }
   };
 
   return (
@@ -113,9 +149,9 @@ export default function Find() {
             <InputBox>
               <input
                 type="text"
-                id="id"
+                id="username"
                 required
-                value={findPwForm.id}
+                value={findPwForm.username}
                 onChange={onChangeFindPw}
               />
               <label htmlFor="id">아이디</label>
