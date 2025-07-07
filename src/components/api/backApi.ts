@@ -225,12 +225,13 @@ export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
     throw error;
   }
 };
+// 아이디 찾기
 export const apiFindUserId = async (email: string, name: string) => {
   return await instanceAuth
     .post("/auth/findId", { email, name })
     .then((res) => res.data);
 };
-
+// 비밀번호 찾기
 export const apiFindUserPw = async (email: string, username: string) => {
   return await instanceAuth
     .post("/auth/changePw", { email, username })
