@@ -12,7 +12,6 @@ interface LayoutContext {
 }
 
 // 파티클 옵션 설정
-// 파티클 옵션 설정
 const particlesOptions = {
   fullScreen: { enable: true, zIndex: 0 }, // 화면 전체에 표시되며, 가장 아래로
   background: { color: { value: "#1e1f24" } }, // 배경색 유지
