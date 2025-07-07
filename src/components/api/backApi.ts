@@ -92,6 +92,40 @@ export const apiAddGameDiscount = async (discountData: {
   }
 };
 
+// 할인 전체 리스트 불러오기
+export interface GameDiscount {
+  discountId: number | null;
+  userName: string;
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+  released: string;
+  esrbRating: string;
+  discountPercent: number;
+  result: string;
+  createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
+}
+
+export interface DiscountListResponse {
+  list: GameDiscount[]; // 20개 페이징 리스트
+  one: GameDiscount; // 할인율 1위 게임 (옵션)
+}
+export const apiGetDiscountList = async (
+  page: number
+): Promise<DiscountListResponse> => {
+  try {
+    const res = await instanceBack.get<DiscountListResponse>(
+      `/member/discount/list/${page}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("할인 게임 목록 불러오기 실패", error);
+    throw error;
+  }
+};
+
 // 장바구니 조회
 export const apiCheckGameCart = async (userName: string, gameId: number) => {
   try {
