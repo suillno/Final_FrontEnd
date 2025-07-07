@@ -5,6 +5,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
 import PGLogo from "../../img/PGLogo.png";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // Redux 액션 및 토큰 저장 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
@@ -22,6 +25,7 @@ import {
   LeftText,
   RightText,
   Login,
+  ErrorMessage,
 } from "../../style/Find.styles";
 import { Logo, SubLogo } from "../../style/Login.styles";
 
@@ -38,16 +42,51 @@ export default function Find() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // 아이디,비밀번호 찾기 폼 제출시 이메일 리턴동안 막기
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [isFindId, setIsFindId] = useState(false); // false = 비밀번호 찾기, true = 아이디 찾기
 
-  const [findIdForm, setFindIdForm] = useState({
-    name: "",
-    email: "",
+  const [timedErrors, setTimedErrors] = useState<{
+    name?: string;
+    email?: string;
+  }>({});
+
+  const [timedErrorsPw, setTimedErrorsPw] = useState<{
+    username?: string;
+    email?: string;
+  }>({});
+  const FindIdSchema = z.object({
+    name: z.string().min(1, { message: "이름을 입력해주세요." }),
+    email: z
+      .string()
+      .min(1, { message: "이메일을 입력해주세요." })
+      .email("올바른 이메일 형식이어야 합니다."),
+  });
+  type FindIdFormData = z.infer<typeof FindIdSchema>;
+  const FindPwSchema = z.object({
+    username: z.string().min(1, { message: "아이디를 입력해주세요." }),
+    email: z
+      .string()
+      .min(1, { message: "이메일을 입력해주세요." })
+      .email("올바른 이메일 형식이어야 합니다."),
+  });
+  type FindPwFormData = z.infer<typeof FindPwSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FindIdFormData>({
+    resolver: zodResolver(FindIdSchema),
   });
 
-  const [findPwForm, setFindPwForm] = useState({
-    username: "",
-    email: "",
+  const {
+    register: registerPw,
+    handleSubmit: handleSubmitPw,
+    formState: { errors: errorsPw },
+  } = useForm<FindPwFormData>({
+    resolver: zodResolver(FindPwSchema),
   });
 
   const [deviceInfo, setDeviceInfo] = useState({
@@ -55,6 +94,34 @@ export default function Find() {
     deviceType: "",
     NotificationToken: uuidv4(),
   });
+  useEffect(() => {
+    if (errors.name || errors.email) {
+      setTimedErrors({
+        name: errors.name?.message,
+        email: errors.email?.message,
+      });
+
+      const timer = setTimeout(() => {
+        setTimedErrors({});
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
+  useEffect(() => {
+    if (errorsPw.username || errorsPw.email) {
+      setTimedErrorsPw({
+        username: errorsPw.username?.message,
+        email: errorsPw.email?.message,
+      });
+
+      const timer = setTimeout(() => {
+        setTimedErrorsPw({});
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorsPw]);
 
   useEffect(() => {
     let device = "";
@@ -82,22 +149,12 @@ export default function Find() {
 
   const toggleMode = () => setIsFindId(!isFindId);
 
-  const onChangeFindId = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFindIdForm({ ...findIdForm, [id]: value });
-  };
-
-  const onChangeFindPw = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFindPwForm({ ...findPwForm, [id]: value });
-  };
-
-  const onSubmitFindId = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("아이디찾기 시도:", findIdForm);
+  const onSubmitFindId = async (data: FindIdFormData) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     try {
-      await apiFindUserId(findIdForm.email, findIdForm.name);
+      await apiFindUserId(data.email, data.name);
       customSwal.fire({
         html: "이메일로 아이디가 전송되었습니다.",
         confirmButtonText: "확인",
@@ -109,15 +166,17 @@ export default function Find() {
     } catch (error) {
       console.error("전송실패", error);
       alert("아이디 전송에 실패했습니다. 이메일 주소를 확인해주세요");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const onSubmitFindPw = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("비밀번호찾기 시도:", findPwForm);
+  const onSubmitFindPw = async (data: FindPwFormData) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     try {
-      await apiFindUserPw(findPwForm.email, findPwForm.username);
+      await apiFindUserPw(data.email, data.username);
       customSwal.fire({
         html: "이메일로 임시 비밀번호가 전송되었습니다.",
         confirmButtonText: "확인",
@@ -129,6 +188,8 @@ export default function Find() {
     } catch (error) {
       console.error("전송실패", error);
       alert("비밀번호 전송에 실패했습니다. 이메일 주소를 확인해주세요");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -144,34 +205,29 @@ export default function Find() {
           <Logo src={PGLogo} alt="로고" $visible={isFindId} />
         </Link>
         <FormBox className={!isFindId ? "" : "active"}>
-          <Form onSubmit={onSubmitFindPw}>
+          <Form onSubmit={handleSubmitPw(onSubmitFindPw)}>
             <h2>비밀번호 찾기</h2>
             <InputBox>
-              <input
-                type="text"
-                id="username"
-                required
-                value={findPwForm.username}
-                onChange={onChangeFindPw}
-              />
-              <label htmlFor="id">아이디</label>
+              <input type="text" {...registerPw("username")} />
+              <label htmlFor="username">아이디</label>
               <IoIdCardOutline />
+              {timedErrorsPw.username && (
+                <ErrorMessage>{timedErrorsPw.username}</ErrorMessage>
+              )}
             </InputBox>
             <InputBox>
-              <input
-                type="text"
-                id="email"
-                required
-                value={findPwForm.email}
-                onChange={onChangeFindPw}
-              />
+              <input type="text" {...registerPw("email")} />
               <label htmlFor="email">이메일</label>
               <IoMailOutline />
+              {timedErrorsPw.email && (
+                <ErrorMessage>{timedErrorsPw.email}</ErrorMessage>
+              )}
             </InputBox>
-            <Button type="submit">비밀번호 찾기</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? " 전송 중 ..." : " 비밀번호 찾기"}
+            </Button>
             <ToggleText>
-              아이디를 모르시나요?
-              <span onClick={toggleMode}>아이디 찾기</span>
+              아이디를 모르시나요? <span onClick={toggleMode}>아이디 찾기</span>
             </ToggleText>
             <Login>
               <Link to="/member/login">로그인 페이지로 돌아가기</Link>
@@ -186,35 +242,35 @@ export default function Find() {
           <SubLogo src={PGLogo} alt="로고" $visible={!isFindId} />
         </Link>
         <FormBox className={isFindId ? "" : "active"}>
-          <Form onSubmit={onSubmitFindId}>
+          <Form onSubmit={handleSubmit(onSubmitFindId)}>
             <h2>아이디 찾기</h2>
             <InputBox>
-              <input
-                type="text"
-                id="name"
-                required
-                value={findIdForm.name}
-                onChange={onChangeFindId}
-              />
+              <input type="text" {...register("name")} />
               <label htmlFor="name">사용자 이름</label>
               <IoIdCardOutline />
+              {timedErrors.name && (
+                <ErrorMessage>{timedErrors.name}</ErrorMessage>
+              )}
             </InputBox>
+
             <InputBox>
-              <input
-                type="text"
-                id="email"
-                required
-                value={findIdForm.email}
-                onChange={onChangeFindId}
-              />
+              <input type="text" {...register("email")} />
               <label htmlFor="email">이메일</label>
               <IoMailOutline />
+              {timedErrors.email && (
+                <ErrorMessage>{timedErrors.email}</ErrorMessage>
+              )}
             </InputBox>
-            <Button type="submit">아이디 찾기</Button>
+
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? " 전송 중 ..." : " 아이디 찾기"}
+            </Button>
+
             <ToggleText>
               아이디를 알고계신가요?
               <span onClick={toggleMode}>비밀번호 찾기</span>
             </ToggleText>
+
             <Login>
               <Link to="/member/login">로그인 페이지로 돌아가기</Link>
             </Login>

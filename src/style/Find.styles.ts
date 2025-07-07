@@ -1,5 +1,5 @@
 // components/auth/Find.styles.ts
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import bgImage from "../img/g3.jpg";
 
 export const Section = styled.section`
@@ -155,25 +155,45 @@ export const InputBox = styled.div`
     top: 20px;
   }
 `;
-
-export const Button = styled.button`
-  /* margin-bottom: 30px; */
+export const Button = styled.button<{ disabled?: boolean }>`
   width: 100%;
   height: 40px;
   border-radius: 40px;
-  background: transparent;
-  border: 2px solid #fff;
-  color: #fff;
+  background: ${({ disabled }) => (disabled ? "#ccc" : "transparent")};
+  border: 2px solid ${({ disabled }) => (disabled ? "#ccc" : "#fff")};
+  color: ${({ disabled }) => (disabled ? "#666" : "#fff")};
   outline: none;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   font-size: 1em;
   font-weight: 600;
   margin-top: 5px;
+  transition: background 0.3s, color 0.3s, border 0.3s;
 
   &:hover {
-    background: #fff;
-    color: black;
+    background: ${({ disabled }) => (disabled ? "#ccc" : "#fff")};
+    color: ${({ disabled }) => (disabled ? "#666" : "black")};
   }
+`;
+
+// 나타났다 서서히 사라지는 애니메이션
+const fadeOut = keyframes`
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+`;
+
+// 에러 메시지 스타일
+export const ErrorMessage = styled.p`
+  color: #ff4d4f;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  animation: ${fadeOut} 6s forwards;
 `;
 
 export const ToggleText = styled.p`

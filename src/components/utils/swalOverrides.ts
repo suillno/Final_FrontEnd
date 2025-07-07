@@ -42,4 +42,19 @@ export function overrideAlertConfirmPrompt() {
 
     return percent !== undefined ? parseFloat(percent) : null;
   };
+  (window as any).validateForm = async (
+    fields: { name: string; value: string }[]
+  ) => {
+    for (const field of fields) {
+      if (!field.value.trim()) {
+        await customSwal.fire({
+          text: `"${field.name}" 입력란을 작성해주세요.`,
+          icon: "warning",
+          confirmButtonText: "확인",
+        });
+        return false;
+      }
+    }
+    return true;
+  };
 }
