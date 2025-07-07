@@ -1,0 +1,29 @@
+cd my-app
+cd react-router-dom-example
+
+yarn 프로젝트 생성
+yarn create react-app 파일명
+
+1. 타입스크립트 기반 리엑트 프로젝트 생성
+yarn create react-app 파일명 --template typescript
+
+2. 리엑트 라우터, 엑시오스, 스타일컴포넌트 다운
+yarn add react-router-dom axios styled-components
+
+3. 아이콘 사용 다운
+yarn add react-icons
+
+프로젝트 시작
+yarn start
+
+vs 코드로 실행
+code .
+
+프로젝트 완료시
+yarn build
+
+차트그래프 그리기 위한 의존성 추가 (어드민)
+yarn add recharts
+
+파티클을 위한 의존성 추가 (어드민 뒷쪽 배경)
+yarn add react-tsparticles tsparticles-slim
