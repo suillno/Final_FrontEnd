@@ -16,8 +16,6 @@ import {
   apiAddGameLike,
   apiAddGameReviews,
   apiCheckAll,
-  apiCheckGameCart,
-  apiCheckGameLike,
   apiGetGameReviews,
 } from "../components/api/backApi";
 import { selectUserInfo } from "../components/auth/store/userInfo";
