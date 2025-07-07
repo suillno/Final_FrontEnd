@@ -6,20 +6,19 @@ import {
   updateUserRole,
   toggleUserStatus,
 } from "./UserService";
-
 import UserDetailModal from "./UserDetailModal";
 import styled, { keyframes } from "styled-components";
 
-// 한 페이지에 보여줄 유저 수
+// 한 페이지당 보여줄 사용자 수
 const USERS_PER_PAGE = 10;
 
-// 등장 애니메이션
+// 등장 애니메이션 효과
 const fadeSlideIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-// 전체 페이지 wrapper
+// 전체 wrapper
 const Wrapper = styled.div`
   color: white;
   display: flex;
@@ -27,7 +26,7 @@ const Wrapper = styled.div`
   gap: 2rem;
 `;
 
-// 타이틀 + 검색창을 감싸는 wrapper
+// 타이틀 + 검색창 wrapper
 const HeaderWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,17 +41,16 @@ const Title = styled.h2`
   color: #00eaff;
   text-align: center;
   text-shadow: 0 0 10px #00eaff88;
-  margin-bottom: 0.5rem;
 `;
 
-// 검색바 wrapper - 가운데 정렬
+// 검색창 wrapper
 const SearchBar = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
 `;
 
-// 검색 입력창
+// 검색 입력창 스타일
 const SearchInput = styled.input`
   width: 250px;
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
@@ -76,14 +74,14 @@ const SearchInput = styled.input`
   }
 `;
 
-// 사용자 카드 리스트 wrapper
+// 카드 리스트 wrapper
 const CardList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 `;
 
-// 사용자 카드 스타일
+// 유저 카드 스타일
 const UserCard = styled.div`
   background-color: #2b2e33;
   padding: 1.5rem;
@@ -107,20 +105,19 @@ const UserCard = styled.div`
   }
 `;
 
-// 사용자 정보 영역
+// 유저 정보 영역
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
 `;
 
-// 역할 및 상태 뱃지
+// 뱃지 스타일
 const Badge = styled.span<{ color: string }>`
   background-color: ${(props) => props.color};
   padding: 0.4rem 1rem;
   border-radius: 9999px;
   font-weight: bold;
-  text-align: center;
 `;
 
 // 버튼 그룹
@@ -131,7 +128,7 @@ const ButtonGroup = styled.div`
   justify-content: flex-end;
 `;
 
-// 버튼 스타일 (transient props 사용)
+// 버튼 스타일
 const Button = styled.button<{ $bg: string; $hover: string }>`
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -180,13 +177,18 @@ const UserList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    getUsers().then((data) => {
-      setUsers(data);
-      setFilteredUsers(data);
-    });
-  }, []);
+useEffect(() => {
+  getUsers().then((data) => {
+    const uniqueUsers = Array.from(
+      new Map(data.map((u) => [u.id, u])).values()
+    );
+    setUsers(uniqueUsers);
+    setFilteredUsers(uniqueUsers);
+  });
+}, []);
 
+
+  // 검색어 변경 시 필터링
   useEffect(() => {
     const filtered = users.filter(
       (user) =>
@@ -194,11 +196,10 @@ const UserList: React.FC = () => {
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
-    setCurrentPage(1);
+    setCurrentPage(1); // 검색 시 첫 페이지로 초기화
   }, [searchTerm, users]);
 
   const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
-
   const currentUsers = filteredUsers.slice(
     (currentPage - 1) * USERS_PER_PAGE,
     currentPage * USERS_PER_PAGE
@@ -237,15 +238,14 @@ const UserList: React.FC = () => {
             placeholder="이름 또는 이메일 검색"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            spellCheck={false}
           />
         </SearchBar>
       </HeaderWrapper>
 
-      {/* 카드 리스트 */}
+      {/* 사용자 카드 리스트 */}
       <CardList>
         {currentUsers.map((user) => (
-          <UserCard key={user.id}>
+          <UserCard key={`user-${user.id}`}>
             <UserInfo>
               <div style={{ fontSize: "2rem" }}>👤</div>
               <div>
@@ -301,7 +301,7 @@ const UserList: React.FC = () => {
       <Pagination>
         {Array.from({ length: totalPages }, (_, i) => (
           <button
-            key={i + 1}
+            key={`page-${i + 1}`}
             className={currentPage === i + 1 ? "active" : ""}
             onClick={() => setCurrentPage(i + 1)}
           >

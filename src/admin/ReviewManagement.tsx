@@ -1,67 +1,79 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import * as Styled from "./reviewManagement/ReviewManagement.styles";
 import { LayoutContext, Review } from "./reviewManagement/ReviewManagement.types";
 import ReviewDetailModal from "./reviewManagement/ReviewDetailModal";
+import axios from "axios";
 
-// 초기 리뷰 더미 데이터
-const initialReviews: Review[] = [
-  { id: 1, userId: "userA", gameTitle: "Elden Ring", content: "정말 재미있어요!", reportCount: 0 },
-  { id: 2, userId: "userB", gameTitle: "GTA V", content: "욕설이 많아요", reportCount: 2 },
-  { id: 3, userId: "userC", gameTitle: "Zelda", content: "역시 갓겜입니다.", reportCount: 0 },
-  { id: 4, userId: "userD", gameTitle: "The Witcher 3", content: "버그 너무 많음", reportCount: 3 },
-  { id: 5, userId: "userE", gameTitle: "Cyberpunk 2077", content: "최적화가 필요해요. 너무 무거움. 버그도 많고 고쳐야 될 점이 많습니다.", reportCount: 1 },
-];
-
-const ITEMS_PER_PAGE = 10; // 한 페이지에 보여줄 리뷰 수
+// 페이지당 보여줄 리뷰 수
+const ITEMS_PER_PAGE = 10;
 
 const ReviewManagement: React.FC = () => {
-  const { isSidebarOpen } = useOutletContext<LayoutContext>(); // 사이드바 열림 여부 가져오기
+  // 사이드바 열림 여부를 부모 Layout에서 받아옴
+  const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  // 상태값들 정의
-  const [reviews, setReviews] = useState<Review[]>(initialReviews); // 전체 리뷰 목록
-  const [search, setSearch] = useState(""); // 검색어
-  const [filterReported, setFilterReported] = useState(false); // 신고된 리뷰만 보기 필터
-  const [sortByReport, setSortByReport] = useState(false); // 신고 수 기준 정렬 여부
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null); // 상세보기용 선택된 리뷰
+  // 상태 변수 정의
+  const [reviews, setReviews] = useState<Review[]>([]);         // 전체 리뷰 목록
+  const [search, setSearch] = useState("");                     // 검색어
+  const [currentPage, setCurrentPage] = useState(1);            // 현재 페이지
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null); // 선택된 리뷰 (모달용)
 
-  // 리뷰 삭제 함수
-  const handleDelete = (id: number) => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      setReviews((prev) => prev.filter((review) => review.id !== id));
+  // 컴포넌트 마운트 시 리뷰 목록을 API로부터 불러옴
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get("/api/admin/reviews");
+        setReviews(res.data); // 응답 받은 리뷰 데이터 저장
+      } catch (error) {
+        console.error("리뷰 목록 불러오기 실패:", error);
+      }
+    };
+    fetchReviews();
+  }, []);
+
+  // 리뷰 삭제 함수 
+  const handleDelete = async (reviewId: number) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      // 🔹 서버에 DELETE 요청
+      await axios.delete(`/api/admin/reviews/${reviewId}`);
+
+      // 🔹 삭제 성공 시 프론트 목록에서 제거
+      setReviews((prev) => prev.filter((review) => review.reviewId !== reviewId));
+
+      alert("삭제되었습니다.");
+    } catch (error) {
+      console.error("리뷰 삭제 실패:", error);
+      alert("삭제 중 오류가 발생했습니다.");
     }
   };
 
-  // 필터링: 검색어 + 신고 여부 체크
-  const filtered = reviews
-    .filter((r) =>
-      (r.userId + r.gameTitle + r.content).toLowerCase().includes(search.toLowerCase())
-    )
-    .filter((r) => (filterReported ? r.reportCount > 0 : true));
 
-  // 정렬: 신고 수 기준 내림차순 정렬
-  const sorted = sortByReport
-    ? [...filtered].sort((a, b) => b.reportCount - a.reportCount)
-    : filtered;
+  // 검색어 필터링
+  const filtered = reviews.filter((r) =>
+    (r.userName + r.gameTitle + r.content)
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
-  // 페이지네이션 처리
-  const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
-  const paginated = sorted.slice(
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  // 파티클 효과 초기화 함수
+  // 파티클 애니메이션 초기화
   const particlesInit = async (engine: any) => {
     await loadSlim(engine);
   };
 
   return (
     <Styled.Container $isSidebarOpen={isSidebarOpen}>
-      {/* 파티클 배경 효과 */}
+      {/* 배경 애니메이션 효과 */}
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -83,71 +95,59 @@ const ReviewManagement: React.FC = () => {
         }}
       />
 
-      {/* 전체 콘텐츠 래퍼 */}
+      {/* 내부 컨텐츠 */}
       <Styled.InnerWrapper>
-        {/* 페이지 제목 */}
+        {/* 페이지 타이틀 */}
         <Styled.Title style={{ marginTop: "100px" }}>리뷰 관리</Styled.Title>
 
-        {/* 검색 및 정렬, 필터 제어 영역 */}
+        {/* 검색 입력창 */}
         <Styled.Controls>
-          {/* 검색 입력창 */}
           <Styled.SearchInput
             type="text"
-            placeholder="유저ID / 게임제목 / 내용 검색"
+            placeholder="유저 이름 / 게임 제목 / 내용 검색"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setCurrentPage(1); // 검색 시 페이지 초기화
+              setCurrentPage(1); // 검색 시 첫 페이지로 이동
             }}
             spellCheck={false}
           />
-
-          {/* 신고 수 정렬 버튼 */}
-          <Styled.SortButton onClick={() => setSortByReport((prev) => !prev)}>
-            📊 신고순 {sortByReport ? "▲" : "▼"}
-          </Styled.SortButton>
-
-          {/* 신고된 리뷰만 보기 체크박스 */}
-          <label>
-            <input
-              type="checkbox"
-              checked={filterReported}
-              onChange={() => setFilterReported(!filterReported)}
-            />
-            신고된 리뷰만 보기
-          </label>
         </Styled.Controls>
 
         {/* 리뷰 테이블 */}
         <Styled.ReviewTable>
           <thead>
             <tr>
-              <th>유저 ID</th>
+              <th>리뷰 ID</th>
+              <th>유저 이름</th>
               <th>게임 제목</th>
               <th>내용</th>
-              <th>신고 수</th>
               <th>기능</th>
             </tr>
           </thead>
           <tbody>
             {paginated.map((review) => (
-              <tr key={review.id}>
-                <td>{review.userId}</td>
+              <tr key={review.reviewId}>
+                <td>{review.reviewId}</td>
+                <td>{review.userName}</td>
                 <td>{review.gameTitle}</td>
                 <td>
-                  {/* 리뷰 내용이 길 경우 '+' 버튼으로 상세보기 모달 표시 */}
+                  {/* 🔸 내용이 길면 30자까지만 보여주고 + 버튼 제공 */}
                   {review.content.length > 30 ? (
                     <>
                       {review.content.slice(0, 30)}...
-                      <Styled.MoreButton onClick={() => setSelectedReview(review)}>+</Styled.MoreButton>
+                      <Styled.MoreButton onClick={() => setSelectedReview(review)}>
+                        +
+                      </Styled.MoreButton>
                     </>
                   ) : (
                     review.content
                   )}
                 </td>
-                <td>{review.reportCount}</td>
                 <td>
-                  <Styled.DeleteButton onClick={() => handleDelete(review.id)}>삭제</Styled.DeleteButton>
+                  <Styled.DeleteButton onClick={() => handleDelete(review.reviewId)}>
+                    삭제
+                  </Styled.DeleteButton>
                 </td>
               </tr>
             ))}

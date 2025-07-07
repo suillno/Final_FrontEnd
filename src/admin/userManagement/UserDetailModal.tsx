@@ -116,8 +116,6 @@ const UserDetailModal: React.FC<Props> = ({ user, onClose }) => {
           <span>상태:</span>
           {user.status === "ACTIVE" ? "✅ 활성" : "⛔ 정지"}
         </InfoRow>
-        <InfoRow><span>전화번호:</span>{user.phone || "없음"}</InfoRow>
-        <InfoRow><span>주소:</span>{user.address || "없음"}</InfoRow>
         <InfoRow><span>가입일:</span>{user.createdAt || "N/A"}</InfoRow>
       </ModalBox>
     </>
