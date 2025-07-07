@@ -15,6 +15,7 @@ import {
   apiRegisterUser,
   apiCheckUsername,
   apiCheckEmail,
+  apiSendEmailVerification,
 } from "../../components/api/backApi";
 
 // 스타일 컴포넌트 불러오기
@@ -33,6 +34,8 @@ import {
   SubLogo,
   SignPanel,
   CheckButton,
+  H2,
+  Div,
 } from "../../style/Login.styles";
 
 // 아이콘
@@ -68,6 +71,9 @@ export default function LoginPage() {
     registerEmail: "",
     registerEmailCode: "",
   });
+
+  // 이메일 인증코드
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   // 디바이스 정보 상태
   const [deviceInfo, setDeviceInfo] = useState({
@@ -133,6 +139,60 @@ export default function LoginPage() {
     }
   };
 
+  // 이메일 인증번호 요청 버튼
+  const sendEmailAuthCode = async () => {
+    try {
+      const res = await axios.post("http://localhost:8080/api/auth/mail", {
+        params: {
+          mailTo: registerForm.registerEmail,
+          subject: "인증메일",
+          mailType: "emailAuth",
+          username: registerForm.registerName,
+        },
+      });
+      alert("인증 메일이 발송되었습니다!");
+    } catch (err) {
+      alert("이메일 발송 실패");
+    }
+  };
+
+  // 인증번호 검증
+
+  const verifyEmailCode = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/mail/verify",
+        {
+          mailTo: registerForm.registerEmail,
+          authCode: registerForm.registerEmailCode,
+        }
+      );
+      alert(res.data); // 인증 성공
+      setIsEmailVerified(true);
+    } catch (err) {
+      alert("인증 실패");
+    }
+  };
+
+  const sendEmailVerification = async () => {
+    if (!registerForm.registerEmail) {
+      alert("이메일을 입력해주세요.");
+      return;
+    }
+    try {
+      const emailData = {
+        mailTo: registerForm.registerEmail,
+        username: registerForm.registerName,
+        mailType: "emailAuth",
+      };
+      const res = await apiSendEmailVerification(emailData);
+      console.log(res);
+      alert(res.message || "인증코드가 전송되었습니다!");
+    } catch (err) {
+      alert("인증코드 발송 실패");
+    }
+  };
+
   // 로그인 처리
   const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -153,6 +213,7 @@ export default function LoginPage() {
       setCurrentUser(res.data);
       dispatch(setUserInfo(userRes.data));
       navigate("/");
+      console.log("로그인 요청 바디:", loginData);
     } catch (err) {
       alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
     }
@@ -167,6 +228,19 @@ export default function LoginPage() {
       alert("비밀번호가 일치하지 않습니다.");
       return;
     }
+
+    if (!isEmailVerified) {
+      alert("이메일 인증을 먼저 완료해주세요.");
+      return;
+    }
+
+    if (
+      registerForm.registerPassword !== registerForm.registerConfirmPassword
+    ) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
     try {
       const registerData = {
         username: registerForm.registerId,
@@ -176,11 +250,15 @@ export default function LoginPage() {
         email: registerForm.registerEmail,
         roleNum: 1, // 기본 회원 등급
       };
+      console.log(registerData);
       const res = await apiRegisterUser(registerData);
-      alert(res);
+      alert("회원가입 성공!");
       setIsSignIn(true);
     } catch (err) {
       alert("회원가입 중 오류 발생");
+      if (axios.isAxiosError(err)) {
+        console.error("회원가입 실패", err.response?.data);
+      }
     }
   };
 
@@ -194,10 +272,14 @@ export default function LoginPage() {
         <Link to={"/"}>
           <Logo src={PGLogo} alt="PG로고" $visible={!isSignIn} />
         </Link>
-        <div className="h-[600px] overflow-auto">
+        <Div
+          className={
+            isSignIn ? "h-[600px] sign-in" : "h-[600px] sign-up active"
+          }
+        >
+          <H2>회원가입</H2>
           <FormBox className={!isSignIn ? "active" : ""}>
-            <Form onSubmit={onSubmitRegister}>
-              <h2>회원가입</h2>
+            <Form id="register-form" onSubmit={onSubmitRegister}>
               {/* 아이디 입력 + 중복확인 */}
               <InputBox>
                 <input
@@ -270,8 +352,11 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmail">본인확인 이메일</label>
-                <CheckButton type="button" onClick={checkEmail}>
+                {/* <CheckButton type="button" onClick={checkEmail}>
                   중복확인
+                </CheckButton> */}
+                <CheckButton type="button" onClick={sendEmailVerification}>
+                  인증코드 전송
                 </CheckButton>
                 <IoMailOutline />
               </InputBox>
@@ -286,16 +371,20 @@ export default function LoginPage() {
                   onChange={onChangeRegister}
                 />
                 <label htmlFor="registerEmailCode">인증번호 입력</label>
+                <CheckButton type="button" onClick={verifyEmailCode}>
+                  인증번호 확인
+                </CheckButton>
                 <IoCheckmarkCircleOutline />
               </InputBox>
-
-              <Button type="submit">회원가입</Button>
-              <ToggleText>
-                계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
-              </ToggleText>
             </Form>
+            <Button type="submit" form="register-form">
+              회원가입
+            </Button>
+            <ToggleText>
+              계정이 있으신가요? <span onClick={toggleMode}>로그인</span>
+            </ToggleText>
           </FormBox>
-        </div>
+        </Div>
       </SignPanel>
 
       {/* 로그인 패널 */}
@@ -303,9 +392,9 @@ export default function LoginPage() {
         <Link to={"/"}>
           <SubLogo src={PGLogo} alt="PG로고" $visible={isSignIn} />
         </Link>
-        <FormBox className={isSignIn ? "active" : ""}>
+        <FormBox className={isSignIn ? "active" : ""} $isLogin={isSignIn}>
           <Form onSubmit={onSubmitLogin}>
-            <h2>로그인</h2>
+            <H2>로그인</H2>
             <InputBox>
               <input
                 type="text"

@@ -3,7 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import * as Styled from "./reviewManagement/ReviewManagement.styles";
-import { LayoutContext, Review } from "./reviewManagement/ReviewManagement.types";
+import {
+  LayoutContext,
+  Review,
+} from "./reviewManagement/ReviewManagement.types";
 import ReviewDetailModal from "./reviewManagement/ReviewDetailModal";
 import axios from "axios";
 
@@ -62,6 +65,7 @@ const ReviewManagement: React.FC = () => {
   // 페이지네이션 계산
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
+
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -81,7 +85,10 @@ const ReviewManagement: React.FC = () => {
           background: { color: "#0e0f11" },
           fpsLimit: 60,
           interactivity: {
-            events: { onHover: { enable: true, mode: "repulse" }, resize: true },
+            events: {
+              onHover: { enable: true, mode: "repulse" },
+              resize: true,
+            },
           },
           particles: {
             color: { value: "#00eaff" },
@@ -137,6 +144,7 @@ const ReviewManagement: React.FC = () => {
                     <>
                       {review.content.slice(0, 30)}...
                       <Styled.MoreButton onClick={() => setSelectedReview(review)}>
+
                         +
                       </Styled.MoreButton>
                     </>

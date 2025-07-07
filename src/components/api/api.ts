@@ -20,21 +20,6 @@ export const apiGetGameList = async (pageNext: number) => {
 };
 
 /**
- * RAWG 상세 게임 정보 조회
- * @param gameId
- * @returns
- */
-export const apiGetGameDetail = async (gameId: string) => {
-  try {
-    const res = await instance.get(`/game/detail/${gameId}`);
-    return res.data;
-  } catch (error) {
-    console.error("게임 상세 호출 에러", error);
-    return null;
-  }
-};
-
-/**
  * 게임 장르별조회
  * @param Genres
  * @param pageNext
@@ -65,6 +50,21 @@ export const apiGetGameImg = async (gameId: string) => {
     return res.data;
   } catch (error) {
     console.error("게임 검색 호출 에러", error);
+    return null;
+  }
+};
+
+/**
+ * RAWG 상세 게임 정보 조회
+ * @param gameId
+ * @returns
+ */
+export const apiGetGameDetail = async (gameId: string) => {
+  try {
+    const res = await instance.get(`/game/detail/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("게임 상세 호출 에러", error);
     return null;
   }
 };
@@ -143,6 +143,27 @@ export const apiGetGameTime = async (GameTime: string, pageNext: number) => {
     return res.data;
   } catch (error) {
     console.error("베스트 플레이타임 호출 실패", error);
+    return null;
+  }
+};
+
+/**
+ * 게임 플렛폼 조회
+ * @param platformId
+ * @param pageNext
+ * @returns
+ */
+export const apiGetGamesByPlatform = async (
+  platformId: number | string,
+  pageNext: number
+) => {
+  try {
+    const res = await instance.get("/game/gamePlatform", {
+      params: { platforms: platformId, page: pageNext },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("백엔드 API 호출 실패", error);
     return null;
   }
 };

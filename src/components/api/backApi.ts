@@ -1,5 +1,16 @@
 import { instanceBack, instanceAuth } from "./instance";
 
+// 🔸 장바구니 아이템 타입 정의 (이 파일 또는 공용 types.ts로 분리 가능)
+export interface CartItem {
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+  released: string;
+  esrbRating: string;
+}
+
 // 리뷰 목록 가져오기
 export const apiGetGameReviews = async (gameId: string) => {
   try {
@@ -61,10 +72,64 @@ export const apiAddGameCart = async (cartData: {
   }
 };
 
+// 게임 할인가 적용
+export const apiAddGameDiscount = async (discountData: {
+  userName: string;
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+  released: string;
+  esrbRating: string;
+}) => {
+  try {
+    const res = await instanceBack.post("/member/discount/apply", discountData);
+    return res.data;
+  } catch (error) {
+    console.error("할인가 저장 실패", error);
+    return "ERROR: 할인가 저장 실패";
+  }
+};
+
+// 할인 전체 리스트 불러오기
+export interface GameDiscount {
+  discountId: number | null;
+  userName: string;
+  gameId: number;
+  title: string;
+  backgroundImage: string;
+  price: number;
+  salePrice: number;
+  released: string;
+  esrbRating: string;
+  discountPercent: number;
+  result: string;
+  createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
+}
+
+export interface DiscountListResponse {
+  list: GameDiscount[]; // 20개 페이징 리스트
+  one: GameDiscount; // 할인율 1위 게임 (옵션)
+}
+export const apiGetDiscountList = async (
+  page: number
+): Promise<DiscountListResponse> => {
+  try {
+    const res = await instanceBack.get<DiscountListResponse>(
+      `/member/discount/list/${page}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("할인 게임 목록 불러오기 실패", error);
+    throw error;
+  }
+};
+
 // 장바구니 조회
 export const apiCheckGameCart = async (userName: string, gameId: number) => {
   try {
-    const res = await instanceBack.get(`/member/review/checkCart/${gameId}`);
+    const res = await instanceBack.get(`/member/cart/checkCart/${gameId}`);
     return res.data;
   } catch (error) {
     console.error("찜 여부 확인 실패", error);
@@ -75,7 +140,18 @@ export const apiCheckGameCart = async (userName: string, gameId: number) => {
 // 좋아요 조회
 export const apiCheckGameLike = async (userName: string, gameId: number) => {
   try {
-    const res = await instanceBack.get(`/member/review/checkLike/${gameId}`);
+    const res = await instanceBack.get(`/member/like/checkLike/${gameId}`);
+    return res.data;
+  } catch (error) {
+    console.error("위시리스트 여부 확인 실패", error);
+    return false;
+  }
+};
+
+// 장바구니, 좋아요, 할인기능 통합 조회
+export const apiCheckAll = async (userName: string, gameId: number) => {
+  try {
+    const res = await instanceBack.get(`/member/status/checkAll/${gameId}`);
     return res.data;
   } catch (error) {
     console.error("위시리스트 여부 확인 실패", error);
@@ -123,4 +199,41 @@ export const apiCheckEmail = async (email: string) => {
   } catch (err) {
     throw new Error("이메일 확인 중 오류");
   }
+};
+
+// 이메일 인증코드 전송
+export const apiSendEmailVerification = async (emailData: {
+  mailTo: string;
+  username: string;
+  mailType: string;
+}) => {
+  try {
+    const res = await instanceAuth.post("/auth/mail", emailData);
+    return res.data;
+  } catch (err) {
+    throw new Error("이메일 확인 중 오류");
+  }
+};
+
+// 장바구니 전체 리스트 불러오기
+export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
+  try {
+    const res = await instanceBack.get(`/member/cart/list/${username}`);
+    return res.data;
+  } catch (error) {
+    console.error("장바구니 목록 불러오기 실패", error);
+    throw error;
+  }
+};
+// 아이디 찾기
+export const apiFindUserId = async (email: string, name: string) => {
+  return await instanceAuth
+    .post("/auth/findId", { email, name })
+    .then((res) => res.data);
+};
+// 비밀번호 찾기
+export const apiFindUserPw = async (email: string, username: string) => {
+  return await instanceAuth
+    .post("/auth/changePw", { email, username })
+    .then((res) => res.data);
 };
