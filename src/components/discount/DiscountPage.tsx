@@ -4,8 +4,9 @@ import styled from "styled-components";
 import { GameDiscount } from "../api/backApi";
 import PGLogoContents from "../../img/PGLogoContents.png";
 import { CalenderSvg, PriceSvg } from "../../img/SvgImg";
-import SteamPrice from "../api/SteamPrice";
 import { Link } from "react-router-dom";
+import { GiCheckMark } from "react-icons/gi";
+import { MdOutlineTrendingDown } from "react-icons/md";
 
 // 카드 전체 스타일
 const Card = styled.div`
@@ -14,13 +15,14 @@ const Card = styled.div`
   overflow: hidden;
   transition: all 0.4s ease;
   position: relative;
-  cursor: pointer;
 
   img {
-    &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    }
+    cursor: pointer;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   }
 `;
 
@@ -36,12 +38,31 @@ interface Props {
   item: GameDiscount;
 }
 
+// 체크 아이콘
+const CheckIcon = styled(GiCheckMark)`
+  color: gray;
+  transition: color 0.2s;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+
+  button:hover & {
+    color: green;
+  }
+`;
+
+// 할인가
+const DownIcon = styled(MdOutlineTrendingDown)`
+  width: 20px;
+  height: 20px;
+`;
+
 // 할인 카드 컴포넌트
 const DiscountPage: React.FC<Props> = ({ item }) => {
   return (
     <Card>
       {/* 썸네일 이미지 (이미지 없을 시 대체) */}
-      <Link to={`/game/${item.gameId}`} key={item.gameId}>
+      <Link to={`/game/${item.gameId}`}>
         <img
           src={item.backgroundImage || PGLogoContents}
           alt={item.title}
@@ -64,22 +85,34 @@ const DiscountPage: React.FC<Props> = ({ item }) => {
         </div>
 
         {/* 할인율 */}
-        <div className="text-sm mb-1">
-          할인율:{" "}
-          <span className="font-semibold text-red-400">
-            {item.discountPercent?.toFixed(1)}%
-          </span>
-        </div>
 
         {/* 원래 가격 / 할인 가격 */}
         <div className="text-sm flex flex-col gap-0.5">
-          <div className="flex items-center gap-1 line-through text-gray-400">
-            <PriceSvg />
-            정가: {item.price.toLocaleString()}원
+          {/* 정가 / 할인율 양쪽정렬 */}
+          <div className="flex justify-between">
+            <div className="flex items-center gap-1 line-through text-gray-400">
+              <PriceSvg />
+              정가: {item.price.toLocaleString()}원
+            </div>
+            <div className="text-sm mb-1">
+              할인율:{" "}
+              <span className="font-semibold text-red-400">
+                {item.discountPercent?.toFixed(1)}%
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1 text-green-400 font-semibold">
-            <PriceSvg />
-            할인가: {item.salePrice.toLocaleString()}원
+          {/* 할인가 / 공동구매체크 양쪽정렬 */}
+          <div className="flex justify-between">
+            <div className="flex items-center gap-1 text-green-400 font-semibold">
+              <DownIcon />
+              할인가: {item.salePrice.toLocaleString()}원
+            </div>
+            <div>
+              <button className="flex" type="button">
+                <CheckIcon />
+                1명 신청시 구매가능
+              </button>
+            </div>
           </div>
         </div>
       </Info>

@@ -62,10 +62,9 @@ const ReviewDetailModal: React.FC<Props> = ({ review, onClose }) => {
       {/* 모달 내용 영역 클릭 시 닫힘 방지 */}
       <ModalBox onClick={(e) => e.stopPropagation()}>
         <h3>리뷰 상세 보기</h3>
-        <p><strong>유저 ID:</strong> {review.userId}</p>
+        <p><strong>유저 ID:</strong> {review.reviewId}</p>
         <p><strong>게임 제목:</strong> {review.gameTitle}</p>
         <p><strong>내용:</strong> {review.content}</p>
-        <p><strong>신고 수:</strong> {review.reportCount}</p>
         {/* 닫기 버튼 */}
         <CloseButton onClick={onClose}>닫기</CloseButton>
       </ModalBox>

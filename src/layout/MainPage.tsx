@@ -6,6 +6,7 @@ import Loader, { LoaderButton } from "../components/common/Loader";
 import { Link, useOutletContext } from "react-router-dom";
 import DiscountPage from "../components/discount/DiscountPage";
 import mainBanner from "../img/mainBanner.png";
+import ModalBase from "../components/common/ModalBase";
 
 // 사이드바 열림 여부를 context로 전달받는 타입 정의
 interface LayoutContext {
@@ -80,7 +81,6 @@ const MainPage: React.FC = () => {
 
     apiGetDiscountList(page)
       .then((res) => {
-        console.log(res);
         const combinedList =
           page === 1 ? res.list : [...discountList, ...res.list];
         setDiscountList(combinedList);
@@ -101,44 +101,52 @@ const MainPage: React.FC = () => {
   }, [pageCount]);
 
   return (
-    <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
-      {/* 메인 베너 이미지 */}
-      <MainTitle $isSidebarOpen={isSidebarOpen}>
-        <img src={mainBanner} alt="메인 베너" />
-      </MainTitle>
+    <>
+      {/* 모달 */}
+      <ModalBase />
+      <div className="bg-[#1e1f24] text-white py-6 w-full mt-10">
+        {/* 메인 베너 이미지 */}
+        <MainTitle $isSidebarOpen={isSidebarOpen}>
+          <img src={mainBanner} alt="메인 베너" />
+        </MainTitle>
 
-      {/* 게임 카드 리스트 */}
-      <MainContainer
-        $isSidebarOpen={isSidebarOpen}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
-      >
-        {discountList.map((item, idx) => (
-          <DiscountPage item={item} />
-        ))}
-      </MainContainer>
+        {/* 게임 카드 리스트 */}
+        <MainContainer
+          $isSidebarOpen={isSidebarOpen}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
+        >
+          {discountList.map((item, idx) => (
+            <DiscountPage key={item.discountId ?? idx} item={item} />
+          ))}
+        </MainContainer>
 
-      {/* 로딩 및 더보기 버튼 */}
-      {firstLoading ? (
-        <Loader />
-      ) : (
-        <div className="flex justify-center mt-8 h-35">
-          {isLoading ? (
-            <LoaderButton />
-          ) : (
-            hasMore && ( // 20개 이하조회시 버튼 숨기기 조건 추가
-              <button
-                type="button"
-                className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
-                style={{ marginTop: "2em", margin: "10px", fontWeight: "600" }}
-                onClick={pageNext}
-              >
-                더보기
-              </button>
-            )
-          )}
-        </div>
-      )}
-    </div>
+        {/* 로딩 및 더보기 버튼 */}
+        {firstLoading ? (
+          <Loader />
+        ) : (
+          <div className="flex justify-center mt-8 h-35">
+            {isLoading ? (
+              <LoaderButton />
+            ) : (
+              hasMore && ( // 20개 이하조회시 버튼 숨기기 조건 추가
+                <button
+                  type="button"
+                  className="w-24 h-12 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded text-center"
+                  style={{
+                    marginTop: "2em",
+                    margin: "10px",
+                    fontWeight: "600",
+                  }}
+                  onClick={pageNext}
+                >
+                  더보기
+                </button>
+              )
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
