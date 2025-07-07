@@ -9,6 +9,7 @@ export interface CartItem {
   salePrice: number;
   released: string;
   esrbRating: string;
+  cartType?: "CART" | "LIKE";
 }
 
 // 리뷰 목록 가져오기
@@ -236,4 +237,15 @@ export const apiFindUserPw = async (email: string, username: string) => {
   return await instanceAuth
     .post("/auth/changePw", { email, username })
     .then((res) => res.data);
+};
+
+// 찜(Wishlist) 목록 불러오기
+export const apiGetWishlist = async (username: string): Promise<CartItem[]> => {
+  try {
+    const res = await instanceBack.get(`/member/like/list/${username}`);
+    return res.data;
+  } catch (error) {
+    console.error("찜 목록 불러오기 실패", error);
+    throw error;
+  }
 };
