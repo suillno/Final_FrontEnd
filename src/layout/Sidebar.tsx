@@ -1,6 +1,8 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { selectUserInfo } from "../components/auth/store/userInfo";
 
 // 사이드바 전체 컨테이너
 // $isOpen은 styled-components 전용 props (DOM에는 전달되지 않음)
@@ -52,18 +54,26 @@ interface SidebarProps {
   setIsOpen: (open: boolean) => void;
 }
 
-// 사이드바 컴포넌트 본체
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+// 사이드바 컴포넌트
+const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+  const userInfo = useSelector(selectUserInfo); // Redux에서 현재 로그인 사용자 정보 가져옴
+  const roles = userInfo.roles || [];
+
+  // 관리자 권한 판별 (역할 배열에 ROLE_ADMIN 또는 ROLE_SYSTEM이 포함되어 있는지 확인)
+  const isAdmin = roles.some(
+    (r: any) => r.role === "ROLE_ADMIN" || r.role === "ROLE_SYSTEM"
+  );
+
   return (
     <SidebarContainer $isOpen={isOpen}>
-      {/* 기본 메뉴 섹션 */}
+      {/* 기본 메뉴 */}
       <Section>
-        <MenuItem className="font-bold">
+        <MenuItem>
           <Link to="/">Home</Link>
         </MenuItem>
       </Section>
 
-      {/* 인기 게임 관련 섹션 */}
+      {/* 인기 게임 섹션 */}
       <Section>
         <SectionTitle>Top</SectionTitle>
         <MenuItem>
@@ -77,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </MenuItem>
       </Section>
 
-      {/* 탐색 관련 섹션 */}
+      {/* 플랫폼별 탐색 */}
       <Section>
         <SectionTitle>GameVerse</SectionTitle>
         <MenuItem>
@@ -94,25 +104,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </MenuItem>
       </Section>
 
-      {/* 관리자 전용 메뉴 섹션 */}
-      <Section>
-        <SectionTitle>Admin</SectionTitle>
-        <MenuItem>
-          <Link to="/admin/Chart">Chart</Link>
-        </MenuItem>
-        <MenuItem>
-          <Link to="/admin/CustomerSupport">Customer Support</Link>
-        </MenuItem>
-        <MenuItem>
-          <Link to="/admin/ReviewManagement">Review Management</Link>
-        </MenuItem>
-        <MenuItem>
-          <Link to="/admin/UserManagement">User Management</Link>
-        </MenuItem>
-        <br />
-        <br />
-        <br />
-      </Section>
+      {/* 관리자 메뉴 - ROLE_ADMIN 또는 ROLE_SYSTEM 유저만 노출 */}
+      {isAdmin && (
+        <Section>
+          <SectionTitle>Admin</SectionTitle>
+          <MenuItem>
+            <Link to="/admin/Chart">Chart</Link>
+          </MenuItem>
+          <MenuItem>
+            <Link to="/admin/CustomerSupport">Customer Support</Link>
+          </MenuItem>
+          <MenuItem>
+            <Link to="/admin/ReviewManagement">Review Management</Link>
+          </MenuItem>
+          <MenuItem>
+            <Link to="/admin/UserManagement">User Management</Link>
+          </MenuItem>
+        </Section>
+      )}
     </SidebarContainer>
   );
 };
