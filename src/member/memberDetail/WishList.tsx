@@ -1,301 +1,336 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import {
+  FaRegCalendarAlt,
+  FaUserShield,
+  FaTags,
+  FaHeart,
+} from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  apiAddGameLike,
+  apiGetWishlist,
+  CartItem,
+} from "../../components/api/backApi";
 
-// ===============================
-// 🔷 LayoutContext: 사이드바 열림 여부 받아오기 위한 타입
-// ===============================
+// 🔹 Layout Sidebar 상태
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// ===============================
-// 🔷 GameItem: 찜한 게임 항목에 대한 타입 정의
-// ===============================
-interface GameItem {
-  id: number;
-  title: string;
-  price: number;
-  discountRate?: number;
-  image: string;
-}
-
-// ===============================
-// 🔷 초기 찜목록 더미 데이터
-//     - 이미지 URL은 안전한 placehold.co 도메인 사용
-// ===============================
-const initialWishlist: GameItem[] = [
-  {
-    id: 1,
-    title: "Elden Ring",
-    price: 59900,
-    discountRate: 20,
-    image: "https://placehold.co/150x200?text=Elden+Ring",
-  },
-  {
-    id: 2,
-    title: "God of War",
-    price: 49900,
-    image: "https://placehold.co/150x200?text=God+of+War",
-  },
-  {
-    id: 3,
-    title: "Hades",
-    price: 19900,
-    discountRate: 10,
-    image: "https://placehold.co/150x200?text=Hades",
-  },
-];
-
-// ===============================
-// 💅 styled-components 정의 (페이지 레이아웃 및 카드 스타일)
-// ===============================
+/* ===================== 💅 Styled Components ===================== */
 const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
-  padding: 2em;
-  background-color: #1e1f24;
+  align-items: flex-start;
   min-height: 100vh;
+  padding: 3rem 2rem;
+  background-color: #111218;
   margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 `;
 
-const SectionBox = styled.div`
+const GridBox = styled.div`
+  max-width: 1200px;
   width: 100%;
-  max-width: 600px;
-  background-color: #2b2b2b;
-  padding: 30px;
-  border-radius: 12px;
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-  margin-top: 100px;
-  margin-bottom: 100px;
-`;
-
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
 `;
 
 const Title = styled.h2`
-  font-size: 26px;
+  font-size: 2.2rem;
+  color: #00eaff;
+  margin-bottom: 2rem;
+  text-align: center;
   font-weight: bold;
-  color: #ffffff;
+  text-shadow: 0 0 8px #00eaff66;
 `;
 
-const CartMoveButton = styled.button`
-  background-color: #00bfff;
-  padding: 10px 20px;
-  font-size: 14px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  color: white;
-
-  &:hover {
-    background-color: #008ecc;
-  }
-`;
-
-const GameGrid = styled.div`
-  display: flex;
-  flex-direction: column;
+const CardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
 `;
 
 const GameCard = styled.div`
-  background-color: #292b32;
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  background-color: #1d1e24;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.15);
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+const ImageWrapper = styled.div`
+  position: relative;
 `;
 
 const GameImage = styled.img`
-  width: 120px;
-  height: auto;
-  border-radius: 6px;
-  cursor: pointer;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
 `;
 
 const GameInfo = styled.div`
-  flex: 1;
+  padding: 1rem;
 `;
 
 const GameTitle = styled.h3`
-  font-size: 18px;
-  margin: 0 0 8px;
-`;
-
-const PriceWrapper = styled.div`
-  margin: 10px 0;
-`;
-
-const OriginalPrice = styled.span`
-  color: #aaa;
-  text-decoration: line-through;
-  margin-right: 6px;
-  font-size: 14px;
-`;
-
-const DiscountedPrice = styled.span`
-  color: #00bfff;
-  font-weight: bold;
-`;
-
-const DiscountRateTag = styled.span`
-  display: inline-block;
-  margin-top: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: #fff;
-  background-color: #ff3d3d;
-  border-radius: 12px;
-  font-weight: bold;
+  margin-bottom: 0.5rem;
 `;
 
-const ButtonGroup = styled.div`
+const Detail = styled.div`
+  font-size: 0.9rem;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+`;
+
+const PriceSection = styled.div`
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
+  align-items: flex-end;
 `;
 
-const Button = styled.button`
+const Price = styled.div`
+  font-size: 1rem;
+  color: #ddd;
+`;
+
+const OriginalPrice = styled.div`
+  font-size: 0.9rem;
+  color: #999;
+  text-decoration: line-through;
+`;
+
+const SalePrice = styled.div`
+  font-size: 1.1rem;
+  color: #00eaff;
+  font-weight: bold;
+`;
+
+const DiscountBadge = styled.span`
+  font-size: 0.8rem;
+  color: #ff5252;
+  margin-left: 8px;
+`;
+
+const RemoveButton = styled.button`
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: #ff1744;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  &:hover {
+    background: #d50032;
+  }
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 8px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+`;
+
+const ModalBox = styled.div`
+  background-color: #222;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 360px;
+  color: #fff;
+  text-align: center;
+`;
+
+const ModalText = styled.p`
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+`;
+
+const ModalButtonGroup = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+`;
+
+const ModalButton = styled.button<{ $variant: "cancel" | "confirm" }>`
+  padding: 10px 20px;
   border-radius: 6px;
+  border: none;
   font-weight: bold;
   cursor: pointer;
-  border: none;
-`;
-
-const CartButton = styled(Button)`
-  background: linear-gradient(135deg, #4caf50, #66bb6a);
-  color: white;
+  background-color: ${(props) =>
+    props.$variant === "cancel" ? "#888" : "#00e676"};
+  color: #000;
 
   &:hover {
-    background: #43a047;
+    opacity: 0.9;
   }
 `;
 
-const RemoveButton = styled(Button)`
-  background: linear-gradient(135deg, #d32f2f, #f44336);
-  color: white;
+/* ===================== 📦 Main Component ===================== */
+const WishlistPage: React.FC = () => {
+  const { isSidebarOpen } = useOutletContext<LayoutContext>();
+  const [wishlist, setWishlist] = useState<CartItem[]>([]);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [targetItem, setTargetItem] = useState<CartItem | null>(null);
 
-  &:hover {
-    background: #b71c1c;
-  }
-`;
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const user = localStorage.getItem("currentUser");
+      if (!user) return;
+      const username = JSON.parse(user).username;
 
-const EmptyMessage = styled.p`
-  font-size: 18px;
-  color: #aaa;
-  text-align: center;
-  margin-top: 30px;
-`;
+      try {
+        const wishItems = await apiGetWishlist(username);
+        setWishlist(wishItems);
+      } catch (err) {
+        console.error("찜 목록 실패:", err);
+        toast.error("찜 목록을 불러오는 데 실패했습니다.");
+      }
+    };
+    fetchWishlist();
+  }, []);
 
-// ===============================
-// 📦 WishList 컴포넌트 구현부
-// ===============================
-const WishList: React.FC = () => {
-  const { isSidebarOpen } = useOutletContext<LayoutContext>(); // 레이아웃 컨텍스트
-  const navigate = useNavigate(); // 라우터 내비게이션
-  const [wishlist, setWishlist] = useState<GameItem[]>(initialWishlist); // 찜목록 상태
-
-  // 🔸 찜 해제 버튼 클릭 시 항목 제거
-  const handleRemove = (id: number) => {
-    setWishlist(wishlist.filter((item) => item.id !== id));
+  const handleRemoveClick = (item: CartItem) => {
+    setTargetItem(item);
+    setShowConfirm(true);
   };
 
-  // 🔸 장바구니 담기 버튼 클릭 시 알림
-  const handleAddToCart = (game: GameItem) => {
-    alert(`"${game.title}" 장바구니에 담았습니다.`);
+  const confirmDelete = async () => {
+    if (!targetItem) return;
+    const user = localStorage.getItem("currentUser");
+    if (!user) return;
+    const username = JSON.parse(user).username;
+
+    try {
+      const result = await apiAddGameLike({
+        userName: username,
+        gameId: targetItem.gameId,
+        title: targetItem.title,
+        backgroundImage: targetItem.backgroundImage,
+        price: targetItem.price,
+        salePrice: targetItem.salePrice,
+      });
+
+      if (result.startsWith("SUCCESS")) {
+        setWishlist((prev) =>
+          prev.filter((g) => g.gameId !== targetItem.gameId)
+        );
+        toast.success(`"${targetItem.title}" 찜 해제됨`);
+      } else {
+        toast.error("찜 해제 실패: " + result);
+      }
+    } catch (err) {
+      toast.error("서버 오류로 찜 해제 실패");
+    }
+
+    setShowConfirm(false);
+    setTargetItem(null);
   };
 
-  // 🔸 게임 이미지 클릭 시 상세페이지로 이동
-  const handleViewDetail = (id: number) => {
-    navigate(`/game/${id}`);
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setTargetItem(null);
   };
 
-  // 🔸 상단 버튼 클릭 시 장바구니 페이지로 이동
-  const handleGoToCart = () => {
-    navigate("/member/CartPage");
+  const getDiscountRate = (price: number, salePrice: number): number => {
+    if (price <= 0 || salePrice <= 0 || salePrice >= price) return 0;
+    return Math.floor(((price - salePrice) / price) * 100);
   };
 
   return (
     <PageWrapper $isSidebarOpen={isSidebarOpen}>
-      <SectionBox>
-        <HeaderRow>
-          <Title>찜한 게임 목록</Title>
-          <CartMoveButton onClick={handleGoToCart}>
-            장바구니로 이동ss
-          </CartMoveButton>
-        </HeaderRow>
+      <GridBox>
+        <Title>💖 찜한 게임 모음</Title>
 
         {wishlist.length === 0 ? (
-          <EmptyMessage>찜한 게임이 없습니다.</EmptyMessage>
+          <p style={{ textAlign: "center", color: "#aaa" }}>
+            아직 찜한 게임이 없습니다.
+          </p>
         ) : (
-          <GameGrid>
-            {wishlist.map((game) => {
-              const hasDiscount = game.discountRate && game.discountRate > 0;
-              const discountedPrice = hasDiscount
-                ? Math.floor(game.price * (1 - game.discountRate! / 100))
-                : game.price;
-
+          <CardGrid>
+            {wishlist.map((item) => {
+              const hasDiscount = item.salePrice < item.price;
               return (
-                <GameCard key={game.id}>
-                  <GameImage
-                    src={game.image}
-                    alt={game.title}
-                    onClick={() => handleViewDetail(game.id)}
-                    onError={(e) => {
-                      e.currentTarget.src = "/fallback-image.png"; // 이미지 깨질 경우 대체 이미지
-                    }}
-                  />
+                <GameCard key={item.gameId}>
+                  <ImageWrapper>
+                    <GameImage src={item.backgroundImage} alt={item.title} />
+                  </ImageWrapper>
                   <GameInfo>
-                    <GameTitle>{game.title}</GameTitle>
-                    <PriceWrapper>
+                    <GameTitle>{item.title}</GameTitle>
+                    <Detail>
+                      <FaRegCalendarAlt />
+                      {item.released || "출시일 정보 없음"}
+                    </Detail>
+                    <Detail>
+                      <FaUserShield />
+                      {item.esrbRating || "연령 등급 정보 없음"}
+                    </Detail>
+                    <PriceSection>
                       {hasDiscount ? (
                         <>
                           <OriginalPrice>
-                            {game.price.toLocaleString()}원
+                            ₩ {item.price.toLocaleString()}
                           </OriginalPrice>
-                          <DiscountedPrice>
-                            {discountedPrice.toLocaleString()}원
-                          </DiscountedPrice>
-                          <DiscountRateTag>
-                            {game.discountRate}% 할인
-                          </DiscountRateTag>
+                          <SalePrice>
+                            ₩ {item.salePrice.toLocaleString()}
+                            <DiscountBadge>
+                              -{getDiscountRate(item.price, item.salePrice)}%
+                            </DiscountBadge>
+                          </SalePrice>
                         </>
                       ) : (
-                        <DiscountedPrice>
-                          {game.price.toLocaleString()}원
-                        </DiscountedPrice>
+                        <Price>₩ {item.price.toLocaleString()}</Price>
                       )}
-                    </PriceWrapper>
-                    <ButtonGroup>
-                      <CartButton onClick={() => handleAddToCart(game)}>
-                        장바구니 담기
-                      </CartButton>
-                      <RemoveButton onClick={() => handleRemove(game.id)}>
+                      <RemoveButton onClick={() => handleRemoveClick(item)}>
                         찜 해제
                       </RemoveButton>
-                    </ButtonGroup>
+                    </PriceSection>
                   </GameInfo>
                 </GameCard>
               );
             })}
-          </GameGrid>
+          </CardGrid>
         )}
-      </SectionBox>
+      </GridBox>
+
+      {showConfirm && targetItem && (
+        <ModalOverlay>
+          <ModalBox>
+            <ModalText>
+              "{targetItem.title}" 을(를) 찜 목록에서 삭제할까요?
+            </ModalText>
+            <ModalButtonGroup>
+              <ModalButton $variant="cancel" onClick={cancelDelete}>
+                취소
+              </ModalButton>
+              <ModalButton $variant="confirm" onClick={confirmDelete}>
+                삭제
+              </ModalButton>
+            </ModalButtonGroup>
+          </ModalBox>
+        </ModalOverlay>
+      )}
+
+      <ToastContainer />
     </PageWrapper>
   );
 };
 
-export default WishList;
+export default WishlistPage;
