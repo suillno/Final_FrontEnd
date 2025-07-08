@@ -1,5 +1,5 @@
 // components/auth/Login.styles.ts
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import bgImage from "../img/g1.jpg";
 
 export const Section = styled.section`
@@ -174,6 +174,25 @@ export const Form = styled.form<{ $isLogin?: boolean }>`
     `}
 `;
 
+const fadeOut = keyframes`
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+`;
+
+export const ErrorMessage = styled.p`
+  color: #ff4d4f;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  animation: ${fadeOut} 3s forwards;
+`;
+
 export const InputBox = styled.div`
   position: relative;
   z-index: 20;
@@ -181,18 +200,38 @@ export const InputBox = styled.div`
   border-bottom: 2px solid #fff;
   margin-bottom: 20px;
 
-  /* 날짜 전용 커스터마이징 */
+  p.error-message {
+    position: absolute;
+    bottom: -18px; /* 인풋 바로 아래 */
+    left: 5px;
+    color: #ff4d4f;
+    font-size: 0.75em;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+
+    height: 18px; /* 공간 고정 */
+    line-height: 18px;
+    visibility: hidden; /* 기본은 숨김 */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &.error p.error-message {
+    visibility: visible; /* 에러 있을 때만 표시 */
+    opacity: 1;
+  }
+
+  /* (기존 나머지 스타일 유지) */
   input[type="date"] {
     color: transparent;
     background-color: transparent;
-    padding-right: 2.5rem; /* 아이콘 안 겹치도록 */
+    padding-right: 2.5rem;
   }
-
   input[type="date"]:focus,
   input[type="date"]:valid {
     color: white;
   }
-
   input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(2);
     cursor: pointer;
@@ -205,12 +244,10 @@ export const InputBox = styled.div`
     width: 1.2em;
     z-index: 1;
   }
-
   input[type="date"]::-webkit-calendar-picker-indicator:hover {
     filter: invert(59%) sepia(10%) saturate(130%) hue-rotate(315deg)
       brightness(91%) contrast(95%);
   }
-
   label {
     position: absolute;
     top: 50%;
@@ -221,13 +258,11 @@ export const InputBox = styled.div`
     pointer-events: none;
     transition: 0.5s;
   }
-
   input:focus ~ label,
   input:valid ~ label {
     top: -5px;
     font-size: 0.8em;
   }
-
   input {
     width: 100%;
     height: 50px;
@@ -240,12 +275,10 @@ export const InputBox = styled.div`
     background-color: transparent;
     transition: background-color 5000s ease-in-out 0s;
   }
-
   input:-webkit-autofill {
     -webkit-text-fill-color: #fff !important;
     box-shadow: transparent inset !important;
   }
-
   svg {
     position: absolute;
     top: 50%;

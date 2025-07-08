@@ -5,6 +5,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { osName } from "react-device-detect";
 import PGLogo from "../../img/PGLogo.png";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // 상태 저장 및 로컬 저장소 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
@@ -36,6 +39,7 @@ import {
   CheckButton,
   H2,
   Div,
+  ErrorMessage,
 } from "../../style/Login.styles";
 
 // 아이콘
@@ -60,6 +64,11 @@ export default function LoginPage() {
     loginId: "",
     loginPassword: "",
   });
+  // 에러 5초후 삭제
+  const [timedErrors, setTimedErrors] = useState<{
+    loginId?: string;
+    loginPassword?: string;
+  }>({});
 
   // 회원가입 폼 상태
   const [registerForm, setRegisterForm] = useState({
@@ -80,6 +89,19 @@ export default function LoginPage() {
     deviceId: uuidv4(),
     deviceType: "",
     notificationToken: uuidv4(),
+  });
+  // zod 조건식
+  const loginSchema = z.object({
+    loginId: z.string().nonempty("아이디를 입력하세요."),
+    loginPassword: z.string().nonempty("비밀번호를 입력하세요."),
+  });
+  type LoginFormType = z.infer<typeof loginSchema>;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormType>({
+    resolver: zodResolver(loginSchema),
   });
 
   // OS 기반 deviceType 설정
@@ -103,6 +125,21 @@ export default function LoginPage() {
     }
     setDeviceInfo((prev) => ({ ...prev, deviceType: device }));
   }, []);
+  // 에러 시간 초 후 삭제
+  useEffect(() => {
+    if (errors.loginId || errors.loginPassword) {
+      setTimedErrors({
+        loginId: errors.loginId?.message,
+        loginPassword: errors.loginPassword?.message,
+      });
+
+      const timer = setTimeout(() => {
+        setTimedErrors({});
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
 
   // 로그인/회원가입 전환
   const toggleMode = () => setIsSignIn(!isSignIn);
@@ -194,12 +231,12 @@ export default function LoginPage() {
   };
 
   // 로그인 처리
-  const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmitLogin = async (data: LoginFormType) => {
+    console.log("로그인 제출 데이터:", data);
     try {
       const loginData = {
-        username: loginForm.loginId,
-        password: loginForm.loginPassword,
+        username: data.loginId,
+        password: data.loginPassword,
         deviceInfo,
       };
       const res = await axios.post(
@@ -285,6 +322,7 @@ export default function LoginPage() {
                 <input
                   type="text"
                   id="registerId"
+                  name="registerId"
                   required
                   value={registerForm.registerId}
                   onChange={onChangeRegister}
@@ -393,30 +431,35 @@ export default function LoginPage() {
           <SubLogo src={PGLogo} alt="PG로고" $visible={isSignIn} />
         </Link>
         <FormBox className={isSignIn ? "active" : ""} $isLogin={isSignIn}>
-          <Form onSubmit={onSubmitLogin}>
+          <Form onSubmit={handleSubmit(onSubmitLogin)} noValidate>
             <H2>로그인</H2>
             <InputBox>
               <input
                 type="text"
                 id="loginId"
-                required
-                value={loginForm.loginId}
-                onChange={onChangeLogin}
+                {...register("loginId")}
+                autoComplete="username"
               />
               <label htmlFor="loginId">아이디</label>
               <IoIdCardOutline />
+              {timedErrors.loginId && (
+                <ErrorMessage>{timedErrors.loginId}</ErrorMessage>
+              )}
             </InputBox>
             <InputBox>
               <input
                 type="password"
                 id="loginPassword"
-                required
-                value={loginForm.loginPassword}
-                onChange={onChangeLogin}
+                {...register("loginPassword")}
+                autoComplete="current-password"
               />
               <label htmlFor="loginPassword">비밀번호</label>
               <IoLockClosedOutline />
+              {timedErrors.loginPassword && (
+                <ErrorMessage>{timedErrors.loginPassword}</ErrorMessage>
+              )}
             </InputBox>
+
             <Button type="submit">로그인</Button>
             <ToggleText>
               계정이 없으신가요? <span onClick={toggleMode}>회원가입</span>
