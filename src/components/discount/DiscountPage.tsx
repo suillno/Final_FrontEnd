@@ -1,14 +1,17 @@
 // DiscountPage.tsx - 할인 게임 카드 컴포넌트
 import React from "react";
 import styled from "styled-components";
-import { GameDiscount } from "../api/backApi";
+import { apiAddGameGroupReservation, GameDiscount } from "../api/backApi";
 import PGLogoContents from "../../img/PGLogoContents.png";
 import { CalenderSvg, PriceSvg } from "../../img/SvgImg";
 import { Link } from "react-router-dom";
 import { GiCheckMark } from "react-icons/gi";
 import { MdOutlineTrendingDown } from "react-icons/md";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../auth/store/userInfo";
 
 // 카드 전체 스타일
+
 const Card = styled.div`
   background-color: #2a2b32;
   border-radius: 10px;
@@ -59,6 +62,37 @@ const DownIcon = styled(MdOutlineTrendingDown)`
 
 // 할인 카드 컴포넌트
 const DiscountPage: React.FC<Props> = ({ item }) => {
+  const userInfo = useSelector(selectUserInfo);
+  // 공동구매 신청 호출
+  const GameGroupReservation = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+    const reservationDate = {
+      userName: userInfo.username,
+      gameId: item.gameId,
+    };
+    try {
+      const response = await apiAddGameGroupReservation(reservationDate);
+      // 문자열 앞 SUCCESS 및 ERROR 자르고 배열의 두 요소를 각각 변수에 담음
+      const [status, message] = response
+        // 문자열을 ":" 기준으로 분리합니다.
+        .split(":")
+        // 배열의 각 요소에 대해 trim()을 적용해서 앞뒤 공백 제거
+        .map((s: string) => s.trim());
+
+      if (status === "SUCCESS") {
+        alert(message); // 성공 메세지
+      } else {
+        alert("에러: " + message);
+      }
+    } catch (error) {
+      console.error("공동구매 신청 오류", error);
+      alert("공동구매 신청 등록중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <Card>
       {/* 썸네일 이미지 (이미지 없을 시 대체) */}
@@ -84,8 +118,6 @@ const DiscountPage: React.FC<Props> = ({ item }) => {
           출시일: {item.released || "미정"}
         </div>
 
-        {/* 할인율 */}
-
         {/* 원래 가격 / 할인 가격 */}
         <div className="text-sm flex flex-col gap-0.5">
           {/* 정가 / 할인율 양쪽정렬 */}
@@ -108,9 +140,13 @@ const DiscountPage: React.FC<Props> = ({ item }) => {
               할인가: {item.salePrice.toLocaleString()}원
             </div>
             <div>
-              <button className="flex" type="button">
+              <button
+                className="flex items-center gap-1"
+                type="button"
+                onClick={GameGroupReservation}
+              >
                 <CheckIcon />
-                1명 신청시 구매가능
+                <span>{item.countApplicants}명 신청시 구매가능</span>
               </button>
             </div>
           </div>
