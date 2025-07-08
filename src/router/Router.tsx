@@ -27,6 +27,7 @@ import GameNsList from "../gameApi/GameNsList";
 import GamePcList from "../gameApi/GamePcList";
 import GamePsList from "../gameApi/GamePsList";
 import GameXboxList from "../gameApi/GameXboxList";
+import ExcelTmp from "../Excel/ExcelTmp";
 // DB에있는 권한 확인
 const ROLES = {
   ROLE_SYSTEM: 1,
@@ -82,6 +83,9 @@ function Router() {
       </Route>
       {/* 경로 없을때 */}
       <Route path="*" element={<NotFound />} />
+
+      {/* 수업내용띠 */}
+      <Route path="excel" element={<ExcelTmp />} />
     </Routes>
   );
 }
