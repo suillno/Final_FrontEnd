@@ -100,6 +100,14 @@ const MainPage: React.FC = () => {
     getGameList(pageCount);
   }, [pageCount]);
 
+  // 리스트 갱신만 수행 (페이지 초기화 없이)
+  const fetchDiscountList = () => {
+    apiGetDiscountList(0).then((res) => {
+      setDiscountList(res.list);
+      setHasMore(res.list.length >= 20); // 더보기 여부 다시 판단
+    });
+  };
+
   return (
     <>
       {/* 모달 */}
@@ -116,7 +124,11 @@ const MainPage: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
         >
           {discountList.map((item, idx) => (
-            <DiscountPage key={item.discountId ?? idx} item={item} />
+            <DiscountPage
+              key={item.discountId ?? idx}
+              item={item}
+              onUpdated={fetchDiscountList}
+            />
           ))}
         </MainContainer>
 

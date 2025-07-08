@@ -39,6 +39,7 @@ const Info = styled.div`
 // 컴포넌트 Prop 정의
 interface Props {
   item: GameDiscount;
+  onUpdated?: () => void; // 콜백 props 정의
 }
 
 // 체크 아이콘
@@ -61,7 +62,7 @@ const DownIcon = styled(MdOutlineTrendingDown)`
 `;
 
 // 할인 카드 컴포넌트
-const DiscountPage: React.FC<Props> = ({ item }) => {
+const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
   const userInfo = useSelector(selectUserInfo);
   // 공동구매 신청 호출
   const GameGroupReservation = async () => {
@@ -84,6 +85,7 @@ const DiscountPage: React.FC<Props> = ({ item }) => {
 
       if (status === "SUCCESS") {
         alert(message); // 성공 메세지
+        onUpdated?.();
       } else {
         alert("에러: " + message);
       }
