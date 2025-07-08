@@ -30,7 +30,6 @@ import GameTags from "../components/gamedetail/GameTags";
 import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 
 const GameDetail = () => {
-  const token = getCurrentUser();
   const userInfo = useSelector(selectUserInfo);
   const { id } = useParams();
 

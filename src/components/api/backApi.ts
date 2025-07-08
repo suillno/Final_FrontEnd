@@ -94,6 +94,23 @@ export const apiAddGameDiscount = async (discountData: {
   }
 };
 
+// 공동구매 예약 버튼동작
+export const apiAddGameGroupReservation = async (reservationDate: {
+  userName: string;
+  gameId: number;
+}) => {
+  try {
+    const res = await instanceBack.post(
+      "/member/discount/reservation",
+      reservationDate
+    );
+    return res.data;
+  } catch (error) {
+    console.error("공동구매 예약 실패", error);
+    return "ERROR: 공동구매 예약 실패";
+  }
+};
+
 // 할인 전체 리스트 불러오기
 export interface GameDiscount {
   discountId: number | null;
@@ -108,6 +125,7 @@ export interface GameDiscount {
   discountPercent: number;
   result: string;
   createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
+  countApplicants: number;
 }
 
 export interface DiscountListResponse {
