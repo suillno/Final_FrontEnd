@@ -11,10 +11,17 @@ export const userInfoSlice = createSlice({
     },
   },
   reducers: {
-    setUserInfo: (state, actions) => {
+    setUserInfo: (state: { info: any }, actions: { payload: any }) => {
       state.info = actions.payload;
     },
-    removeUserInfo: (state) => {
+    removeUserInfo: (state: {
+      info: {
+        active: boolean;
+        email: string;
+        roles: never[];
+        username: string;
+      };
+    }) => {
       state.info = { active: false, email: "", roles: [], username: "" };
     },
   },

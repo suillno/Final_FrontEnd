@@ -165,13 +165,19 @@ const GameInfo = ({
                   if (discountActive) {
                     await onDiscountApply(0);
                   } else {
-                    const percent = await (window as any).promptDiscount();
-                    if (percent === null) return;
+                    const result = await (window as any).promptGroupDiscount();
+                    if (!result) return;
+
+                    const { discount, groupCount } = result;
 
                     const salePrice = Math.round(
-                      steamPrice * (1 - percent / 100)
+                      steamPrice * (1 - discount / 100)
                     );
+
+                    // 할인 가격 적용
                     await onDiscountApply(salePrice);
+
+                    // 여기서 공동구매 인원도 서버에 등록하거나 상태로 저장 가능
                   }
                 }}
               >
