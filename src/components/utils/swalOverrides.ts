@@ -29,9 +29,6 @@ export function overrideAlertConfirmPrompt() {
       html: `
       <label for="discount">할인율 (0~100%)</label>
       <input id="discount" type="number" min="0" max="100" class="swal2-input" placeholder="예: 20">
-      
-      <label for="groupCount"><br>구매인원 (5~10명)</label>
-      <input id="groupCount" type="number" min="5" max="10" class="swal2-input" placeholder="예: 6">
     `,
       focusConfirm: false,
       showCancelButton: true,
@@ -41,10 +38,6 @@ export function overrideAlertConfirmPrompt() {
         const discount = parseFloat(
           (document.getElementById("discount") as HTMLInputElement).value
         );
-        const groupCount = parseInt(
-          (document.getElementById("groupCount") as HTMLInputElement).value,
-          10
-        );
 
         if (isNaN(discount) || discount < 0 || discount > 100) {
           return customSwal.showValidationMessage(
@@ -52,13 +45,7 @@ export function overrideAlertConfirmPrompt() {
           );
         }
 
-        if (isNaN(groupCount) || groupCount < 5 || groupCount > 10) {
-          return customSwal.showValidationMessage(
-            "인원수는 5~10 사이의 정수여야 합니다."
-          );
-        }
-
-        return { discount, groupCount };
+        return { discount };
       },
     });
 

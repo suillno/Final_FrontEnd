@@ -10,6 +10,7 @@ export interface CartItem {
   released: string;
   esrbRating: string;
   cartType?: "CART" | "LIKE";
+  discountSalePrice?: number;
 }
 
 // 리뷰 목록 가져오기
@@ -93,6 +94,23 @@ export const apiAddGameDiscount = async (discountData: {
   }
 };
 
+// 공동구매 예약 버튼동작
+export const apiAddGameGroupReservation = async (reservationDate: {
+  userName: string;
+  gameId: number;
+}) => {
+  try {
+    const res = await instanceBack.post(
+      "/member/discount/reservation",
+      reservationDate
+    );
+    return res.data;
+  } catch (error) {
+    console.error("공동구매 예약 실패", error);
+    return "ERROR: 공동구매 예약 실패";
+  }
+};
+
 // 할인 전체 리스트 불러오기
 export interface GameDiscount {
   discountId: number | null;
@@ -107,11 +125,13 @@ export interface GameDiscount {
   discountPercent: number;
   result: string;
   createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
+  countApplicants: number;
 }
 
 export interface DiscountListResponse {
   list: GameDiscount[]; // 20개 페이징 리스트
   one: GameDiscount; // 할인율 1위 게임 (옵션)
+  discountWishlist: CartItem[]; // 찜한 게임 중 할인 적용된 게임 목록
 }
 export const apiGetDiscountList = async (
   page: number
@@ -133,7 +153,7 @@ export const apiCheckGameCart = async (userName: string, gameId: number) => {
     const res = await instanceBack.get(`/member/cart/checkCart/${gameId}`);
     return res.data;
   } catch (error) {
-    console.error("찜 여부 확인 실패", error);
+    console.error("장바구니 여부 확인 실패", error);
     return false;
   }
 };
