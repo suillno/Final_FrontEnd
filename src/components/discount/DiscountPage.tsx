@@ -206,7 +206,9 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
                   onClick={GameGroupReservation}
                 >
                   <CheckIcon />
-                  <span>{item.countApplicants}명 신청시 구매가능</span>
+                  <span className="text-gray-400 text-sm">
+                    {item.countApplicants}명 신청시 구매가능
+                  </span>
                 </button>
               ) : item.applicantList ? (
                 <button
@@ -220,7 +222,9 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
                   />
                 </button>
               ) : (
-                <div>신청이 종료되었습니다.</div>
+                <span className="text-gray-400 text-sm">
+                  신청이 종료되었습니다.
+                </span>
               )}
             </div>
           </div>
