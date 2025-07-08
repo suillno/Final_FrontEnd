@@ -1,7 +1,11 @@
 // DiscountPage.tsx - 할인 게임 카드 컴포넌트
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { apiAddGameGroupReservation, GameDiscount } from "../api/backApi";
+import {
+  apiAddGameCart,
+  apiAddGameGroupReservation,
+  GameDiscount,
+} from "../api/backApi";
 import PGLogoContents from "../../img/PGLogoContents.png";
 import { CalenderSvg, PriceSvg } from "../../img/SvgImg";
 import { Link } from "react-router-dom";
@@ -9,6 +13,9 @@ import { GiCheckMark } from "react-icons/gi";
 import { MdOutlineTrendingDown } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../auth/store/userInfo";
+import { BsFillCartCheckFill } from "react-icons/bs";
+import { useEffect } from "react";
+import { apiCheckGameCart } from "../api/backApi";
 
 // 카드 전체 스타일
 
@@ -63,7 +70,26 @@ const DownIcon = styled(MdOutlineTrendingDown)`
 
 // 할인 카드 컴포넌트
 const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
+  // 카트 상태 확인
+  const [cartActive, setCartActive] = useState(false);
+
   const userInfo = useSelector(selectUserInfo);
+
+  // 카트 상태 조회
+  useEffect(() => {
+    const checkCartStatus = async () => {
+      if (!userInfo.username || !item.gameId) return;
+      try {
+        const result = await apiCheckGameCart(userInfo.username, item.gameId);
+        setCartActive(Boolean(result));
+      } catch (err) {
+        console.error("장바구니 상태 확인 실패", err);
+      }
+    };
+
+    checkCartStatus();
+  }, [item.gameId, userInfo.username]);
+
   // 공동구매 신청 호출
   const GameGroupReservation = async () => {
     if (!userInfo.username) {
@@ -92,6 +118,37 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
     } catch (error) {
       console.error("공동구매 신청 오류", error);
       alert("공동구매 신청 등록중 오류가 발생했습니다.");
+    }
+  };
+
+  const cartSave = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+
+    const data = {
+      userName: userInfo.username,
+      gameId: item.gameId,
+      title: item.title,
+      backgroundImage: item.backgroundImage,
+      price: item.price,
+      released: item.released,
+      esrbRating: item.esrbRating || "정보 없음",
+      salePrice: item.salePrice || 0,
+    };
+
+    try {
+      const res = await apiAddGameCart(data);
+      const [status, message] = res.split(":").map((s: string) => s.trim());
+      if (status === "SUCCESS") {
+        alert(message);
+        setCartActive((prev) => !prev);
+      } else {
+        alert("에러: " + message);
+      }
+    } catch (error) {
+      alert("요청 처리 중 오류 발생");
     }
   };
 
@@ -142,14 +199,29 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
               할인가: {item.salePrice.toLocaleString()}원
             </div>
             <div>
-              <button
-                className="flex items-center gap-1"
-                type="button"
-                onClick={GameGroupReservation}
-              >
-                <CheckIcon />
-                <span>{item.countApplicants}명 신청시 구매가능</span>
-              </button>
+              {item.isActive ? (
+                <button
+                  className="flex items-center gap-1"
+                  type="button"
+                  onClick={GameGroupReservation}
+                >
+                  <CheckIcon />
+                  <span>{item.countApplicants}명 신청시 구매가능</span>
+                </button>
+              ) : item.applicantList ? (
+                <button
+                  onClick={cartSave}
+                  className="group hover:bg-black-700 text-white font-bold py-2 px-5 rounded shadow"
+                >
+                  <BsFillCartCheckFill
+                    className={`text-2xl group-hover:text-green-500 transition-colors duration-200 ${
+                      cartActive ? "text-green-500" : "text-white"
+                    }`}
+                  />
+                </button>
+              ) : (
+                <div>신청이 종료되었습니다.</div>
+              )}
             </div>
           </div>
         </div>

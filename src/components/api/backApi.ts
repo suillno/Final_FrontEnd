@@ -56,7 +56,7 @@ export const apiAddGameLike = async (likeData: {
   }
 };
 
-// 게임 카트 등록
+// 게임 장바구니 등록
 export const apiAddGameCart = async (cartData: {
   userName: string;
   gameId: number;
@@ -125,6 +125,8 @@ export interface GameDiscount {
   result: string;
   createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
   countApplicants: number;
+  isActive: number;
+  applicantList: string;
 }
 
 export interface DiscountListResponse {
