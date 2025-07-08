@@ -1,6 +1,7 @@
+// src/pages/member/WishlistPage.tsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import {
   FaRegCalendarAlt,
@@ -11,39 +12,55 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 import {
   apiAddGameLike,
+  apiGetDiscountList,
   apiGetWishlist,
   CartItem,
 } from "../../components/api/backApi";
 
-// 🔹 Layout Sidebar 상태
+// 🔷 Layout Context 타입
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-/* ===================== 💅 Styled Components ===================== */
+type SortType =
+  | "default"
+  | "alphabet"
+  | "price-high"
+  | "price-low"
+  | "discount-high"
+  | "discount-low";
+
+/* 💅 스타일 정의 */
 const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  padding: 5rem 2.5rem 2.5rem;
   min-height: 100vh;
-  padding: 3rem 2rem;
   background-color: #111218;
   margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
   transition: margin-left 0.3s ease;
 `;
 
 const GridBox = styled.div`
-  max-width: 1200px;
   width: 100%;
+  max-width: 1200px;
 `;
 
 const Title = styled.h2`
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   color: #00eaff;
-  margin-bottom: 2rem;
   text-align: center;
-  font-weight: bold;
-  text-shadow: 0 0 8px #00eaff66;
+  margin-bottom: 1.5rem;
+`;
+
+const SortSelect = styled.select`
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  background: #222;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  margin-bottom: 2rem;
 `;
 
 const CardGrid = styled.div`
@@ -52,19 +69,20 @@ const CardGrid = styled.div`
   gap: 24px;
 `;
 
-const GameCard = styled.div`
+const GameCard = styled.div<{ $highlighted?: boolean }>`
   background-color: #1d1e24;
+  border: ${(props) =>
+    props.$highlighted ? "2px solid hotpink" : "1px solid #333"};
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease;
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
   }
-`;
-
-const ImageWrapper = styled.div`
-  position: relative;
 `;
 
 const GameImage = styled.img`
@@ -75,11 +93,15 @@ const GameImage = styled.img`
 
 const GameInfo = styled.div`
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 `;
 
-const GameTitle = styled.h3`
+const GameTitle = styled.h3<{ $highlighted?: boolean }>`
   font-size: 1.2rem;
-  color: #fff;
+  font-weight: bold;
+  color: ${(props) => (props.$highlighted ? "#ff4d4d" : "#fff")};
   margin-bottom: 0.5rem;
 `;
 
@@ -92,216 +114,197 @@ const Detail = styled.div`
   margin-bottom: 4px;
 `;
 
-const PriceSection = styled.div`
-  margin-top: 1rem;
+const PriceWrap = styled.div`
+  margin-top: 0.6rem;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-items: center;
 `;
 
-const Price = styled.div`
-  font-size: 1rem;
-  color: #ddd;
-`;
-
-const OriginalPrice = styled.div`
+const OriginalPrice = styled.div<{ $strike?: boolean }>`
   font-size: 0.9rem;
-  color: #999;
-  text-decoration: line-through;
+  color: #aaa;
+  ${(props) => props.$strike && "text-decoration: line-through;"}
 `;
 
-const SalePrice = styled.div`
+const DiscountPrice = styled.div`
   font-size: 1.1rem;
   color: #00eaff;
   font-weight: bold;
+  text-align: right;
 `;
 
-const DiscountBadge = styled.span`
-  font-size: 0.8rem;
-  color: #ff5252;
-  margin-left: 8px;
+const Spacer = styled.div`
+  flex: 1;
 `;
 
-const RemoveButton = styled.button`
-  margin-top: 12px;
-  padding: 6px 12px;
-  background: #ff1744;
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+`;
+
+const ActionBtn = styled.button`
+  flex: 1;
+  padding: 8px;
+  background: #ff69b422;
   color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  &:hover {
-    background: #d50032;
-  }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-`;
-
-const ModalBox = styled.div`
-  background-color: #222;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 360px;
-  color: #fff;
-  text-align: center;
-`;
-
-const ModalText = styled.p`
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalButtonGroup = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-`;
-
-const ModalButton = styled.button<{ $variant: "cancel" | "confirm" }>`
-  padding: 10px 20px;
+  border: 1px solid hotpink;
   border-radius: 6px;
-  border: none;
-  font-weight: bold;
   cursor: pointer;
-  background-color: ${(props) =>
-    props.$variant === "cancel" ? "#888" : "#00e676"};
-  color: #000;
+  transition: 0.2s ease;
+  font-size: 0.9rem;
 
   &:hover {
-    opacity: 0.9;
+    background: hotpink;
+    color: black;
+    font-weight: bold;
   }
 `;
 
-/* ===================== 📦 Main Component ===================== */
+// ============================== Component ==============================
 const WishlistPage: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
+  const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<CartItem[]>([]);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [targetItem, setTargetItem] = useState<CartItem | null>(null);
+  const [sortType, setSortType] = useState<SortType>("default");
 
+  // 💾 위시리스트 + 할인 정보 불러오기
   useEffect(() => {
-    const fetchWishlist = async () => {
+    const fetchData = async () => {
       const user = localStorage.getItem("currentUser");
       if (!user) return;
       const username = JSON.parse(user).username;
 
       try {
-        const wishItems = await apiGetWishlist(username);
-        setWishlist(wishItems);
+        const wishListResult = await apiGetWishlist(username);
+        const discountResult = await apiGetDiscountList(0);
+        const discountMap = new Map(
+          discountResult.list.map((d: CartItem) => [d.gameId, d.salePrice])
+        );
+
+        const enriched = wishListResult.map((item) => ({
+          ...item,
+          discountSalePrice: discountMap.get(item.gameId) ?? undefined,
+        }));
+
+        setWishlist(enriched);
       } catch (err) {
-        console.error("찜 목록 실패:", err);
-        toast.error("찜 목록을 불러오는 데 실패했습니다.");
+        toast.error("데이터 로딩 실패");
       }
     };
-    fetchWishlist();
+
+    fetchData();
   }, []);
 
-  const handleRemoveClick = (item: CartItem) => {
-    setTargetItem(item);
-    setShowConfirm(true);
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortType(e.target.value as SortType);
   };
 
-  const confirmDelete = async () => {
-    if (!targetItem) return;
-    const user = localStorage.getItem("currentUser");
-    if (!user) return;
-    const username = JSON.parse(user).username;
+  const handleRemove = async (item: CartItem) => {
+    const username = JSON.parse(localStorage.getItem("currentUser")!).username;
 
     try {
-      const result = await apiAddGameLike({
-        userName: username,
-        gameId: targetItem.gameId,
-        title: targetItem.title,
-        backgroundImage: targetItem.backgroundImage,
-        price: targetItem.price,
-        salePrice: targetItem.salePrice,
-      });
-
+      const result = await apiAddGameLike({ ...item, userName: username });
       if (result.startsWith("SUCCESS")) {
-        setWishlist((prev) =>
-          prev.filter((g) => g.gameId !== targetItem.gameId)
-        );
-        toast.success(`"${targetItem.title}" 찜 해제됨`);
+        setWishlist((prev) => prev.filter((g) => g.gameId !== item.gameId));
+        toast.success(`"${item.title}" 찜 해제됨`);
       } else {
-        toast.error("찜 해제 실패: " + result);
+        toast.error("찜 해제 실패");
       }
-    } catch (err) {
-      toast.error("서버 오류로 찜 해제 실패");
+    } catch {
+      toast.error("서버 오류");
     }
-
-    setShowConfirm(false);
-    setTargetItem(null);
   };
 
-  const cancelDelete = () => {
-    setShowConfirm(false);
-    setTargetItem(null);
-  };
+  const goToGroupBuy = () => navigate("/member/groupbuy");
 
-  const getDiscountRate = (price: number, salePrice: number): number => {
-    if (price <= 0 || salePrice <= 0 || salePrice >= price) return 0;
-    return Math.floor(((price - salePrice) / price) * 100);
-  };
+  const getDiscountRate = (original: number, sale: number) =>
+    Math.floor(((original - sale) / original) * 100);
+
+  // 🔽 정렬 처리
+  const sortedList = [...wishlist].sort((a, b) => {
+    switch (sortType) {
+      case "alphabet":
+        return a.title.localeCompare(b.title, "ko");
+      case "price-high":
+        return b.price - a.price;
+      case "price-low":
+        return a.price - b.price;
+      case "discount-high":
+        return (
+          (b.price - (b.discountSalePrice ?? b.price)) / b.price -
+          (a.price - (a.discountSalePrice ?? a.price)) / a.price
+        );
+      case "discount-low":
+        return (
+          (a.price - (a.discountSalePrice ?? a.price)) / a.price -
+          (b.price - (b.discountSalePrice ?? b.price)) / b.price
+        );
+      default:
+        return 0;
+    }
+  });
 
   return (
     <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <GridBox>
-        <Title>💖 찜한 게임 모음</Title>
+        <Title>💖 찜한 게임</Title>
+        <SortSelect value={sortType} onChange={handleSortChange}>
+          <option value="default">기본 정렬</option>
+          <option value="alphabet">가나다순</option>
+          <option value="price-high">가격 높은순</option>
+          <option value="price-low">가격 낮은순</option>
+          <option value="discount-high">할인율 높은순</option>
+          <option value="discount-low">할인율 낮은순</option>
+        </SortSelect>
 
-        {wishlist.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#aaa" }}>
-            아직 찜한 게임이 없습니다.
+        {sortedList.length === 0 ? (
+          <p style={{ color: "#ccc", textAlign: "center" }}>
+            찜한 게임이 없습니다.
           </p>
         ) : (
           <CardGrid>
-            {wishlist.map((item) => {
-              const hasDiscount = item.salePrice < item.price;
+            {sortedList.map((item) => {
+              const isDiscounted =
+                typeof item.discountSalePrice === "number" &&
+                item.discountSalePrice < item.price;
+
               return (
-                <GameCard key={item.gameId}>
-                  <ImageWrapper>
-                    <GameImage src={item.backgroundImage} alt={item.title} />
-                  </ImageWrapper>
+                <GameCard key={item.gameId} $highlighted={isDiscounted}>
+                  <GameImage src={item.backgroundImage} />
                   <GameInfo>
-                    <GameTitle>{item.title}</GameTitle>
+                    <GameTitle $highlighted={isDiscounted}>
+                      {item.title}
+                    </GameTitle>
                     <Detail>
-                      <FaRegCalendarAlt />
-                      {item.released || "출시일 정보 없음"}
+                      <FaRegCalendarAlt /> {item.released || "출시일 없음"}
                     </Detail>
                     <Detail>
-                      <FaUserShield />
-                      {item.esrbRating || "연령 등급 정보 없음"}
+                      <FaUserShield /> {item.esrbRating || "등급 정보 없음"}
                     </Detail>
-                    <PriceSection>
-                      {hasDiscount ? (
-                        <>
-                          <OriginalPrice>
-                            ₩ {item.price.toLocaleString()}
-                          </OriginalPrice>
-                          <SalePrice>
-                            ₩ {item.salePrice.toLocaleString()}
-                            <DiscountBadge>
-                              -{getDiscountRate(item.price, item.salePrice)}%
-                            </DiscountBadge>
-                          </SalePrice>
-                        </>
-                      ) : (
-                        <Price>₩ {item.price.toLocaleString()}</Price>
+
+                    <PriceWrap>
+                      <OriginalPrice $strike={isDiscounted}>
+                        ₩ {item.price.toLocaleString()}
+                      </OriginalPrice>
+                      {isDiscounted && (
+                        <DiscountPrice>
+                          ₩ {item.discountSalePrice!.toLocaleString()}{" "}
+                          <FaTags /> -
+                          {getDiscountRate(item.price, item.discountSalePrice!)}
+                          %
+                        </DiscountPrice>
                       )}
-                      <RemoveButton onClick={() => handleRemoveClick(item)}>
-                        찜 해제
-                      </RemoveButton>
-                    </PriceSection>
+                    </PriceWrap>
+
+                    <Spacer />
+                    <ButtonGroup>
+                      <ActionBtn onClick={() => handleRemove(item)}>
+                        <FaHeart /> 찜 해제
+                      </ActionBtn>
+                      <ActionBtn onClick={goToGroupBuy}>🤝 공동 구매</ActionBtn>
+                    </ButtonGroup>
                   </GameInfo>
                 </GameCard>
               );
@@ -309,24 +312,6 @@ const WishlistPage: React.FC = () => {
           </CardGrid>
         )}
       </GridBox>
-
-      {showConfirm && targetItem && (
-        <ModalOverlay>
-          <ModalBox>
-            <ModalText>
-              "{targetItem.title}" 을(를) 찜 목록에서 삭제할까요?
-            </ModalText>
-            <ModalButtonGroup>
-              <ModalButton $variant="cancel" onClick={cancelDelete}>
-                취소
-              </ModalButton>
-              <ModalButton $variant="confirm" onClick={confirmDelete}>
-                삭제
-              </ModalButton>
-            </ModalButtonGroup>
-          </ModalBox>
-        </ModalOverlay>
-      )}
 
       <ToastContainer />
     </PageWrapper>
