@@ -104,6 +104,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         </MenuItem>
       </Section>
 
+      {/* 고객 문의 */}
+      <Section>
+        <SectionTitle>Service</SectionTitle>
+        <MenuItem>
+          <Link to="/member/memberService">PickGameSupport</Link>
+        </MenuItem>
+      </Section>
+
       {/* 관리자 메뉴 - ROLE_ADMIN 또는 ROLE_SYSTEM 유저만 노출 */}
       {isAdmin && (
         <Section>
@@ -120,6 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           <MenuItem>
             <Link to="/admin/UserManagement">User Management</Link>
           </MenuItem>
+          <br />
         </Section>
       )}
     </SidebarContainer>

@@ -167,3 +167,31 @@ export const apiGetGamesByPlatform = async (
     return null;
   }
 };
+
+/**
+ * 문의 등록 
+ * @param inquiryData 사용자 ID, 게임 ID, 제목, 내용
+ * @returns 등록 성공 메시지 or 예외 발생
+ */
+export const apiSubmitInquiry = async (inquiryData: {
+  userId: number;
+  gameId: number | null;
+  gameTitle: string; // 추가
+  title: string;
+  content: string;
+}) => {
+  // baseURL + 요청 URL 확인 로그
+  console.log("최종 요청 URL:", `${instance.defaults.baseURL}/member/inquiry/submit`);
+  try {
+    // 중복된 /api 제거
+    const res = await instance.post("/member/inquiry/submit", inquiryData);
+
+    if (res.status === 200) return res.data;
+    throw new Error("문의 등록 실패: 예외 응답");
+  } catch (error) {
+    console.error("문의 등록 실패:", error);
+    throw error;
+  }
+};
+
+
