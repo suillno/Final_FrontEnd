@@ -152,6 +152,8 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
     }
   };
 
+  console.log("test", item.applicantList);
+
   return (
     <Card>
       {/* 썸네일 이미지 (이미지 없을 시 대체) */}
@@ -199,7 +201,7 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
               할인가: {item.salePrice.toLocaleString()}원
             </div>
             <div>
-              {item.isActive ? (
+              {item.isActive !== 0 && item.applicantList ? (
                 <button
                   className="flex items-center gap-1"
                   type="button"
@@ -210,7 +212,7 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
                     {item.countApplicants}명 신청시 구매가능
                   </span>
                 </button>
-              ) : item.applicantList ? (
+              ) : item.isActive === 0 && item.applicantList ? (
                 <button
                   onClick={cartSave}
                   className="group hover:bg-black-700 text-white font-bold py-2 px-5 rounded shadow"
@@ -221,11 +223,16 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
                     }`}
                   />
                 </button>
-              ) : (
+              ) : item.isActive === 0 &&
+                // 일치하는 회원이 아니면
+                !item.applicantList
+                  ?.split(",")
+                  .map((s) => s.trim()) // 공백 제거
+                  .includes(userInfo.username) ? (
                 <span className="text-gray-400 text-sm">
                   신청이 종료되었습니다.
                 </span>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
