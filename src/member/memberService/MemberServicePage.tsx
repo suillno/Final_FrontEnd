@@ -1,73 +1,45 @@
 import React, { useState } from "react";
 import * as Styled from "./MemberService.styles";
-import { InquiryForm } from "./MemberService.types";
 import { useOutletContext } from "react-router-dom";
-import {
-  apiGetGameSearch,
-  apiSubmitInquiry,
-} from "../../components/api/api";
+import { apiSubmitInquiry } from "../../components/api/backApi";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 
-// 자동완성용 게임 검색 결과 타입
-interface GameSearchResult {
-  id: number;
-  name: string;
-}
-
-// 레이아웃에서 전달받는 context 타입
+// 레이아웃 context 타입
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
+// 폼 타입 정의 (INQUIRY 테이블에 맞춤)
+interface InquiryForm {
+  category: string;   // 문의 유형
+  content: string;    // 문의 내용
+}
+
+// 문의 유형 옵션
+const inquiryTypes = [
+  "결제 관련",
+  "계정 문제",
+  "게임 실행 오류",
+  "버그 제보",
+  "기타",
+  "직접 입력",
+];
+
 const MemberServicePage = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
-  const userInfo = useSelector(selectUserInfo); // 로그인 사용자 정보
+  const userInfo = useSelector(selectUserInfo);
 
-  // 폼 상태
+  // 셀렉트 모드 or 직접입력 모드
+  const [selectMode, setSelectMode] = useState<"select" | "custom">("select");
+
+  // 입력 상태
   const [form, setForm] = useState<InquiryForm>({
-    game: "",
-    title: "",
+    category: "",
     content: "",
-    gameId: null,
   });
 
-  // 검색 관련 상태
-  const [searchText, setSearchText] = useState("");
-  const [suggestions, setSuggestions] = useState<GameSearchResult[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  // 게임 검색 시 자동완성 동작
-  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const keyword = e.target.value;
-    setSearchText(keyword);
-    setForm({ ...form, game: "", gameId: null });
-
-    if (keyword.trim() === "") {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    try {
-      const data = await apiGetGameSearch(keyword);
-      setSuggestions(data?.results || []);
-      setShowSuggestions(true);
-    } catch (error) {
-      console.error("게임 검색 실패:", error);
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
-
-  // 자동완성 클릭 시 게임 선택
-  const handleSelectGame = (game: GameSearchResult) => {
-    setSearchText(game.name);
-    setForm({ ...form, game: game.name, gameId: game.id });
-    setShowSuggestions(false);
-  };
-
-  // 제목 및 내용 변경 핸들러
+  // 입력값 변경 핸들러
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -78,15 +50,12 @@ const MemberServicePage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 필수값 유효성 검사
-    if (!form.gameId || !form.title.trim() || !form.content.trim()) {
-      alert("게임, 제목, 내용을 모두 입력해주세요.");
+    if (!form.category.trim() || !form.content.trim()) {
+      alert("문의 유형과 내용을 모두 입력해주세요.");
       return;
     }
 
-    // 로그인 여부 확인
     if (!userInfo || typeof userInfo.id !== "number") {
-      console.log("userInfo 확인:", userInfo);
       alert("로그인이 필요합니다.");
       return;
     }
@@ -94,19 +63,13 @@ const MemberServicePage = () => {
     try {
       await apiSubmitInquiry({
         userId: userInfo.id,
-        gameId: form.gameId,
-        gameTitle: form.game,
-        title: form.title.trim(),
+        category: form.category.trim(),
         content: form.content.trim(),
       });
 
       alert("문의가 정상적으로 제출되었습니다.");
-
-      // 입력값 초기화
-      setForm({ game: "", title: "", content: "", gameId: null });
-      setSearchText("");
-      setSuggestions([]);
-      setShowSuggestions(false);
+      setForm({ category: "", content: "" });
+      setSelectMode("select");
     } catch (error) {
       console.error("문의 등록 실패:", error);
       alert("문의 등록 중 오류가 발생했습니다.");
@@ -119,44 +82,50 @@ const MemberServicePage = () => {
         <Styled.Title>고객 문의</Styled.Title>
 
         <Styled.Form onSubmit={handleSubmit}>
-          {/* 게임 검색 입력 */}
-          <Styled.Label htmlFor="game">게임 검색</Styled.Label>
-          <div style={{ position: "relative" }}>
-            <Styled.Input
-              id="game"
-              name="gameSearch"
-              value={searchText}
-              onChange={handleSearchChange}
-              placeholder="게임명을 입력하세요"
-              autoComplete="off"
-            />
+          <Styled.Label htmlFor="inquiryType">문의 유형</Styled.Label>
 
-            {/* 자동완성 결과 */}
-            {showSuggestions && suggestions.length > 0 && (
-              <Styled.SuggestionList>
-                {suggestions.map((game) => (
-                  <Styled.SuggestionItem
-                    key={game.id}
-                    onClick={() => handleSelectGame(game)}
-                  >
-                    {game.name}
-                  </Styled.SuggestionItem>
-                ))}
-              </Styled.SuggestionList>
-            )}
-          </div>
+          {selectMode === "select" ? (
+            <Styled.Select
+              id="inquiryType"
+              value={form.category}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "직접 입력") {
+                  setSelectMode("custom");
+                  setForm({ ...form, category: "" });
+                } else {
+                  setForm({ ...form, category: val });
+                }
+              }}
+            >
+              <option value="">문의 유형을 선택하세요</option>
+              {inquiryTypes.map((type, index) => (
+                <option key={index} value={type}>
+                  {type}
+                </option>
+              ))}
+            </Styled.Select>
+          ) : (
+            <>
+              <Styled.Input
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                placeholder="문의 유형을 입력하세요"
+              />
+              <Styled.SwitchButton
+                type="button"
+                onClick={() => {
+                  setSelectMode("select");
+                  setForm({ ...form, category: "" });
+                }}
+              >
+                목록에서 선택하기
+              </Styled.SwitchButton>
+            </>
+          )}
 
-          {/* 제목 입력 */}
-          <Styled.Label htmlFor="title">제목</Styled.Label>
-          <Styled.Input
-            id="title"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="제목을 입력하세요"
-          />
 
-          {/* 내용 입력 */}
           <Styled.Label htmlFor="content">내용</Styled.Label>
           <Styled.TextArea
             id="content"
@@ -166,7 +135,6 @@ const MemberServicePage = () => {
             placeholder="문의 내용을 입력하세요"
           />
 
-          {/* 제출 버튼 */}
           <Styled.SubmitButton type="submit">제출하기</Styled.SubmitButton>
         </Styled.Form>
       </Styled.FormWrapper>

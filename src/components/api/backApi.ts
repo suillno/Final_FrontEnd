@@ -271,3 +271,25 @@ export const apiGetWishlist = async (username: string): Promise<CartItem[]> => {
     throw error;
   }
 };
+/**
+ * 고객 문의 등록 API 호출
+ * @param inquiryData userId, category, content 포함
+ * @returns 서버 응답 메시지
+ */
+export const apiSubmitInquiry = async (inquiryData: {
+  userId: number;
+  category: string;
+  content: string;
+}) => {
+  
+  try {
+    const response = await instanceBack.post(
+      "/member/inquiry/submit",
+      inquiryData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("문의 등록 실패:", error);
+    throw error;
+  }
+};
