@@ -125,7 +125,7 @@ export interface GameDiscount {
   discountPercent: number;
   result: string;
   createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
-  countApplicants: number;
+  countApplicants?: number;
   isActive: number;
   applicantList: string;
 }

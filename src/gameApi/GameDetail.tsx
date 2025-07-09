@@ -1,5 +1,5 @@
 // GameDetail.tsx - 게임 상세 페이지 메인 컴포넌트 (분리된 하위 컴포넌트 사용)
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -152,6 +152,8 @@ const GameDetail = () => {
     }
   };
 
+  const location = useLocation();
+
   // 초기 로딩
   useEffect(() => {
     fetchGameDetail();
@@ -184,6 +186,10 @@ const GameDetail = () => {
                 cartActive={cartActive}
                 likeActive={likeActive}
                 discountActive={discountActive}
+                discountPrice={location.state?.priceDiscountInfo ?? 0}
+                price={location.state?.priceInfo ?? 0}
+                discountPercent={location.state?.discountPercent ?? 0}
+                showCartButton={location.state?.showCartButton ?? true}
               />
               <GameReviewSection
                 userName={userInfo.username}
