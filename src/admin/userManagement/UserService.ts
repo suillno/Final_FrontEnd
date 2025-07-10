@@ -1,6 +1,6 @@
-import axios from "axios";
+import { instanceBack } from "../../components/api/instance";
 
-// 사용자 정보 타입 정의 (UserVO와 매칭됨)
+// 사용자 정보 타입 정의
 export interface User {
   id: number;
   username: string;
@@ -12,22 +12,10 @@ export interface User {
   createdAt?: string;
 }
 
-// 공통 토큰 추출 함수
-const getAccessToken = () => {
-  const tokenObj = localStorage.getItem("user");
-  return tokenObj ? JSON.parse(tokenObj).accessToken : null;
-};
-
 // [1] 사용자 전체 목록 조회
 export const getUsers = async (): Promise<User[]> => {
   try {
-    const token = getAccessToken();
-
-    const response = await axios.get("/api/member/vo-list", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await instanceBack.get("/member/vo-list");
 
     return response.data.map((user: any) => ({
       id: user.userId,
@@ -44,22 +32,17 @@ export const getUsers = async (): Promise<User[]> => {
 };
 
 // [2] 사용자 권한 변경 요청
-export const updateUserRole = async (id: number, newRole: "USER" | "ADMIN"): Promise<boolean> => {
+export const updateUserRole = async (
+  id: number,
+  newRole: "USER" | "ADMIN"
+): Promise<boolean> => {
   try {
-    const tokenObj = localStorage.getItem("user");
-    const token = tokenObj ? JSON.parse(tokenObj).accessToken : null;
-
     const payload = {
       userId: id,
       role: newRole,
     };
 
-    await axios.patch("/api/member/update-role", payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    await instanceBack.patch("/member/update-role", payload);
 
     return true;
   } catch (error) {
@@ -68,18 +51,10 @@ export const updateUserRole = async (id: number, newRole: "USER" | "ADMIN"): Pro
   }
 };
 
-
 // [3] 사용자 상태 토글 요청
 export const toggleUserStatus = async (id: number): Promise<boolean> => {
   try {
-    const token = getAccessToken();
-
-    await axios.patch(`/api/member/toggle-status?userId=${id}`, null, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    await instanceBack.patch(`/member/toggle-status?userId=${id}`);
     return true;
   } catch (error) {
     console.error("상태 토글 실패:", error);

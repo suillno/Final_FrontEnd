@@ -223,7 +223,6 @@ export default function LoginPage() {
         mailType: "emailAuth",
       };
       const res = await apiSendEmailVerification(emailData);
-      console.log(res);
       alert(res.message || "인증코드가 전송되었습니다!");
     } catch (err) {
       alert("인증코드 발송 실패");
@@ -287,7 +286,6 @@ export default function LoginPage() {
         email: registerForm.registerEmail,
         roleNum: 1, // 기본 회원 등급
       };
-      console.log(registerData);
       const res = await apiRegisterUser(registerData);
       alert("회원가입 성공!");
       setIsSignIn(true);

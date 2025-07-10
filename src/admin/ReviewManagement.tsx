@@ -8,27 +8,27 @@ import {
   Review,
 } from "./reviewManagement/ReviewManagement.types";
 import ReviewDetailModal from "./reviewManagement/ReviewDetailModal";
-import axios from "axios";
+import { instanceBack } from "../components/api/instance";
 
-// 페이지당 보여줄 리뷰 수
+// 페이지당 리뷰 수
 const ITEMS_PER_PAGE = 10;
 
 const ReviewManagement: React.FC = () => {
-  // 사이드바 열림 여부를 부모 Layout에서 받아옴
+  // Layout 컴포넌트에서 사이드바 열림 여부 전달받음
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  // 상태 변수 정의
-  const [reviews, setReviews] = useState<Review[]>([]);         // 전체 리뷰 목록
-  const [search, setSearch] = useState("");                     // 검색어
-  const [currentPage, setCurrentPage] = useState(1);            // 현재 페이지
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null); // 선택된 리뷰 (모달용)
+  // 상태 정의
+  const [reviews, setReviews] = useState<Review[]>([]); // 전체 리뷰 목록
+  const [search, setSearch] = useState(""); // 검색어
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null); // 모달 표시용 리뷰
 
-  // 컴포넌트 마운트 시 리뷰 목록을 API로부터 불러옴
+  // 컴포넌트 마운트 시 리뷰 데이터 가져오기
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await axios.get("/api/admin/reviews");
-        setReviews(res.data); // 응답 받은 리뷰 데이터 저장
+        const res = await instanceBack.get("/admin/reviews"); // 자동으로 baseURL + 토큰 포함
+        setReviews(res.data);
       } catch (error) {
         console.error("리뷰 목록 불러오기 실패:", error);
       }
@@ -36,17 +36,17 @@ const ReviewManagement: React.FC = () => {
     fetchReviews();
   }, []);
 
-  // 리뷰 삭제 함수 
+  // 리뷰 삭제 처리
   const handleDelete = async (reviewId: number) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
-      // 🔹 서버에 DELETE 요청
-      await axios.delete(`/api/admin/reviews/${reviewId}`);
+      await instanceBack.delete(`/admin/reviews/${reviewId}`); // DELETE 요청
 
-      // 🔹 삭제 성공 시 프론트 목록에서 제거
-      setReviews((prev) => prev.filter((review) => review.reviewId !== reviewId));
-
+      // 삭제 후 목록에서 제거
+      setReviews((prev) =>
+        prev.filter((review) => review.reviewId !== reviewId)
+      );
       alert("삭제되었습니다.");
     } catch (error) {
       console.error("리뷰 삭제 실패:", error);
@@ -54,18 +54,16 @@ const ReviewManagement: React.FC = () => {
     }
   };
 
-
-  // 검색어 필터링
+  // 검색 필터링
   const filtered = reviews.filter((r) =>
     (r.userName + r.gameTitle + r.content)
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-  // 페이지네이션 계산
+  // 페이지 계산
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
-
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -77,7 +75,7 @@ const ReviewManagement: React.FC = () => {
 
   return (
     <Styled.Container $isSidebarOpen={isSidebarOpen}>
-      {/* 배경 애니메이션 효과 */}
+      {/* 배경 애니메이션 */}
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -102,12 +100,11 @@ const ReviewManagement: React.FC = () => {
         }}
       />
 
-      {/* 내부 컨텐츠 */}
+      {/* 메인 콘텐츠 */}
       <Styled.InnerWrapper>
-        {/* 페이지 타이틀 */}
         <Styled.Title style={{ marginTop: "100px" }}>리뷰 관리</Styled.Title>
 
-        {/* 검색 입력창 */}
+        {/* 검색창 */}
         <Styled.Controls>
           <Styled.SearchInput
             type="text"
@@ -115,7 +112,7 @@ const ReviewManagement: React.FC = () => {
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setCurrentPage(1); // 검색 시 첫 페이지로 이동
+              setCurrentPage(1);
             }}
             spellCheck={false}
           />
@@ -139,12 +136,13 @@ const ReviewManagement: React.FC = () => {
                 <td>{review.userName}</td>
                 <td>{review.gameTitle}</td>
                 <td>
-                  {/* 🔸 내용이 길면 30자까지만 보여주고 + 버튼 제공 */}
+                  {/* 30자 넘으면 줄이고 + 버튼 */}
                   {review.content.length > 30 ? (
                     <>
                       {review.content.slice(0, 30)}...
-                      <Styled.MoreButton onClick={() => setSelectedReview(review)}>
-
+                      <Styled.MoreButton
+                        onClick={() => setSelectedReview(review)}
+                      >
                         +
                       </Styled.MoreButton>
                     </>
@@ -153,7 +151,9 @@ const ReviewManagement: React.FC = () => {
                   )}
                 </td>
                 <td>
-                  <Styled.DeleteButton onClick={() => handleDelete(review.reviewId)}>
+                  <Styled.DeleteButton
+                    onClick={() => handleDelete(review.reviewId)}
+                  >
                     삭제
                   </Styled.DeleteButton>
                 </td>
@@ -162,7 +162,7 @@ const ReviewManagement: React.FC = () => {
           </tbody>
         </Styled.ReviewTable>
 
-        {/* 페이지네이션 버튼 */}
+        {/* 페이지네이션 */}
         <Styled.Pagination>
           {Array.from({ length: totalPages }, (_, i) => (
             <button

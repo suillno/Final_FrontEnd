@@ -7,8 +7,6 @@ const ExcelTmp = () => {
         responseType: "blob", // 파일 데이터를 받기위해 blob으로 설정해야한다.
       })
       .then((res) => {
-        console.log(res);
-
         // 브라우저에서 다운로드 처리
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");

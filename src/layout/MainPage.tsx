@@ -16,7 +16,8 @@ interface LayoutContext {
 // 메인 컨테이너 스타일 (사이드바 열림 여부에 따라 margin 조정)
 const MainContainer = styled.div<{ $isSidebarOpen: boolean }>`
   margin-right: 5%;
-  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "5%")};
+  margin-left: ${(props: { $isSidebarOpen: boolean }) =>
+    props.$isSidebarOpen ? "300px" : "5%"};
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
@@ -29,7 +30,8 @@ const MainTitle = styled.h2<{ $isSidebarOpen: boolean }>`
   font-size: 3.5vw;
   font-weight: 900;
   max-width: 90%;
-  margin-left: ${(props) => (props.$isSidebarOpen ? "250px" : "5%")};
+  margin-left: ${(props: { $isSidebarOpen: boolean }) =>
+    props.$isSidebarOpen ? "250px" : "5%"};
   margin-bottom: 2%;
   transition: margin-left 0.3s ease;
   background: linear-gradient(90deg, #ff512f, #dd2476);

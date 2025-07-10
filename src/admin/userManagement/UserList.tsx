@@ -114,7 +114,7 @@ const UserInfo = styled.div`
 
 // 뱃지 스타일
 const Badge = styled.span<{ color: string }>`
-  background-color: ${(props) => props.color};
+  background-color: ${(props: { color: any }) => props.color};
   padding: 0.4rem 1rem;
   border-radius: 9999px;
   font-weight: bold;
@@ -136,11 +136,11 @@ const Button = styled.button<{ $bg: string; $hover: string }>`
   font-size: 0.875rem;
   cursor: pointer;
   color: white;
-  background-color: ${(props) => props.$bg};
+  background-color: ${(props: { $bg: any }) => props.$bg};
   transition: 0.2s;
 
   &:hover {
-    background-color: ${(props) => props.$hover};
+    background-color: ${(props: { $hover: any }) => props.$hover};
   }
 `;
 
@@ -177,16 +177,15 @@ const UserList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-useEffect(() => {
-  getUsers().then((data) => {
-    const uniqueUsers = Array.from(
-      new Map(data.map((u) => [u.id, u])).values()
-    );
-    setUsers(uniqueUsers);
-    setFilteredUsers(uniqueUsers);
-  });
-}, []);
-
+  useEffect(() => {
+    getUsers().then((data) => {
+      const uniqueUsers = Array.from(
+        new Map(data.map((u) => [u.id, u])).values()
+      );
+      setUsers(uniqueUsers);
+      setFilteredUsers(uniqueUsers);
+    });
+  }, []);
 
   // 검색어 변경 시 필터링
   useEffect(() => {
@@ -237,7 +236,9 @@ useEffect(() => {
             type="text"
             placeholder="이름 또는 이메일 검색"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e: {
+              target: { value: React.SetStateAction<string> };
+            }) => setSearchTerm(e.target.value)}
           />
         </SearchBar>
       </HeaderWrapper>

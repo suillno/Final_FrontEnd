@@ -19,6 +19,7 @@ import Chart from "../admin/Chart";
 import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
 import GameLongPlayList from "../gameApi/GameLongPlayList";
+import MemberServicePage from "../member/memberService/MemberServicePage";
 
 import Auth from "../components/auth/helper/Auth";
 import { NotFound } from "../components/error/NotFound";
@@ -67,6 +68,9 @@ function Router() {
         <Route path="/game/GamePcList" element={<GamePcList />} />
         <Route path="game/GamePsList" element={<GamePsList />} />
         <Route path="game/GameXboxList" element={<GameXboxList />} />
+
+        {/* 고객 문의 */}
+        <Route path="/member/memberService" element={<MemberServicePage />} />
 
         {/* 어드민 */}
         <Route path="admin/CustomerSupport" element={<CustomerSupport />} />

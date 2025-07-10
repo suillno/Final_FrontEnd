@@ -57,7 +57,7 @@ export const apiAddGameLike = async (likeData: {
   }
 };
 
-// 게임 카트 등록
+// 게임 장바구니 등록
 export const apiAddGameCart = async (cartData: {
   userName: string;
   gameId: number;
@@ -125,7 +125,9 @@ export interface GameDiscount {
   discountPercent: number;
   result: string;
   createdAt: string; // ISO String 또는 'yyyy-MM-dd HH:mm:ss'
-  countApplicants: number;
+  countApplicants?: number;
+  isActive: number;
+  applicantList: string;
 }
 
 export interface DiscountListResponse {
@@ -266,6 +268,28 @@ export const apiGetWishlist = async (username: string): Promise<CartItem[]> => {
     return res.data;
   } catch (error) {
     console.error("찜 목록 불러오기 실패", error);
+    throw error;
+  }
+};
+/**
+ * 고객 문의 등록 API 호출
+ * @param inquiryData userId, category, content 포함
+ * @returns 서버 응답 메시지
+ */
+export const apiSubmitInquiry = async (inquiryData: {
+  userId: number;
+  category: string;
+  content: string;
+}) => {
+  
+  try {
+    const response = await instanceBack.post(
+      "/member/inquiry/submit",
+      inquiryData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("문의 등록 실패:", error);
     throw error;
   }
 };

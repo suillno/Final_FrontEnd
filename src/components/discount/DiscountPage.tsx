@@ -1,40 +1,25 @@
 // DiscountPage.tsx - 할인 게임 카드 컴포넌트
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { apiAddGameGroupReservation, GameDiscount } from "../api/backApi";
+import {
+  apiAddGameCart,
+  apiAddGameGroupReservation,
+  GameDiscount,
+} from "../api/backApi";
 import PGLogoContents from "../../img/PGLogoContents.png";
 import { CalenderSvg, PriceSvg } from "../../img/SvgImg";
-import { Link } from "react-router-dom";
-import { GiCheckMark } from "react-icons/gi";
-import { MdOutlineTrendingDown } from "react-icons/md";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../auth/store/userInfo";
-
-// 카드 전체 스타일
-
-const Card = styled.div`
-  background-color: #2a2b32;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: all 0.4s ease;
-  position: relative;
-
-  img {
-    cursor: pointer;
-  }
-
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  }
-`;
-
-// 카드 하단 정보 영역
-const Info = styled.div`
-  padding: 0.8rem;
-  color: white;
-  background-color: #1e1f24;
-`;
+import { useEffect } from "react";
+import { apiCheckGameCart } from "../api/backApi";
+import {
+  Card,
+  CartIcon,
+  CheckIcon,
+  DownIcon,
+  Info,
+} from "./DiscountPage.style";
 
 // 컴포넌트 Prop 정의
 interface Props {
@@ -42,28 +27,28 @@ interface Props {
   onUpdated?: () => void; // 콜백 props 정의
 }
 
-// 체크 아이콘
-const CheckIcon = styled(GiCheckMark)`
-  color: gray;
-  transition: color 0.2s;
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-
-  button:hover & {
-    color: green;
-  }
-`;
-
-// 할인가
-const DownIcon = styled(MdOutlineTrendingDown)`
-  width: 20px;
-  height: 20px;
-`;
-
 // 할인 카드 컴포넌트
 const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
+  // 카트 상태 확인
+  const [cartActive, setCartActive] = useState(false);
+
   const userInfo = useSelector(selectUserInfo);
+
+  // 카트 상태 조회
+  useEffect(() => {
+    const checkCartStatus = async () => {
+      if (!userInfo.username || !item.gameId) return;
+      try {
+        const result = await apiCheckGameCart(userInfo.username, item.gameId);
+        setCartActive(Boolean(result));
+      } catch (err) {
+        console.error("장바구니 상태 확인 실패", err);
+      }
+    };
+
+    checkCartStatus();
+  }, [item.gameId, userInfo.username]);
+
   // 공동구매 신청 호출
   const GameGroupReservation = async () => {
     if (!userInfo.username) {
@@ -95,20 +80,92 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
     }
   };
 
+  const cartSave = async () => {
+    if (!userInfo.username) {
+      alert("로그인 후 사용 가능합니다");
+      return;
+    }
+
+    const data = {
+      userName: userInfo.username,
+      gameId: item.gameId,
+      title: item.title,
+      backgroundImage: item.backgroundImage,
+      price: item.price,
+      released: item.released,
+      esrbRating: item.esrbRating || "정보 없음",
+      salePrice: item.salePrice || 0,
+    };
+
+    try {
+      const res = await apiAddGameCart(data);
+      const [status, message] = res.split(":").map((s: string) => s.trim());
+      if (status === "SUCCESS") {
+        alert(message);
+        setCartActive((prev) => !prev);
+      } else {
+        alert("에러: " + message);
+      }
+    } catch (error) {
+      alert("요청 처리 중 오류 발생");
+    }
+  };
+
+  // 공동구매 신청자 목록을 쉼표로 분리하여 배열로 만듦 (ex: ["user1", "user2"])
+  const applicantNames =
+    item.applicantList?.split(",").map((s) => s.trim()) || [];
+
+  // 현재 로그인한 사용자가 공동구매 신청자에 포함되어 있는지 여부
+  const isApplicant = applicantNames.includes(userInfo.username);
+
+  // 게임이 현재 공동구매 신청 가능한 상태인지 여부
+  const isActive = item.isActive === 1;
+
+  // 버튼 렌더링을 위한 조건들 정리
+  const showGroupPurchaseButton = isActive && item.applicantList; // 공동구매 신청 버튼 노출
+  const showCartButton = !isActive && isApplicant; // 공동구매 종료 + 신청자 → 장바구니 버튼
+  const showEndMessage = !isActive && !isApplicant; // 공동구매 종료 + 비신청자 → 안내 메시지
+  // 게임 이미지 표기
+  const gameImg = (
+    <img
+      src={item.backgroundImage || PGLogoContents}
+      alt={item.title}
+      style={{
+        width: "100%",
+        height: "160px",
+        objectFit: "cover",
+      }}
+    />
+  );
+  // 신청종료시 이미지클릭
+  const handleImageClick = () => {
+    alert("이 게임의 공동구매는 마감되었습니다.");
+  };
+
+  // 이미지 클릭시 정보전달
+  const navigate = useNavigate();
+  const onGameClick = (item: any) => {
+    navigate(`/game/${item.gameId}`, {
+      state: {
+        priceDiscountInfo: item.salePrice.toLocaleString(),
+        priceInfo: item.price.toLocaleString(),
+        discountPercent: item.discountPercent?.toFixed(1),
+        showCartButton,
+      },
+    });
+  };
+
   return (
     <Card>
       {/* 썸네일 이미지 (이미지 없을 시 대체) */}
-      <Link to={`/game/${item.gameId}`}>
-        <img
-          src={item.backgroundImage || PGLogoContents}
-          alt={item.title}
-          style={{
-            width: "100%",
-            height: "160px",
-            objectFit: "cover",
-          }}
-        />
-      </Link>
+      {showEndMessage ? (
+        <div onClick={handleImageClick} style={{ cursor: "pointer" }}>
+          {gameImg}
+        </div>
+      ) : (
+        <div onClick={() => onGameClick(item)}>{gameImg}</div>
+      )}
+
       {/* 게임 정보 */}
       <Info>
         {/* 게임 제목 */}
@@ -129,27 +186,46 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
               정가: {item.price.toLocaleString()}원
             </div>
             <div className="text-sm mb-1">
-              할인율:{" "}
-              <span className="font-semibold text-red-400">
+              <span className="flex font-semibold text-red-400">
                 {item.discountPercent?.toFixed(1)}%
+                <DownIcon />
               </span>
             </div>
           </div>
           {/* 할인가 / 공동구매체크 양쪽정렬 */}
           <div className="flex justify-between">
             <div className="flex items-center gap-1 text-green-400 font-semibold">
-              <DownIcon />
+              <PriceSvg />
               할인가: {item.salePrice.toLocaleString()}원
             </div>
             <div>
-              <button
-                className="flex items-center gap-1"
-                type="button"
-                onClick={GameGroupReservation}
-              >
-                <CheckIcon />
-                <span>{item.countApplicants}명 신청시 구매가능</span>
-              </button>
+              {showGroupPurchaseButton ? (
+                <button
+                  className="flex items-center"
+                  type="button"
+                  onClick={GameGroupReservation}
+                >
+                  <CheckIcon />
+                  <span className="text-gray-400 text-sm">
+                    {item.countApplicants}명 참여시 구매가능
+                  </span>
+                </button>
+              ) : showCartButton ? (
+                <button
+                  onClick={cartSave}
+                  className="group hover:bg-black-700 text-white font-bold rounded shadow"
+                >
+                  <CartIcon
+                    className={`group-hover:text-green-500 transition-colors duration-200 ${
+                      cartActive ? "text-green-500" : "text-white"
+                    }`}
+                  />
+                </button>
+              ) : showEndMessage ? (
+                <p className="text-gray-400 text-sm">
+                  공동구매가 마감되었습니다.
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
