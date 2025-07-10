@@ -1,9 +1,12 @@
 export interface Inquiry {
-  id: number;
-  status: "처리중" | "완료" | "대기";
-  username: string;
-  date: string;
-  content: string;
+  id: number;                  // INQUIRY_ID
+  userId: number;              // USER_ID
+  username: string;            // 사용자 이름 (프론트에서 매핑용)
+  category: string;            // CATEGORY
+  content: string;             // CONTENT
+  status: "대기중" | "처리중" | "완료"; // STATUS
+  createdAt: string;           // CREATED_AT
+  updatedAt?: string;          // UPDATED_AT (선택적)
 }
 
 export interface LayoutContext {
