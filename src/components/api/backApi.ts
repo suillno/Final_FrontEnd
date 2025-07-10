@@ -293,3 +293,20 @@ export const apiSubmitInquiry = async (inquiryData: {
     throw error;
   }
 };
+// 이메일 인증코드 전송
+export const apiSendWalletAuthCode = async (userId: number) => {
+  console.log(userId);
+  return await instanceBack
+    .post("/wallet/sendAuthCode", null, {
+      params: { userId },
+    })
+    .then((res) => res.data);
+};
+
+export const apiVerifyAuthCode = async (userId: number, code: string) => {
+  return await instanceBack
+    .post("/wallet/verifyAuthCode", null, {
+      params: { userId, code },
+    })
+    .then((res) => res.data as boolean); // 인증 성공 여부 true/false
+};
