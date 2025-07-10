@@ -84,9 +84,6 @@ function Router() {
       </Route>
       {/* 경로 없을때 */}
       <Route path="*" element={<NotFound />} />
-
-      {/* 수업내용띠 */}
-      <Route path="excel" element={<ExcelTmp />} />
     </Routes>
   );
 }
