@@ -1,7 +1,6 @@
 import { instanceBack, instanceAuth } from "./instance";
 import { Inquiry } from "../../admin/customerSupport/CustomerSupport.types";
 
-
 // 🔸 장바구니 아이템 타입 정의 (이 파일 또는 공용 types.ts로 분리 가능)
 export interface CartItem {
   gameId: number;
@@ -286,7 +285,6 @@ export const apiGetWishlist = async (username: string): Promise<CartItem[]> => {
   }
 };
 
-
 /**
  * 고객 문의 등록 API 호출
  * @param inquiryData userId, category, content 포함
@@ -339,9 +337,12 @@ export const apiUpdateInquiryStatus = async (
   status: string
 ): Promise<string> => {
   try {
-    const response = await instanceBack.put(`/admin/inquiry/${inquiryId}/status`, {
-      status,
-    });
+    const response = await instanceBack.put(
+      `/admin/inquiry/${inquiryId}/status`,
+      {
+        status,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("문의 상태 변경 실패:", error);
@@ -358,16 +359,17 @@ export const apiLogVisitor = async (): Promise<string> => {
   try {
     // instanceBack은 토큰이 자동 헤더 삽입되므로 그대로 사용
     const res = await instanceBack.post("/member/log/visit");
-    return res.data;           // "방문 기록 완료"
+    return res.data; // "방문 기록 완료"
   } catch (error) {
     console.error("방문 기록 실패", error);
     throw error;
   }
 };
 
-
 // 최근 7일 방문자 수 + 누적 방문자 수 API 호출
-export const apiGetWeeklyVisitors = async (): Promise<{ label: string; value: number }[]> => {
+export const apiGetWeeklyVisitors = async (): Promise<
+  { label: string; value: number }[]
+> => {
   try {
     const res = await instanceBack.get("/admin/chart/visitors");
     return res.data;
@@ -375,7 +377,8 @@ export const apiGetWeeklyVisitors = async (): Promise<{ label: string; value: nu
     console.error("방문자 통계 조회 실패:", error);
     throw error;
   }
-=======
+};
+
 // 이메일 인증코드 전송
 export const apiSendWalletAuthCode = async (userId: number) => {
   console.log(userId);
