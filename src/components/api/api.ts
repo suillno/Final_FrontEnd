@@ -176,14 +176,11 @@ export const apiGetGamesByPlatform = async (
 export const apiSubmitInquiry = async (inquiryData: {
   userId: number;
   gameId: number | null;
-  gameTitle: string; // 추가
+  gameTitle: string;
   title: string;
   content: string;
 }) => {
-  // baseURL + 요청 URL 확인 로그
-  console.log("최종 요청 URL:", `${instance.defaults.baseURL}/member/inquiry/submit`);
   try {
-    // 중복된 /api 제거
     const res = await instance.post("/member/inquiry/submit", inquiryData);
 
     if (res.status === 200) return res.data;

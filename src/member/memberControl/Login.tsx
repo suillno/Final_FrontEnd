@@ -8,7 +8,7 @@ import PGLogo from "../../img/PGLogo.png";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { apiLogVisitor } from "../../components/api/backApi";
 // 상태 저장 및 로컬 저장소 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
 import { setCurrentUser } from "../../components/auth/helper/storage";
@@ -248,6 +248,8 @@ export default function LoginPage() {
       });
       setCurrentUser(res.data);
       dispatch(setUserInfo(userRes.data));
+      // 방문자 기록 호출
+      await apiLogVisitor();
       navigate("/");
       console.log("로그인 요청 바디:", loginData);
     } catch (err) {

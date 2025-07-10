@@ -3,23 +3,15 @@ export interface LayoutContext {
   isSidebarOpen: boolean;
 }
 
-// 요일 기준 데이터 (매출, 방문자수, 가입자수 등에 공통적으로 사용)
+// 요일 기준 데이터 (방문자 수 전용으로 사용 중)
 export interface DailyData {
-  day: string;
-  sales?: number;     // 매출
-  visitors?: number;  // 방문자수
-  count?: number;     // 가입자수
+  day: string;         // 요일 (예: "월", "화", ...)
+  visitors: number;    // 해당 요일 방문자 수
+  isToday?: boolean;   // 오늘 날짜인지 여부 (그래프 강조용)
 }
 
-// 월별 매출 데이터 타입
-export interface MonthlyData {
-  month: string;
-  sales: number;
-}
-
-// 오늘 및 누적 방문자수
+// 오늘 및 누적 방문자 수
 export interface VisitorCount {
-  today: number;
-  total: number;
+  today: number;       // 오늘 방문자 수
+  total: number;       // 총 방문자 수
 }
-
