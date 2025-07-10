@@ -104,6 +104,32 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
+  // 회원가입 zod 조건식
+  const registrationSchema = z.object({
+    username: z.string().min(3, "아이디는 최소 3자 이상이어야 합니다."),
+    email: z.string().email("이메일 형식에 맞지 않습니다."),
+    password: z.string().min(6, "비밀번호는 최소 4자 이상이어야 합니다."),
+    name: z.string().min(1, "이름을 입력해주세요."),
+    birth: z
+      .string()
+      .regex(
+        /^\d{4}-\d{2}-\d{2}$/,
+        "생년월일은 YYYY-MM-DD 형식으로 입력해주세요."
+      ),
+  });
+  // .refine((data) => data.password === data.confirmPassword, {
+  //   message: "비밀번호가 일치하지 않습니다.",
+  //   path: ["confirmPassword"],
+  // });
+  type RegisterFormType = z.infer<typeof registrationSchema>;
+  const {
+    register: registerUser,
+    handleSubmit: handleSubmitRegister,
+    formState: { errors: registerErrors },
+  } = useForm<RegisterFormType>({
+    resolver: zodResolver(registrationSchema),
+  });
+
   // OS 기반 deviceType 설정
   useEffect(() => {
     let device = "";
@@ -258,8 +284,16 @@ export default function LoginPage() {
   };
 
   // 회원가입 처리
-  const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   if (
+  //     registerForm.registerPassword !== registerForm.registerConfirmPassword
+  //   ) {
+  //     alert("비밀번호가 일치하지 않습니다.");
+  //     return;
+  //   }
+
+  const onSubmitRegisterZod = async (data: RegisterFormType) => {
     if (
       registerForm.registerPassword !== registerForm.registerConfirmPassword
     ) {
@@ -272,21 +306,14 @@ export default function LoginPage() {
       return;
     }
 
-    if (
-      registerForm.registerPassword !== registerForm.registerConfirmPassword
-    ) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
     try {
       const registerData = {
-        username: registerForm.registerId,
-        password: registerForm.registerPassword,
-        name: registerForm.registerName,
-        birth: registerForm.registerBirth,
-        email: registerForm.registerEmail,
-        roleNum: 3, // 기본 회원 등급
+        username: data.username,
+        password: data.password,
+        name: data.name,
+        birth: data.birth,
+        email: data.email,
+        roleNum: 3,
       };
       const res = await apiRegisterUser(registerData);
       alert("회원가입 성공!");
@@ -316,19 +343,22 @@ export default function LoginPage() {
         >
           <H2>회원가입</H2>
           <FormBox className={!isSignIn ? "active" : ""}>
-            <Form id="register-form" onSubmit={onSubmitRegister}>
+            <Form
+              id="register-form"
+              onSubmit={handleSubmitRegister(onSubmitRegisterZod)}
+            >
               {/* 아이디 입력 + 중복확인 */}
               <InputBox>
                 <input
                   type="text"
-                  id="registerId"
-                  name="registerId"
-                  required
-                  value={registerForm.registerId}
-                  onChange={onChangeRegister}
+                  {...registerUser("username")}
+                  placeholder="아이디"
                 />
                 <label htmlFor="registerId">아이디</label>
                 <IoIdCardOutline />
+                {registerErrors.username && (
+                  <ErrorMessage>{registerErrors.username.message}</ErrorMessage>
+                )}
                 <CheckButton type="button" onClick={checkUsername}>
                   중복확인
                 </CheckButton>
@@ -336,13 +366,14 @@ export default function LoginPage() {
               <InputBox>
                 <input
                   type="password"
-                  id="registerPassword"
-                  required
-                  value={registerForm.registerPassword}
-                  onChange={onChangeRegister}
+                  {...registerUser("password")}
+                  placeholder="비밀번호"
                 />
                 <label htmlFor="registerPassword">비밀번호</label>
                 <IoLockClosedOutline />
+                {registerErrors.password && (
+                  <ErrorMessage>{registerErrors.password.message}</ErrorMessage>
+                )}
               </InputBox>
               <InputBox>
                 <input
@@ -359,36 +390,34 @@ export default function LoginPage() {
               <InputBox>
                 <input
                   type="text"
-                  id="registerName"
-                  required
-                  value={registerForm.registerName}
-                  onChange={onChangeRegister}
+                  {...registerUser("name")}
+                  placeholder="이름"
                 />
                 <label htmlFor="registerName">이름</label>
                 <IoIdCardOutline />
+                {registerErrors.name && (
+                  <ErrorMessage>{registerErrors.name.message}</ErrorMessage>
+                )}
               </InputBox>
 
               {/* 생년월일 */}
               <InputBox>
                 <input
                   type="date"
-                  id="registerBirth"
-                  required
-                  value={registerForm.registerBirth}
-                  onChange={onChangeRegister}
+                  {...registerUser("birth")}
+                  placeholder="YYYY-MM-DD"
                 />
                 <label htmlFor="registerBirth">생년월일</label>
+                {registerErrors.birth && (
+                  <ErrorMessage>{registerErrors.birth.message}</ErrorMessage>
+                )}
               </InputBox>
 
               {/* 이메일 인증 */}
               <InputBox>
-                <input
-                  type="email"
-                  id="registerEmail"
-                  required
-                  value={registerForm.registerEmail}
-                  onChange={onChangeRegister}
-                />
+                {registerErrors.email && (
+                  <ErrorMessage>{registerErrors.email.message}</ErrorMessage>
+                )}
                 <label htmlFor="registerEmail">본인확인 이메일</label>
                 {/* <CheckButton type="button" onClick={checkEmail}>
                   중복확인
@@ -397,6 +426,9 @@ export default function LoginPage() {
                   인증코드 전송
                 </CheckButton>
                 <IoMailOutline />
+                {registerErrors.email && (
+                  <ErrorMessage>{registerErrors.email.message}</ErrorMessage>
+                )}
               </InputBox>
 
               {/* 인증번호 입력칸 */}
