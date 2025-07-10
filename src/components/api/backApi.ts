@@ -41,6 +41,17 @@ export const apiAddGameReviews = async (reviewData: {
   }
 };
 
+// 리뷰 삭제
+export const apiDeleteGameReviews = async () => {
+  try {
+    const res = await instanceBack.delete("/member/review");
+    return res.data;
+  } catch (error) {
+    console.error("리뷰 삭제 실패", error);
+    throw error;
+  }
+};
+
 // 좋아요 저장
 export const apiAddGameLike = async (likeData: {
   userName: string;
