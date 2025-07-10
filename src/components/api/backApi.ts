@@ -30,6 +30,7 @@ export const apiGetGameReviews = async (gameId: string) => {
 export const apiAddGameReviews = async (reviewData: {
   userName: string;
   gameId: number;
+  title: string;
   rating: number;
   content: string;
 }) => {
@@ -293,8 +294,6 @@ export const apiSubmitInquiry = async (inquiryData: {
     throw error;
   }
 };
-
-
 /**
  * 고객 문의 전체 목록 조회 (관리자용)
  */
@@ -365,4 +364,21 @@ export const apiGetWeeklyVisitors = async (): Promise<{ label: string; value: nu
     console.error("방문자 통계 조회 실패:", error);
     throw error;
   }
+=======
+// 이메일 인증코드 전송
+export const apiSendWalletAuthCode = async (userId: number) => {
+  console.log(userId);
+  return await instanceBack
+    .post("/wallet/sendAuthCode", null, {
+      params: { userId },
+    })
+    .then((res) => res.data);
+};
+
+export const apiVerifyAuthCode = async (userId: number, code: string) => {
+  return await instanceBack
+    .post("/wallet/verifyAuthCode", null, {
+      params: { userId, code },
+    })
+    .then((res) => res.data as boolean); // 인증 성공 여부 true/false
 };

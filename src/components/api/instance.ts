@@ -1,9 +1,13 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
-import { getCurrentUser } from "../auth/helper/storage";
+import {
+  getCurrentUser,
+  removeCurrentUser,
+  setCurrentUser,
+} from "../auth/helper/storage";
+import store from "../auth/store/store";
+import { setUserInfo } from "../auth/store/userInfo";
+import Swal from "sweetalert2";
 
-const token = getCurrentUser(); //토큰가져오기
-
-// AxiosRequestConfig 타입 확장
 declare module "axios" {
   export interface InternalAxiosRequestConfig<D = any> {
     _retryCount?: number;
@@ -19,20 +23,109 @@ export const instanceBack = axios.create({
 
 instanceBack.interceptors.request.use(
   (config) => {
-    const fullUrl = `${config.baseURL}${config.url}`;
-    // 토큰 자동 삽입
-    const token = getCurrentUser();
-    if (token?.tokenType && token?.accessToken) {
-      config.headers?.set(
-        "Authorization",
-        `${token.tokenType}${token.accessToken}`
-      );
+    const user = getCurrentUser();
+
+    if (user?.accessToken && user?.tokenType) {
+      config.headers["Authorization"] = `${user.tokenType} ${user.accessToken}`;
+    }
+
+    const isFormData = config.data instanceof FormData;
+
+    if (!isFormData) {
+      config.headers["Content-Type"] = "application/json";
+    } else {
+      // FormData일 땐 Content-Type 자동 설정되도록 놔둠
+      delete config.headers["Content-Type"];
     }
 
     return config;
   },
   (error) => {
     console.error("[백엔드 요청 오류]", error);
+    return Promise.reject(error);
+  }
+);
+
+// 리플레시 토큰
+// 응답 인터셉터
+instanceBack.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest: any = error.config;
+
+    if (
+      error.response &&
+      !originalRequest._retry &&
+      (error.response.status === 401 || error.response.status === 406)
+    ) {
+      originalRequest._retry = true;
+
+      const user = getCurrentUser();
+
+      try {
+        // 1. refresh 토큰으로 access 갱신
+        const { data: newToken } = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/auth/refresh`,
+          { refreshToken: user.refreshToken }
+        );
+
+        // 2. 사용자 정보 다시 조회
+        const { data: userInfo } = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/user/me`,
+          {
+            headers: {
+              Authorization: `${newToken.tokenType} ${newToken.accessToken}`,
+            },
+          }
+        );
+        // 3. 사용자 정보 저장 및 헤더 재설정
+        setCurrentUser(newToken);
+        store.dispatch(setUserInfo(userInfo));
+        instanceBack.defaults.headers.common[
+          "Authorization"
+        ] = `${newToken.tokenType} ${newToken.accessToken}`;
+        // 4. 요청 재시도
+        return instanceBack(originalRequest);
+      } catch (refreshError: any) {
+        Swal.fire({
+          title: "Error!",
+          text: "로그인이 만료되었습니다. 다시 로그인해주세요.",
+          icon: "error",
+          confirmButtonText: "확인",
+        }).then(() => {
+          removeCurrentUser();
+          // window.location.href = "/";
+        });
+
+        return Promise.reject(refreshError);
+      }
+    } else if (error.response?.status === 403) {
+      Swal.fire({
+        title: "접근 불가",
+        text: "이 요청을 수행할 권한이 없습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    } else if (
+      error.response?.data &&
+      (error.response.data as any).status_message
+    ) {
+      // API 에러 메시지 표시
+      Swal.fire({
+        title: "요청 실패",
+        text: (error.response.data as any).status_message,
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "알 수 없는 오류",
+        text: "예기치 않은 오류가 발생했습니다. 관리자에게 문의해주세요.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
+
     return Promise.reject(error);
   }
 );
@@ -50,7 +143,7 @@ export const instanceAuth = axios.create({
   timeout: 5000,
 });
 
-instanceBack.interceptors.request.use(
+instanceAuth.interceptors.request.use(
   (config) => {
     const fullUrl = `${config.baseURL}${config.url}`;
     // 토큰 자동 삽입
@@ -66,40 +159,6 @@ instanceBack.interceptors.request.use(
   },
   (error) => {
     console.error("[백엔드 요청 오류]", error);
-    return Promise.reject(error);
-  }
-);
-
-// 응답 인터셉터 (재시도 없음)
-instanceBack.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
-  (error: AxiosError) => {
-    console.error("[백엔드 응답 오류]", error);
-
-    // 필요하면 사용자 알림도 가능
-    if (error.response?.data && (error.response.data as any).status_message) {
-      alert((error.response.data as any).status_message);
-    }
-
-    return Promise.reject(error);
-  }
-);
-
-// 응답 인터셉터 (재시도 없음)
-instanceBack.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
-  (error: AxiosError) => {
-    console.error("[백엔드 응답 오류]", error);
-
-    // 필요하면 사용자 알림도 가능
-    if (error.response?.data && (error.response.data as any).status_message) {
-      alert((error.response.data as any).status_message);
-    }
-
     return Promise.reject(error);
   }
 );

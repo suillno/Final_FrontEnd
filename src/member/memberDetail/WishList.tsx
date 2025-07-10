@@ -16,6 +16,9 @@ import {
   apiGetWishlist,
   CartItem,
 } from "../../components/api/backApi";
+import { useSelector } from "react-redux";
+import { userInfo } from "os";
+import { selectUserInfo } from "../../components/auth/store/userInfo";
 
 // 🔷 Layout Context 타입
 interface LayoutContext {
@@ -168,20 +171,21 @@ const WishlistPage: React.FC = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<CartItem[]>([]);
   const [sortType, setSortType] = useState<SortType>("default");
+  // 유저정보
+  const userInfo = useSelector(selectUserInfo);
 
   // 💾 위시리스트 + 할인 정보 불러오기
   useEffect(() => {
     const fetchData = async () => {
-      const user = localStorage.getItem("currentUser");
-      if (!user) return;
-      const username = JSON.parse(user).username;
+      if (!userInfo) return;
 
       try {
-        const wishListResult = await apiGetWishlist(username);
+        const wishListResult = await apiGetWishlist(userInfo.username);
         const discountResult = await apiGetDiscountList(0);
         const discountMap = new Map(
           discountResult.list.map((d: CartItem) => [d.gameId, d.salePrice])
         );
+        console.log(wishListResult);
 
         const enriched = wishListResult.map((item) => ({
           ...item,

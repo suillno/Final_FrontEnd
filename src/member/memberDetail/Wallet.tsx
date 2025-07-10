@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
+import { useSelector } from "react-redux";
+import {
+  apiSendWalletAuthCode,
+  apiVerifyAuthCode,
+} from "../../components/api/backApi";
+import { selectUserInfo } from "../../components/auth/store/userInfo";
 
 // 💳 거래 타입 정의
 interface Transaction {
@@ -97,17 +103,19 @@ const Input = styled.input`
 `;
 
 // 🚀 충전 버튼
-const Button = styled.button`
+const Button = styled.button<{ disabled?: boolean }>`
   padding: 10px 20px;
-  background-color: #00bfff;
-  color: white;
+  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#00bfff")};
+  color: ${({ disabled }) => (disabled ? "#666" : "white")};
   border: none;
   border-radius: 4px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   font-weight: bold;
+  transition: all 0.2s;
 
   &:hover {
-    background-color: #009edd;
+    background: ${({ disabled }) => (disabled ? "#ccc" : "#fff")};
+    color: ${({ disabled }) => (disabled ? "#666" : "blue")};
   }
 `;
 
@@ -159,16 +167,26 @@ const ListItem = styled.li<{ type: "충전" | "사용" }>`
 
 const Wallet: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
-
+  const userInfo = useSelector(selectUserInfo); // userId 호출
+  const userId = userInfo?.id;
   const [balance, setBalance] = useState(0); // 잔액 상태
   const [chargeAmount, setChargeAmount] = useState(""); // 입력 필드 값
   const [history, setHistory] = useState<Transaction[]>([]); // 거래 내역 배열
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // ✅ 충전 버튼 클릭 시 처리
-  const handleCharge = () => {
+  const handleCharge = async () => {
     const amount = parseInt(chargeAmount, 10);
     if (isNaN(amount) || amount <= 0) {
       alert("유효한 금액을 입력하세요.");
+      return;
+    }
+    setIsSubmitting(true);
+
+    const isVerified = await (window as any).promptSendAuthCode(userId);
+
+    if (!isVerified) {
+      alert("인증이 실패하거나 취소되었습니다.");
+      setIsSubmitting(false);
       return;
     }
 
@@ -182,6 +200,7 @@ const Wallet: React.FC = () => {
     setBalance((prev) => prev + amount);
     setHistory((prev) => [newTransaction, ...prev]);
     setChargeAmount("");
+    setIsSubmitting(false);
   };
 
   // ✅ 프리셋 버튼 클릭 시 입력 값에 누적
@@ -205,7 +224,10 @@ const Wallet: React.FC = () => {
             value={chargeAmount}
             onChange={(e) => setChargeAmount(e.target.value)}
           />
-          <Button onClick={handleCharge}>충전하기</Button>
+          <Button onClick={handleCharge} disabled={isSubmitting}>
+            {" "}
+            {isSubmitting ? " 전송 중 ..." : " 충전하기"}
+          </Button>
         </ChargeSection>
 
         <PresetButtons>
