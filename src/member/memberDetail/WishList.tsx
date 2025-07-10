@@ -171,15 +171,13 @@ const WishlistPage: React.FC = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<CartItem[]>([]);
   const [sortType, setSortType] = useState<SortType>("default");
+  // 유저정보
   const userInfo = useSelector(selectUserInfo);
 
   // 💾 위시리스트 + 할인 정보 불러오기
   useEffect(() => {
     const fetchData = async () => {
-      const user = localStorage.getItem("currentUser");
-      console.log(userInfo);
       if (!userInfo) return;
-      // const username = JSON.parse(user).username;
 
       try {
         const wishListResult = await apiGetWishlist(userInfo.username);

@@ -70,12 +70,28 @@ const GameReviewSection = ({
           <ul className="space-y-4">
             {reviews.map((rev, idx) => (
               <li key={idx} className="bg-white/10 p-3 rounded">
-                <div className="text-sm text-gray-500 mb-1">
-                  <span className="font-semibold text-white">{rev.userName}</span>
+                <div className="flex justify-between">
+                  <div className="text-sm text-gray-500 mb-1">
+                    <span className="font-semibold text-white">
+                      {rev.userName}
+                    </span>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => onSubmit(rating, content)}
+                      className=" bg-gray-500 hover:bg-gray-600 text-white-300 font-bold py-1 px-4 rounded text-sm"
+                    >
+                      {reviews.some((r) => r.userName === userName)
+                        ? "삭제"
+                        : ""}
+                    </button>
+                  </div>
                 </div>
                 <div className="text-yellow-400 mb-1">
                   {"★".repeat(rev.rating)}{" "}
-                  <span className="text-gray-400 text-sm">({rev.rating}점)</span>
+                  <span className="text-gray-400 text-sm">
+                    ({rev.rating}점)
+                  </span>
                 </div>
                 <div className="text-white mb-1">{rev.content}</div>
                 <div className="text-gray-500 text-xs">
