@@ -28,6 +28,7 @@ export const apiGetGameReviews = async (gameId: string) => {
 export const apiAddGameReviews = async (reviewData: {
   userName: string;
   gameId: number;
+  title: string;
   rating: number;
   content: string;
 }) => {
@@ -281,7 +282,6 @@ export const apiSubmitInquiry = async (inquiryData: {
   category: string;
   content: string;
 }) => {
-  
   try {
     const response = await instanceBack.post(
       "/member/inquiry/submit",

@@ -19,7 +19,6 @@ import {
   apiGetGameReviews,
 } from "../components/api/backApi";
 import { selectUserInfo } from "../components/auth/store/userInfo";
-import { getCurrentUser } from "../components/auth/helper/storage";
 import { ContentContainer } from "../style/GameDetail.styles";
 
 // 분리된 하위 컴포넌트
@@ -198,11 +197,13 @@ const GameDetail = () => {
                   const reviewData = {
                     userName: userInfo.username,
                     gameId: gameDetail.id,
+                    title: gameDetail.name,
                     rating,
                     content,
                   };
                   try {
                     const response = await apiAddGameReviews(reviewData);
+                    console.log(reviewData);
                     alert(response);
                     await fetchReviewList();
                   } catch {

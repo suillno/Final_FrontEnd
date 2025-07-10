@@ -1,5 +1,6 @@
-// GameReviewSection.tsx - 리뷰 작성 및 리뷰 리스트 컴포넌트
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../auth/store/userInfo";
 
 interface Review {
   userName: string;
@@ -16,6 +17,25 @@ interface Props {
   initialContent: string;
 }
 
+// ⭐ 별 렌더링 컴포넌트 (크기 유지, 반 별 영역만 조절)
+const Star = ({ filled }: { filled: number }) => {
+  return (
+    <div className="relative w-6 h-6 inline-block">
+      <div
+        className="absolute top-0 left-0 text-yellow-400 text-2xl leading-none"
+        style={{
+          width: `${filled * 100}%`,
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+        }}
+      >
+        ★
+      </div>
+      <div className="text-gray-600 text-2xl leading-none opacity-40">★</div>
+    </div>
+  );
+};
+
 const GameReviewSection = ({
   userName,
   reviews,
@@ -31,23 +51,49 @@ const GameReviewSection = ({
     setContent(initialContent);
   }, [initialRating, initialContent]);
 
+  const userinfo = useSelector(selectUserInfo);
+  const hasAdminRole = userinfo.roles.some(
+    (res: { role: string }) => res.role === "ROLE_ADMIN"
+  );
+
+  const handleStarClick = (index: number, isHalf: boolean) => {
+    const newRating = isHalf ? index - 0.5 : index;
+    setRating(newRating);
+  };
+
+  const renderStars = () => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      const filled = rating >= i ? 1 : rating >= i - 0.5 ? 0.5 : 0;
+      stars.push(
+        <div key={i} className="relative w-6 h-6 inline-block group">
+          {/* 왼쪽 반 클릭 */}
+          <div
+            className="absolute top-0 left-0 w-1/2 h-full z-10"
+            onClick={() => handleStarClick(i, true)}
+          ></div>
+          {/* 오른쪽 반 클릭 */}
+          <div
+            className="absolute top-0 right-0 w-1/2 h-full z-10"
+            onClick={() => handleStarClick(i, false)}
+          ></div>
+          <Star filled={filled} />
+        </div>
+      );
+    }
+    return stars;
+  };
+
   return (
     <div className="max-w-4xl mx-auto mt-12 p-4 bg-white/5 rounded-xl">
       <div className="font-bold text-lg text-gray-300 mb-3">리뷰 남기기</div>
+
       <div className="flex items-center gap-2 mb-4">
         <div className="text-white font-semibold">평점:</div>
-        {[1, 2, 3, 4, 5].map((num) => (
-          <span
-            key={num}
-            onClick={() => setRating(num)}
-            className={`cursor-pointer text-2xl ${
-              num <= rating ? "text-yellow-400" : "text-gray-600"
-            }`}
-          >
-            ★
-          </span>
-        ))}
+        {renderStars()}
+        <span className="ml-2 text-yellow-400 font-semibold">{rating}점</span>
       </div>
+
       <textarea
         spellCheck="false"
         value={content}
@@ -55,12 +101,22 @@ const GameReviewSection = ({
         placeholder="게임에 대한 후기를 남겨주세요..."
         className="w-full h-24 p-3 rounded bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring focus:border-yellow-400 mb-4 resize-none"
       />
+
       <button
         onClick={() => onSubmit(rating, content)}
         className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded"
       >
         {reviews.some((r) => r.userName === userName) ? "수정하기" : "등록하기"}
       </button>
+
+      {reviews.some((r) => r.userName === userName) && (
+        <button
+          onClick={() => onSubmit(rating, content)} // 삭제 전용 함수 분리 필요 시 조정
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold ml-4 py-2 px-6 rounded"
+        >
+          삭제하기
+        </button>
+      )}
 
       <div className="mt-8">
         <div className="font-bold text-lg text-gray-300 mb-3">리뷰 목록</div>
@@ -76,21 +132,22 @@ const GameReviewSection = ({
                       {rev.userName}
                     </span>
                   </div>
-                  <div>
+                  {(rev.userName === userName || hasAdminRole) && (
                     <button
                       onClick={() => onSubmit(rating, content)}
-                      className=" bg-gray-500 hover:bg-gray-600 text-white-300 font-bold py-1 px-4 rounded text-sm"
+                      className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-4 rounded text-sm"
                     >
-                      {reviews.some((r) => r.userName === userName)
-                        ? "삭제"
-                        : ""}
+                      삭제
                     </button>
-                  </div>
+                  )}
                 </div>
                 <div className="text-yellow-400 mb-1">
-                  {"★".repeat(rev.rating)}{" "}
+                  {"★".repeat(Math.floor(rev.rating))}
+                  {rev.rating % 1 >= 0.5 && (
+                    <span className="opacity-80">⯨</span>
+                  )}{" "}
                   <span className="text-gray-400 text-sm">
-                    ({rev.rating}점)
+                    ({rev.rating.toFixed(1)}점)
                   </span>
                 </div>
                 <div className="text-white mb-1">{rev.content}</div>
