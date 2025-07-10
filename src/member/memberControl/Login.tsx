@@ -284,7 +284,7 @@ export default function LoginPage() {
         name: registerForm.registerName,
         birth: registerForm.registerBirth,
         email: registerForm.registerEmail,
-        roleNum: 1, // 기본 회원 등급
+        roleNum: 3, // 기본 회원 등급
       };
       const res = await apiRegisterUser(registerData);
       alert("회원가입 성공!");
