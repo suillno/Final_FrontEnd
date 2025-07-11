@@ -18,7 +18,7 @@ declare module "axios" {
 // 백엔드 호출
 export const instanceBack = axios.create({
   baseURL: process.env.REACT_APP_HOST,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 instanceBack.interceptors.request.use(
@@ -53,12 +53,18 @@ instanceBack.interceptors.response.use(
   async (error) => {
     const originalRequest: any = error.config;
 
+    // 기본 재시도 횟수 초기화
+    if (!originalRequest._retryCount) {
+      originalRequest._retryCount = 0;
+    }
+
+    // 첫 실패일 경우 1회 재시도
     if (
+      originalRequest._retryCount < 1 &&
       error.response &&
-      !originalRequest._retry &&
       (error.response.status === 401 || error.response.status === 406)
     ) {
-      originalRequest._retry = true;
+      originalRequest._retryCount += 1;
 
       const user = getCurrentUser();
 
@@ -78,13 +84,15 @@ instanceBack.interceptors.response.use(
             },
           }
         );
+
         // 3. 사용자 정보 저장 및 헤더 재설정
         setCurrentUser(newToken);
         store.dispatch(setUserInfo(userInfo));
         instanceBack.defaults.headers.common[
           "Authorization"
         ] = `${newToken.tokenType} ${newToken.accessToken}`;
-        // 4. 요청 재시도
+
+        // 4. 원래 요청 재시도
         return instanceBack(originalRequest);
       } catch (refreshError: any) {
         Swal.fire({
@@ -110,7 +118,6 @@ instanceBack.interceptors.response.use(
       error.response?.data &&
       (error.response.data as any).status_message
     ) {
-      // API 에러 메시지 표시
       Swal.fire({
         title: "요청 실패",
         text: (error.response.data as any).status_message,

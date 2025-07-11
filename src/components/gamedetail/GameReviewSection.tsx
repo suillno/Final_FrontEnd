@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../auth/store/userInfo";
+import { apiDeleteGameReviews } from "../api/backApi";
 
 interface Review {
   userName: string;
@@ -13,6 +14,7 @@ interface Props {
   userName: string;
   reviews: Review[];
   onSubmit: (rating: number, content: string) => void;
+  onDelete: () => void;
   initialRating: number;
   initialContent: string;
 }
@@ -40,6 +42,7 @@ const GameReviewSection = ({
   userName,
   reviews,
   onSubmit,
+  onDelete,
   initialRating,
   initialContent,
 }: Props) => {
@@ -61,6 +64,7 @@ const GameReviewSection = ({
     setRating(newRating);
   };
 
+  // 별 그리기
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -111,7 +115,7 @@ const GameReviewSection = ({
 
       {reviews.some((r) => r.userName === userName) && (
         <button
-          onClick={() => onSubmit(rating, content)} // 삭제 전용 함수 분리 필요 시 조정
+          onClick={() => onDelete()} // 삭제 전용 함수 분리 필요 시 조정
           className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold ml-4 py-2 px-6 rounded"
         >
           삭제하기
@@ -134,7 +138,7 @@ const GameReviewSection = ({
                   </div>
                   {(rev.userName === userName || hasAdminRole) && (
                     <button
-                      onClick={() => onSubmit(rating, content)}
+                      onClick={() => onDelete()}
                       className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-4 rounded text-sm"
                     >
                       삭제

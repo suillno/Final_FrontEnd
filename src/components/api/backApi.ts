@@ -43,9 +43,14 @@ export const apiAddGameReviews = async (reviewData: {
 };
 
 // 리뷰 삭제
-export const apiDeleteGameReviews = async () => {
+export const apiDeleteGameReviews = async (
+  userName: string,
+  gameId: number
+) => {
   try {
-    const res = await instanceBack.delete("/member/review");
+    const res = await instanceBack.delete("/member/review", {
+      params: { userName, gameId },
+    });
     return res.data;
   } catch (error) {
     console.error("리뷰 삭제 실패", error);
@@ -388,7 +393,7 @@ export const apiSendWalletAuthCode = async (userId: number) => {
     })
     .then((res) => res.data);
 };
-
+// 이메일 인증코드 체크확인 기능
 export const apiVerifyAuthCode = async (userId: number, code: string) => {
   return await instanceBack
     .post("/wallet/verifyAuthCode", null, {
@@ -396,7 +401,6 @@ export const apiVerifyAuthCode = async (userId: number, code: string) => {
     })
     .then((res) => res.data as boolean); // 인증 성공 여부 true/false
 };
-
 /**
  * 최근 7일 신규 가입자 수 조회
  *  - label : 'YYYY-MM-DD' 날짜 문자열
@@ -414,4 +418,21 @@ export const apiGetWeeklySignups = async (): Promise<
     console.error("신규 가입자 통계 조회 실패:", error);
     throw error;
   }
+// 지갑충전 기능
+export const apiChargeWallet = async (
+  userId: number,
+  amount: number,
+  userName: string
+) => {
+  return await instanceBack
+    .post("/wallet/charge", null, {
+      params: { userId, amount, userName },
+    })
+    .then((res) => res.data);
+};
+
+// 지갑 로그 기능
+export const apiWalletLog = async (userId: number) => {
+  const res = await instanceBack.get(`wallet/logs/${userId}`);
+  return res.data;
 };
