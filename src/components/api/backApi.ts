@@ -83,7 +83,10 @@ export const apiAddGameCart = async (cartData: {
   backgroundImage: string;
   price: number;
   salePrice: number;
+  actionType?: number; // 0: 삭제, 1: 구매
 }) => {
+  const { actionType = 0 } = cartData; // 기본값 0 설정
+
   try {
     const res = await instanceBack.post("/member/cart/save", cartData);
     return res.data;
@@ -422,11 +425,12 @@ export const apiGetWeeklySignups = async (): Promise<
 export const apiChargeWallet = async (
   userId: number,
   amount: number,
-  userName: string
+  userName: string,
+  logType: number
 ) => {
   return await instanceBack
     .post("/wallet/charge", null, {
-      params: { userId, amount, userName },
+      params: { userId, amount, userName, logType },
     })
     .then((res) => res.data);
 };
