@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -6,6 +6,7 @@ import {
   apiChargeWallet,
   apiSendWalletAuthCode,
   apiVerifyAuthCode,
+  apiWalletLog,
 } from "../../components/api/backApi";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 import customSwal from "../../style/customSwal.styles";
@@ -16,6 +17,7 @@ interface Transaction {
   type: "충전" | "사용";
   amount: number;
   date: string;
+  logText: string;
 }
 
 // 🔧 Layout에서 전달되는 context 타입
@@ -153,7 +155,7 @@ const List = styled.ul`
 `;
 
 // 📄 거래 아이템 스타일
-const ListItem = styled.li<{ type: "충전" | "사용" }>`
+const ListItem = styled.li<{ type: any }>`
   padding: 12px;
   margin-bottom: 10px;
   border-left: 5px solid
@@ -180,6 +182,27 @@ const Wallet: React.FC = () => {
   const [history, setHistory] = useState<Transaction[]>([]); // 거래 내역 배열
   const [isSubmitting, setIsSubmitting] = useState(false);
   // ✅ 충전 버튼 클릭 시 처리
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!userId) return;
+
+      try {
+        const logData = await apiWalletLog(userId);
+        const converted = logData.map((log: any) => ({
+          id: log.logId,
+          type: log.logType === "" ? " 충전" : "사용",
+          amount: log.amount,
+          date: new Date(log.createdAt).toLocaleString(),
+          logText: log.logText,
+        }));
+        setHistory(converted);
+      } catch (error) {
+        console.error("거래내역 불러오기 실패:", error);
+      }
+    };
+    fetchHistory();
+  }, [userId]);
+
   const handleCharge = async () => {
     const amount = parseInt(chargeAmount, 10);
     if (isNaN(amount) || amount <= 0) {
@@ -206,6 +229,7 @@ const Wallet: React.FC = () => {
         type: "충전",
         amount,
         date: new Date().toLocaleString(),
+        logText: "충전",
       };
 
       setBalance((prev) => prev + amount);
@@ -273,8 +297,8 @@ const Wallet: React.FC = () => {
           ) : (
             <List>
               {history.map((item) => (
-                <ListItem key={item.id} type={item.type}>
-                  [{item.type}] {item.amount.toLocaleString()}₩ - {item.date}
+                <ListItem key={item.id} type={item.logText}>
+                  [{item.logText}] {item.amount.toLocaleString()}₩ - {item.date}
                 </ListItem>
               ))}
             </List>
