@@ -413,3 +413,9 @@ export const apiChargeWallet = async (
     })
     .then((res) => res.data);
 };
+
+// 지갑 로그 기능
+export const apiWalletLog = async (userId: number) => {
+  const res = await instanceBack.get(`wallet/logs/${userId}`);
+  return res.data;
+};
