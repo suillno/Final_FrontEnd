@@ -100,6 +100,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
   });
@@ -118,6 +119,9 @@ export default function LoginPage() {
           /^\d{4}-\d{2}-\d{2}$/,
           "생년월일은 YYYY-MM-DD 형식으로 입력해주세요."
         ),
+      confirmCode: z
+        .string()
+        .regex(/^\d{6}$/, "6자리 숫자 인증번호를 입력해주세요."),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "비밀번호가 일치하지 않습니다.",
@@ -128,6 +132,7 @@ export default function LoginPage() {
     register: registerUser,
     handleSubmit: handleSubmitRegister,
     formState: { errors: registerErrors },
+    watch: watchRegister,
   } = useForm<RegisterFormType>({
     resolver: zodResolver(registrationSchema),
   });
@@ -184,9 +189,14 @@ export default function LoginPage() {
 
   // 아이디 중복 확인
   const checkUsername = async () => {
-    if (!registerForm.registerId) return alert("아이디를 입력하세요.");
+    const watchedUsername = watchRegister("username");
+
+    if (!watchedUsername) {
+      alert("아이디를 입력하세요.");
+      return;
+    }
     try {
-      const res = await apiCheckUsername(registerForm.registerId);
+      const res = await apiCheckUsername(watchedUsername);
       alert(res.data);
     } catch (err) {
       alert("아이디 중복 확인 실패");
@@ -223,12 +233,20 @@ export default function LoginPage() {
 
   // 인증번호 검증
   const verifyEmailCode = async () => {
+    const watchedEmail = watchRegister("email");
+    const watchedCode = watchRegister("confirmCode");
+
+    if (!watchedEmail || !watchedCode) {
+      alert("이메일과 인증번호를 모두 입력해주세요!");
+      return;
+    }
+
     try {
       const res = await axios.post(
         "http://localhost:8080/api/auth/mail/verify",
         {
-          mailTo: registerForm.registerEmail,
-          authCode: registerForm.registerEmailCode,
+          mailTo: watchedEmail,
+          authCode: watchedCode,
         }
       );
       alert(res.data); // 인증 성공
@@ -239,14 +257,16 @@ export default function LoginPage() {
   };
 
   const sendEmailVerification = async () => {
-    if (!registerForm.registerEmail) {
+    const watchedEmail = watchRegister("email");
+    const watchedName = watchRegister("name");
+    if (!watchedEmail) {
       alert("이메일을 입력해주세요.");
       return;
     }
     try {
       const emailData = {
-        mailTo: registerForm.registerEmail,
-        username: registerForm.registerName,
+        mailTo: watchedEmail,
+        username: watchedName,
         mailType: "emailAuth",
       };
       const res = await apiSendEmailVerification(emailData);
@@ -425,16 +445,19 @@ export default function LoginPage() {
               <InputBox>
                 <input
                   type="text"
-                  id="registerEmailCode"
-                  required
-                  value={registerForm.registerEmailCode}
-                  onChange={onChangeRegister}
+                  {...registerUser("confirmCode")}
+                  placeholder="인증코드"
                 />
                 <label htmlFor="registerEmailCode">인증번호 입력</label>
                 <CheckButton type="button" onClick={verifyEmailCode}>
                   인증번호 확인
                 </CheckButton>
                 <IoCheckmarkCircleOutline />
+                {registerErrors.confirmCode && (
+                  <ErrorMessage>
+                    {registerErrors.confirmCode.message}
+                  </ErrorMessage>
+                )}
               </InputBox>
             </Form>
             <Button type="submit" form="register-form">
