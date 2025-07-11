@@ -417,6 +417,7 @@ export const apiGetWeeklySignups = async (): Promise<
     console.error("신규 가입자 통계 조회 실패:", error);
     throw error;
   }
+};
 // 지갑충전 기능
 export const apiChargeWallet = async (
   userId: number,
