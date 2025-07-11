@@ -393,11 +393,23 @@ export const apiSendWalletAuthCode = async (userId: number) => {
     })
     .then((res) => res.data);
 };
-
+// 이메일 인증코드 체크확인 기능
 export const apiVerifyAuthCode = async (userId: number, code: string) => {
   return await instanceBack
     .post("/wallet/verifyAuthCode", null, {
       params: { userId, code },
     })
     .then((res) => res.data as boolean); // 인증 성공 여부 true/false
+};
+// 지갑충전 기능
+export const apiChargeWallet = async (
+  userId: number,
+  amount: number,
+  userName: string
+) => {
+  return await instanceBack
+    .post("/wallet/charge", null, {
+      params: { userId, amount, userName },
+    })
+    .then((res) => res.data);
 };

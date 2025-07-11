@@ -3,10 +3,12 @@ import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
+  apiChargeWallet,
   apiSendWalletAuthCode,
   apiVerifyAuthCode,
 } from "../../components/api/backApi";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
+import customSwal from "../../style/customSwal.styles";
 
 // 💳 거래 타입 정의
 interface Transaction {
@@ -169,6 +171,10 @@ const Wallet: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
   const userInfo = useSelector(selectUserInfo); // userId 호출
   const userId = userInfo?.id;
+  const userName = userInfo?.username;
+  const [authCode, setAuthCode] = useState(""); // 입증 코드 입력값 상태
+  const [isAuthStep, setIsAuthStep] = useState(false);
+
   const [balance, setBalance] = useState(0); // 잔액 상태
   const [chargeAmount, setChargeAmount] = useState(""); // 입력 필드 값
   const [history, setHistory] = useState<Transaction[]>([]); // 거래 내역 배열
@@ -180,27 +186,49 @@ const Wallet: React.FC = () => {
       alert("유효한 금액을 입력하세요.");
       return;
     }
-    setIsSubmitting(true);
-
-    const isVerified = await (window as any).promptSendAuthCode(userId);
-
-    if (!isVerified) {
-      alert("인증이 실패하거나 취소되었습니다.");
-      setIsSubmitting(false);
+    if (!userId) {
+      alert("사용자 정보가 없습니다.");
       return;
     }
+    setIsSubmitting(true);
+    try {
+      const isVerified = await (window as any).promptSendAuthCode(userId);
 
-    const newTransaction: Transaction = {
-      id: Date.now(),
-      type: "충전",
-      amount,
-      date: new Date().toLocaleString(),
-    };
+      if (!isVerified) {
+        alert("인증이 실패하거나 취소되었습니다.");
+        setIsSubmitting(false);
+        return;
+      }
+      await apiChargeWallet(userId, amount, userName);
 
-    setBalance((prev) => prev + amount);
-    setHistory((prev) => [newTransaction, ...prev]);
-    setChargeAmount("");
-    setIsSubmitting(false);
+      const newTransaction: Transaction = {
+        id: Date.now(),
+        type: "충전",
+        amount,
+        date: new Date().toLocaleString(),
+      };
+
+      setBalance((prev) => prev + amount);
+      setHistory((prev) => [newTransaction, ...prev]);
+      setChargeAmount("");
+      setIsSubmitting(false);
+
+      await customSwal.fire({
+        icon: "success",
+        title: "충전 완료",
+        text: `${amount.toLocaleString()}₩ 충전되었습니다.`,
+        confirmButtonText: "확인",
+      });
+    } catch (err) {
+      console.error("충전 오류:", err);
+      await customSwal.fire({
+        icon: "error",
+        title: "충전 실패",
+        text: "충전 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
+    } finally {
+      setIsAuthStep(false);
+    }
   };
 
   // ✅ 프리셋 버튼 클릭 시 입력 값에 누적
