@@ -105,22 +105,24 @@ export default function LoginPage() {
   });
 
   // 회원가입 zod 조건식
-  const registrationSchema = z.object({
-    username: z.string().min(3, "아이디는 최소 3자 이상이어야 합니다."),
-    email: z.string().email("이메일 형식에 맞지 않습니다."),
-    password: z.string().min(6, "비밀번호는 최소 4자 이상이어야 합니다."),
-    name: z.string().min(1, "이름을 입력해주세요."),
-    birth: z
-      .string()
-      .regex(
-        /^\d{4}-\d{2}-\d{2}$/,
-        "생년월일은 YYYY-MM-DD 형식으로 입력해주세요."
-      ),
-  });
-  // .refine((data) => data.password === data.confirmPassword, {
-  //   message: "비밀번호가 일치하지 않습니다.",
-  //   path: ["confirmPassword"],
-  // });
+  const registrationSchema = z
+    .object({
+      username: z.string().min(3, "아이디는 최소 3자 이상이어야 합니다."),
+      email: z.string().email("이메일 형식에 맞지 않습니다."),
+      password: z.string().min(4, "비밀번호는 최소 4자 이상이어야 합니다."),
+      confirmPassword: z.string().min(4, "비밀번호 확인을 입력해주세요."),
+      name: z.string().min(1, "이름을 입력해주세요."),
+      birth: z
+        .string()
+        .regex(
+          /^\d{4}-\d{2}-\d{2}$/,
+          "생년월일은 YYYY-MM-DD 형식으로 입력해주세요."
+        ),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "비밀번호가 일치하지 않습니다.",
+      path: ["confirmPassword"],
+    });
   type RegisterFormType = z.infer<typeof registrationSchema>;
   const {
     register: registerUser,
@@ -220,7 +222,6 @@ export default function LoginPage() {
   };
 
   // 인증번호 검증
-
   const verifyEmailCode = async () => {
     try {
       const res = await axios.post(
@@ -284,23 +285,7 @@ export default function LoginPage() {
   };
 
   // 회원가입 처리
-  // const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   if (
-  //     registerForm.registerPassword !== registerForm.registerConfirmPassword
-  //   ) {
-  //     alert("비밀번호가 일치하지 않습니다.");
-  //     return;
-  //   }
-
   const onSubmitRegisterZod = async (data: RegisterFormType) => {
-    if (
-      registerForm.registerPassword !== registerForm.registerConfirmPassword
-    ) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
     if (!isEmailVerified) {
       alert("이메일 인증을 먼저 완료해주세요.");
       return;
@@ -348,7 +333,7 @@ export default function LoginPage() {
               onSubmit={handleSubmitRegister(onSubmitRegisterZod)}
             >
               {/* 아이디 입력 + 중복확인 */}
-              <InputBox>
+              <InputBox style={{ marginTop: "10px" }}>
                 <input
                   type="text"
                   {...registerUser("username")}
@@ -378,13 +363,16 @@ export default function LoginPage() {
               <InputBox>
                 <input
                   type="password"
-                  id="registerConfirmPassword"
-                  required
-                  value={registerForm.registerConfirmPassword}
-                  onChange={onChangeRegister}
+                  {...registerUser("confirmPassword")}
+                  placeholder="비밀번호 확인"
                 />
                 <label htmlFor="registerConfirmPassword">비밀번호 확인</label>
                 <IoLockClosedOutline />
+                {registerErrors.confirmPassword && (
+                  <ErrorMessage>
+                    {registerErrors.confirmPassword.message}
+                  </ErrorMessage>
+                )}
               </InputBox>
               {/* 이름 */}
               <InputBox>
@@ -415,9 +403,11 @@ export default function LoginPage() {
 
               {/* 이메일 인증 */}
               <InputBox>
-                {registerErrors.email && (
-                  <ErrorMessage>{registerErrors.email.message}</ErrorMessage>
-                )}
+                <input
+                  type="text"
+                  {...registerUser("email")}
+                  placeholder="이메일"
+                />
                 <label htmlFor="registerEmail">본인확인 이메일</label>
                 {/* <CheckButton type="button" onClick={checkEmail}>
                   중복확인
