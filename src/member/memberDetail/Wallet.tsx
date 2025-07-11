@@ -194,8 +194,12 @@ const Wallet: React.FC = () => {
           amount: log.amount,
           date: new Date(log.createdAt).toLocaleString(),
           logText: log.logText,
+          balance: log.balance,
         }));
         setHistory(converted);
+        if (converted.length > 0) {
+          setBalance(converted[0].balance);
+        }
       } catch (error) {
         console.error("거래내역 불러오기 실패:", error);
       }
@@ -291,7 +295,7 @@ const Wallet: React.FC = () => {
         </PresetButtons>
 
         <History>
-          <h3>거래 내역</h3>
+          <h3>거래 내역 (최근 10건만 조회)</h3>
           {history.length === 0 ? (
             <p style={{ color: "#ccc" }}>거래 내역이 없습니다.</p>
           ) : (
