@@ -5,6 +5,7 @@ import {
   apiGetCartList,
   apiAddGameCart,
   CartItem,
+  apiChargeWallet,
 } from "../../components/api/backApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,202 +13,35 @@ import GameActionButtons from "../../components/gamedetail/GameActionButtons";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 import { FaRegCalendarAlt, FaUserShield, FaTags } from "react-icons/fa";
+import {
+  PageWrapper,
+  SectionBox,
+  Title,
+  List,
+  ItemCard,
+  Checkbox,
+  Image,
+  Info,
+  GameTitle,
+  SubInfo,
+  PriceBox,
+  Price,
+  OriginalPrice,
+  SalePrice,
+  DiscountRate,
+  TotalBar,
+  CheckoutButton,
+  ModalOverlay,
+  ModalBox,
+  ModalText,
+  ModalButtonGroup,
+  ModalButton,
+} from "../member.style/CartPage.style";
 
 // 🔷 Layout Context 타입
 interface LayoutContext {
   isSidebarOpen: boolean;
 }
-
-/* 💅 Styled-components (모달 포함) */
-const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  padding: 2em;
-  background-color: #121317;
-  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
-  transition: margin-left 0.3s ease;
-`;
-
-const SectionBox = styled.div`
-  width: 100%;
-  max-width: 800px;
-  background-color: #1e1f1f;
-  border-radius: 12px;
-  padding: 40px;
-  color: #fff;
-  margin-top: 100px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-`;
-
-const Title = styled.h2`
-  font-size: 30px;
-  margin-bottom: 30px;
-  text-align: center;
-  font-weight: bold;
-`;
-
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const ItemCard = styled.div`
-  background-color: #292c31;
-  border-radius: 10px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-`;
-
-const Checkbox = styled.input`
-  width: 18px;
-  height: 18px;
-  accent-color: #00eaff;
-`;
-
-const Image = styled.img`
-  width: 130px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 6px;
-`;
-
-const Info = styled.div`
-  flex: 1;
-`;
-
-const GameTitle = styled.h3`
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 6px;
-`;
-
-const SubInfo = styled.div`
-  font-size: 14px;
-  color: #aaa;
-  margin-top: 4px;
-  line-height: 1.6;
-
-  div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2px;
-    gap: 6px;
-  }
-`;
-
-const PriceBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 160px;
-`;
-
-const Price = styled.div`
-  font-size: 16px;
-  color: #ccc;
-`;
-
-const OriginalPrice = styled.div`
-  font-size: 14px;
-  color: #888;
-  text-decoration: line-through;
-`;
-
-const SalePrice = styled.div`
-  font-size: 16px;
-  color: #00eaff;
-  font-weight: bold;
-`;
-
-const DiscountRate = styled.span`
-  font-size: 13px;
-  color: #ff6b6b;
-  margin-left: 6px;
-`;
-
-const TotalBar = styled.div`
-  margin-top: 2em;
-  text-align: right;
-  font-size: 18px;
-  font-weight: bold;
-  border-top: 1px solid #555;
-  padding-top: 20px;
-  line-height: 1.8;
-`;
-
-const CheckoutButton = styled.button`
-  margin-top: 1.5em;
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, #00c853, #009b46);
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #00b04c;
-  }
-`;
-
-/* 🧩 모달 컴포넌트 */
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-`;
-
-const ModalBox = styled.div`
-  background-color: #222;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 360px;
-  color: #fff;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-  text-align: center;
-`;
-
-const ModalText = styled.p`
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalButtonGroup = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-`;
-
-const ModalButton = styled.button<{ $variant: "cancel" | "confirm" }>`
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: ${(props) =>
-    props.$variant === "cancel" ? "#888" : "#00e676"};
-  color: #000;
-
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
-// ========================= 🧾 Main Component =========================
 
 const CartPage: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
@@ -220,6 +54,7 @@ const CartPage: React.FC = () => {
 
   const userInfo = useSelector(selectUserInfo);
   const username = userInfo?.username;
+  const userId = userInfo?.id;
 
   const fetchCartItems = async () => {
     if (!username) {
@@ -303,17 +138,51 @@ const CartPage: React.FC = () => {
     selectedIds.includes(item.gameId)
   );
 
-  const handleCheckout = () => {
+  // 결제버튼 동작
+  const handleCheckout = async () => {
     if (selectedItems.length === 0) {
       toast.warn("결제할 항목을 선택해주세요.");
       return;
     }
 
-    alert(
-      `선택된 ${
-        selectedItems.length
-      }개의 항목을 결제합니다.\n총 결제 금액: ₩ ${finalTotal.toLocaleString()}`
-    );
+    const totalAmount = selectedItems.reduce((sum, item) => {
+      return sum + (item.salePrice >= 1 ? item.salePrice : item.price);
+    }, 0);
+
+    try {
+      // 1. 지갑 차감 처리
+      const result = await apiChargeWallet(
+        userId,
+        totalAmount,
+        userInfo.username,
+        1
+      );
+
+      // 응답 SUCCESS 기준 분리후 사용
+      if (result.startsWith("SUCCESS")) {
+        const successMessage = result.replace("SUCCESS: ", "").trim();
+
+        for (const item of selectedItems) {
+          await apiAddGameCart({
+            userName: userInfo.username,
+            gameId: item.gameId,
+            title: item.title,
+            backgroundImage: item.backgroundImage,
+            price: item.price,
+            salePrice: item.salePrice,
+            actionType: 1,
+          });
+        }
+
+        alert(successMessage);
+        await fetchCartItems();
+      } else {
+        const errorMessage = result.replace("ERROR: ", "").trim();
+        toast.error("❌ 결제 실패: " + errorMessage);
+      }
+    } catch (error) {
+      toast.error("⚠️ 결제 중 오류가 발생했습니다.");
+    }
   };
 
   if (error) {

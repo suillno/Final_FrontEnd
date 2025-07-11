@@ -226,7 +226,7 @@ const Wallet: React.FC = () => {
         setIsSubmitting(false);
         return;
       }
-      await apiChargeWallet(userId, amount, userName);
+      await apiChargeWallet(userId, amount, userName, 0);
 
       const newTransaction: Transaction = {
         id: Date.now(),
