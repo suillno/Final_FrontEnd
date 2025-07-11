@@ -386,7 +386,6 @@ export const apiGetWeeklyVisitors = async (): Promise<
 
 // 이메일 인증코드 전송
 export const apiSendWalletAuthCode = async (userId: number) => {
-  console.log(userId);
   return await instanceBack
     .post("/wallet/sendAuthCode", null, {
       params: { userId },

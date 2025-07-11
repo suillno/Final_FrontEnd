@@ -90,8 +90,6 @@ export function overrideAlertConfirmPrompt() {
         }
         const isVerified = await apiVerifyAuthCode(userId, value);
 
-        console.log(isVerified);
-
         if (!isVerified) {
           customSwal.showValidationMessage("인증 코드가 올바르지 않습니다.");
           return false;
@@ -118,7 +116,6 @@ export function overrideAlertConfirmPrompt() {
       });
 
       const code = await (window as any).promptCode(userId);
-      console.log(code);
       if (code === null) return false;
 
       return true;

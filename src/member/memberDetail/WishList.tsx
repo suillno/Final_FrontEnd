@@ -185,7 +185,6 @@ const WishlistPage: React.FC = () => {
         const discountMap = new Map(
           discountResult.list.map((d: CartItem) => [d.gameId, d.salePrice])
         );
-        console.log(wishListResult);
 
         const enriched = wishListResult.map((item) => ({
           ...item,
