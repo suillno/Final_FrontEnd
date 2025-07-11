@@ -401,6 +401,23 @@ export const apiVerifyAuthCode = async (userId: number, code: string) => {
     })
     .then((res) => res.data as boolean); // 인증 성공 여부 true/false
 };
+/**
+ * 최근 7일 신규 가입자 수 조회
+ *  - label : 'YYYY-MM-DD' 날짜 문자열
+ *  - value : 해당 날짜의 가입자 수
+ *  - 차트(BarChart) 등에 그대로 바인딩해서 사용
+ */
+export const apiGetWeeklySignups = async (): Promise<
+  { label: string; value: number }[]
+> => {
+  try {
+    // 백엔드 ChartController → /game/admin/chart/signups
+    const res = await instanceBack.get("/admin/chart/signups");
+    return res.data; // [{ label: '2025-07-05', value: 12 }, …]
+  } catch (error) {
+    console.error("신규 가입자 통계 조회 실패:", error);
+    throw error;
+  }
 // 지갑충전 기능
 export const apiChargeWallet = async (
   userId: number,
