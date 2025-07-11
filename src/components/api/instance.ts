@@ -14,7 +14,7 @@ declare module "axios" {
 // 백엔드 호출
 export const instanceBack = axios.create({
   baseURL: process.env.REACT_APP_HOST,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 instanceBack.interceptors.request.use(
