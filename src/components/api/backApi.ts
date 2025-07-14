@@ -385,3 +385,17 @@ export const apiWalletLog = async (userId: number) => {
   const res = await instanceBack.get(`wallet/logs/${userId}`);
   return res.data;
 };
+
+// 회원탈퇴 기능
+export const apiLeave = async (
+  userPw: string,
+  username: string,
+  email: string
+) => {
+  const res = await instanceBack.post("/leave", {
+    password: userPw,
+    username,
+    email,
+  });
+  return res.data;
+};
