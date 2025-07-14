@@ -30,7 +30,6 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   padding: 2em;
   background-color: #1e1f24;
   margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
@@ -38,6 +37,7 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
 
   @media (max-width: 768px) {
     margin-left: 0;
+    font-size: 0.75em;
   }
 `;
 
@@ -71,12 +71,16 @@ const BalanceBox = styled.div`
   background: linear-gradient(135deg, #00bfff, #007acc);
   padding: 20px;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 1.5rem;
   font-weight: bold;
   color: white;
   text-align: center;
   margin-bottom: 30px;
   box-shadow: 0 4px 10px rgba(0, 191, 255, 0.3);
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
 `;
 
 // 💳 충전 입력 영역
@@ -147,7 +151,10 @@ const PresetButton = styled.button`
 `;
 
 // 🧾 거래 내역 리스트
-const History = styled.div``;
+const History = styled.div`
+  max-height: 450px;
+  overflow: auto;
+`;
 
 const List = styled.ul`
   list-style: none;
@@ -282,7 +289,7 @@ const Wallet: React.FC = () => {
           />
           <Button onClick={handleCharge} disabled={isSubmitting}>
             {" "}
-            {isSubmitting ? " 전송 중 ..." : " 충전하기"}
+            {isSubmitting ? " 전송 중 ..." : " 확인"}
           </Button>
         </ChargeSection>
 
