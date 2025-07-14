@@ -6,7 +6,7 @@ import { instanceBack } from "../../components/api/instance";
 // 🔷 사용자 정보 타입
 interface UserProfile {
   email: string;
-  profileImage: string; // 이미지 경로 또는 ""
+  profileImage: string;
 }
 
 // 🔷 레이아웃 컨텍스트 타입
@@ -30,6 +30,10 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
     margin-left: 0;
     padding: 1.5em;
   }
+
+  @media (max-width: 480px) {
+    padding: 1em;
+  }
 `;
 
 const SectionBox = styled.div`
@@ -52,6 +56,15 @@ const SectionBox = styled.div`
       transform: translateY(0);
     }
   }
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+    max-width: 90%;
+  }
+
+  @media (max-width: 480px) {
+    padding: 24px 16px;
+  }
 `;
 
 const Title = styled.h2`
@@ -60,6 +73,14 @@ const Title = styled.h2`
   margin-bottom: 25px;
   color: #00eaff;
   text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 20px;
+  }
 `;
 
 const Field = styled.div`
@@ -87,6 +108,16 @@ const Input = styled.input`
   &::placeholder {
     color: #888;
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
 `;
 
 const Button = styled.button<{ color?: string }>`
@@ -107,6 +138,16 @@ const Button = styled.button<{ color?: string }>`
       props.color === "#4caf50" ? "#3ea942" : "#009acd"};
     transform: translateY(-2px);
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
 `;
 
 const ProfileImage = styled.img`
@@ -117,6 +158,16 @@ const ProfileImage = styled.img`
   margin-bottom: 10px;
   border: 3px solid #00eaff;
   background-color: #111;
+
+  @media (max-width: 768px) {
+    width: 80px;
+    height: 80px;
+  }
+
+  @media (max-width: 480px) {
+    width: 70px;
+    height: 70px;
+  }
 `;
 
 const ImageWrapper = styled.div`
@@ -148,6 +199,16 @@ const SelectableImage = styled.img<{ $selected: boolean }>`
     transform: scale(1.08);
     border-color: #00eaff;
   }
+
+  @media (max-width: 768px) {
+    width: 56px;
+    height: 56px;
+  }
+
+  @media (max-width: 480px) {
+    width: 50px;
+    height: 50px;
+  }
 `;
 
 /* ======================= 📘 React Component ======================= */
@@ -165,7 +226,6 @@ const Profile: React.FC = () => {
     (_, i) => `/profiles/profile_${i + 1}.png`
   );
 
-  // 사용자 정보 불러오기
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -182,12 +242,10 @@ const Profile: React.FC = () => {
     fetchUser();
   }, []);
 
-  // 이메일 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUser((prev) => ({ ...prev, email: e.target.value }));
   };
 
-  // 저장
   const handleSave = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(user.email)) {
