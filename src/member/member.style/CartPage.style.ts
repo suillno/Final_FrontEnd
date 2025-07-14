@@ -7,7 +7,7 @@ export const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   min-height: 100vh;
   padding: 2em;
   background-color: #121317;
-  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "240px" : "0")};
   transition: margin-left 0.3s ease;
 `;
 

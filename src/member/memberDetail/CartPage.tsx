@@ -186,7 +186,7 @@ const CartPage: React.FC = () => {
           });
         }
 
-        toast.success(successMessage);
+        alert(successMessage);
         await fetchCartItems();
       } else {
         const errorMessage = result.replace("ERROR: ", "").trim();
