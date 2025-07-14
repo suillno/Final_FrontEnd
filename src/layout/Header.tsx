@@ -98,6 +98,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
             <Link to="/member/wallet">Wallet</Link>
             <Link to="/member/cartpage">CartPage</Link>
             <Link to="/member/wishlist">WishList</Link>
+            <Link to="/member/Leave">Leave</Link>
           </Dropdown>
         )}
       </HeaderRight>
