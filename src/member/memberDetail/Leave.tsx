@@ -106,7 +106,7 @@ const Leave: React.FC = () => {
   const logout = () => {
     localStorage.removeItem("currentUser"); // ✅ localStorage에서 사용자 정보 제거
     dispatch(removeUserInfo()); // ✅ Redux 스토어 초기화
-    navigate("/member/login"); // ✅ 로그인 페이지로 이동 (경로는 실제 경로에 맞게 수정)
+    navigate("/member/login", { replace: true }); // ✅ 로그인 페이지로 이동 (경로는 실제 경로에 맞게 수정)
   };
   const handleDeleteAccount = async () => {
     if (!password) {
