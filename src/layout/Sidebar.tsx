@@ -63,6 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const isAdmin = roles.some(
     (r: any) => r.role === "ROLE_ADMIN" || r.role === "ROLE_SYSTEM"
   );
+  const isLoggedIn = !!userInfo && !!userInfo.username; // 로그인 여부
 
   return (
     <SidebarContainer $isOpen={isOpen}>
@@ -104,13 +105,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         </MenuItem>
       </Section>
 
-      {/* 고객 문의 */}
-      <Section>
-        <SectionTitle>Service</SectionTitle>
-        <MenuItem>
-          <Link to="/member/memberService">PickGameSupport</Link>
-        </MenuItem>
-      </Section>
+      {/* 고객문의 - 로그인 사용자만 표시 */}
+      {isLoggedIn && (
+        <Section>
+          <SectionTitle>Service</SectionTitle>
+          <MenuItem>
+            <Link to="/member/memberService">PickGameSupport</Link>
+          </MenuItem>
+        </Section>
+      )}
 
       {/* 관리자 메뉴 - ROLE_ADMIN 또는 ROLE_SYSTEM 유저만 노출 */}
       {isAdmin && (
