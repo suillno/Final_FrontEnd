@@ -189,7 +189,6 @@ export const ErrorMessage = styled.p`
   color: #ff4d4f;
   font-size: 0.8rem;
   margin-top: 4px;
-  animation: ${fadeOut} 3s forwards;
 `;
 
 export const InputBox = styled.div`
