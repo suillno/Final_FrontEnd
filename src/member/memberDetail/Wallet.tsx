@@ -1,15 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
-import { useSelector } from "react-redux";
-import {
-  apiChargeWallet,
-  apiSendWalletAuthCode,
-  apiVerifyAuthCode,
-  apiWalletLog,
-} from "../../components/api/backApi";
-import { selectUserInfo } from "../../components/auth/store/userInfo";
-import customSwal from "../../style/customSwal.styles";
 
 // 💳 거래 타입 정의
 interface Transaction {
@@ -17,7 +8,6 @@ interface Transaction {
   type: "충전" | "사용";
   amount: number;
   date: string;
-  logText: string;
 }
 
 // 🔧 Layout에서 전달되는 context 타입
@@ -30,6 +20,7 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
   padding: 2em;
   background-color: #1e1f24;
   margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
@@ -37,7 +28,6 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
 
   @media (max-width: 768px) {
     margin-left: 0;
-    font-size: 0.75em;
   }
 `;
 
@@ -71,16 +61,12 @@ const BalanceBox = styled.div`
   background: linear-gradient(135deg, #00bfff, #007acc);
   padding: 20px;
   border-radius: 10px;
-  font-size: 1.5rem;
+  font-size: 20px;
   font-weight: bold;
   color: white;
   text-align: center;
   margin-bottom: 30px;
   box-shadow: 0 4px 10px rgba(0, 191, 255, 0.3);
-
-  @media (max-width: 768px) {
-    font-size: 1.1rem;
-  }
 `;
 
 // 💳 충전 입력 영역
@@ -111,19 +97,17 @@ const Input = styled.input`
 `;
 
 // 🚀 충전 버튼
-const Button = styled.button<{ disabled?: boolean }>`
+const Button = styled.button`
   padding: 10px 20px;
-  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#00bfff")};
-  color: ${({ disabled }) => (disabled ? "#666" : "white")};
+  background-color: #00bfff;
+  color: white;
   border: none;
   border-radius: 4px;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: pointer;
   font-weight: bold;
-  transition: all 0.2s;
 
   &:hover {
-    background: ${({ disabled }) => (disabled ? "#ccc" : "#fff")};
-    color: ${({ disabled }) => (disabled ? "#666" : "blue")};
+    background-color: #009edd;
   }
 `;
 
@@ -151,10 +135,7 @@ const PresetButton = styled.button`
 `;
 
 // 🧾 거래 내역 리스트
-const History = styled.div`
-  max-height: 450px;
-  overflow: auto;
-`;
+const History = styled.div``;
 
 const List = styled.ul`
   list-style: none;
@@ -162,7 +143,7 @@ const List = styled.ul`
 `;
 
 // 📄 거래 아이템 스타일
-const ListItem = styled.li<{ type: any }>`
+const ListItem = styled.li<{ type: "충전" | "사용" }>`
   padding: 12px;
   margin-bottom: 10px;
   border-left: 5px solid
@@ -178,92 +159,29 @@ const ListItem = styled.li<{ type: any }>`
 
 const Wallet: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
-  const userInfo = useSelector(selectUserInfo); // userId 호출
-  const userId = userInfo?.id;
-  const userName = userInfo?.username;
-  const [authCode, setAuthCode] = useState(""); // 입증 코드 입력값 상태
-  const [isAuthStep, setIsAuthStep] = useState(false);
 
   const [balance, setBalance] = useState(0); // 잔액 상태
   const [chargeAmount, setChargeAmount] = useState(""); // 입력 필드 값
   const [history, setHistory] = useState<Transaction[]>([]); // 거래 내역 배열
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // ✅ 충전 버튼 클릭 시 처리
-  useEffect(() => {
-    const fetchHistory = async () => {
-      if (!userId) return;
-
-      try {
-        const logData = await apiWalletLog(userId);
-        const converted = logData.map((log: any) => ({
-          id: log.logId,
-          type: log.logType === "" ? " 충전" : "사용",
-          amount: log.amount,
-          date: new Date(log.createdAt).toLocaleString(),
-          logText: log.logText,
-          balance: log.balance,
-        }));
-        setHistory(converted);
-        if (converted.length > 0) {
-          setBalance(converted[0].balance);
-        }
-      } catch (error) {
-        console.error("거래내역 불러오기 실패:", error);
-      }
-    };
-    fetchHistory();
-  }, [userId]);
-
-  const handleCharge = async () => {
+  const handleCharge = () => {
     const amount = parseInt(chargeAmount, 10);
     if (isNaN(amount) || amount <= 0) {
       alert("유효한 금액을 입력하세요.");
       return;
     }
-    if (!userId) {
-      alert("사용자 정보가 없습니다.");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const isVerified = await (window as any).promptSendAuthCode(userId);
 
-      if (!isVerified) {
-        alert("인증이 실패하거나 취소되었습니다.");
-        setIsSubmitting(false);
-        return;
-      }
-      await apiChargeWallet(userId, amount, userName, 0);
+    const newTransaction: Transaction = {
+      id: Date.now(),
+      type: "충전",
+      amount,
+      date: new Date().toLocaleString(),
+    };
 
-      const newTransaction: Transaction = {
-        id: Date.now(),
-        type: "충전",
-        amount,
-        date: new Date().toLocaleString(),
-        logText: "충전",
-      };
-
-      setBalance((prev) => prev + amount);
-      setHistory((prev) => [newTransaction, ...prev]);
-      setChargeAmount("");
-      setIsSubmitting(false);
-
-      await customSwal.fire({
-        icon: "success",
-        title: "충전 완료",
-        text: `${amount.toLocaleString()}₩ 충전되었습니다.`,
-        confirmButtonText: "확인",
-      });
-    } catch (err) {
-      console.error("충전 오류:", err);
-      await customSwal.fire({
-        icon: "error",
-        title: "충전 실패",
-        text: "충전 중 오류가 발생했습니다. 다시 시도해주세요.",
-      });
-    } finally {
-      setIsAuthStep(false);
-    }
+    setBalance((prev) => prev + amount);
+    setHistory((prev) => [newTransaction, ...prev]);
+    setChargeAmount("");
   };
 
   // ✅ 프리셋 버튼 클릭 시 입력 값에 누적
@@ -287,10 +205,7 @@ const Wallet: React.FC = () => {
             value={chargeAmount}
             onChange={(e) => setChargeAmount(e.target.value)}
           />
-          <Button onClick={handleCharge} disabled={isSubmitting}>
-            {" "}
-            {isSubmitting ? " 전송 중 ..." : " 확인"}
-          </Button>
+          <Button onClick={handleCharge}>충전하기</Button>
         </ChargeSection>
 
         <PresetButtons>
@@ -302,14 +217,14 @@ const Wallet: React.FC = () => {
         </PresetButtons>
 
         <History>
-          <h3>거래 내역 (최근 10건만 조회)</h3>
+          <h3>거래 내역</h3>
           {history.length === 0 ? (
             <p style={{ color: "#ccc" }}>거래 내역이 없습니다.</p>
           ) : (
             <List>
               {history.map((item) => (
-                <ListItem key={item.id} type={item.logText}>
-                  [{item.logText}] {item.amount.toLocaleString()}₩ - {item.date}
+                <ListItem key={item.id} type={item.type}>
+                  [{item.type}] {item.amount.toLocaleString()}₩ - {item.date}
                 </ListItem>
               ))}
             </List>

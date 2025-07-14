@@ -135,6 +135,7 @@ export const InputBox = styled.div`
   input:valid ~ label {
     top: -5px;
   }
+
   input {
     width: 100%;
     height: 50px;
@@ -142,15 +143,10 @@ export const InputBox = styled.div`
     border: none;
     outline: none;
     font-size: 1em;
-    padding: 0 2.5rem 0 5px;
+    padding: 0 15px 0 5px;
     color: #fff;
-    background-color: transparent;
-    transition: background-color 5000s ease-in-out 0s;
   }
-  input:-webkit-autofill {
-    -webkit-text-fill-color: #fff !important;
-    box-shadow: transparent inset !important;
-  }
+
   svg {
     position: absolute;
     right: 8px;

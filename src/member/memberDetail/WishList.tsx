@@ -17,7 +17,6 @@ import {
   CartItem,
 } from "../../components/api/backApi";
 import { useSelector } from "react-redux";
-import { userInfo } from "os";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 
 // 🔷 Layout Context 타입
@@ -171,13 +170,12 @@ const WishlistPage: React.FC = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<CartItem[]>([]);
   const [sortType, setSortType] = useState<SortType>("default");
-  // 유저정보
   const userInfo = useSelector(selectUserInfo);
 
   // 💾 위시리스트 + 할인 정보 불러오기
   useEffect(() => {
     const fetchData = async () => {
-      if (!userInfo) return;
+      if (!userInfo || !userInfo.username) return;
 
       try {
         const wishListResult = await apiGetWishlist(userInfo.username);
@@ -198,17 +196,20 @@ const WishlistPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [userInfo]);
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortType(e.target.value as SortType);
   };
 
   const handleRemove = async (item: CartItem) => {
-    const username = JSON.parse(localStorage.getItem("currentUser")!).username;
+    if (!userInfo?.username) return;
 
     try {
-      const result = await apiAddGameLike({ ...item, userName: username });
+      const result = await apiAddGameLike({
+        ...item,
+        userName: userInfo.username,
+      });
       if (result.startsWith("SUCCESS")) {
         setWishlist((prev) => prev.filter((g) => g.gameId !== item.gameId));
         toast.success(`"${item.title}" 찜 해제됨`);
@@ -225,7 +226,6 @@ const WishlistPage: React.FC = () => {
   const getDiscountRate = (original: number, sale: number) =>
     Math.floor(((original - sale) / original) * 100);
 
-  // 🔽 정렬 처리
   const sortedList = [...wishlist].sort((a, b) => {
     switch (sortType) {
       case "alphabet":
@@ -315,7 +315,6 @@ const WishlistPage: React.FC = () => {
           </CardGrid>
         )}
       </GridBox>
-
       <ToastContainer />
     </PageWrapper>
   );

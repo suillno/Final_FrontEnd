@@ -74,11 +74,9 @@ export const Title = styled.h2`
  */
 export const Controls = styled.div`
   display: flex;
-  justify-content: center;     
   align-items: center;
   margin-bottom: 20px;
   gap: 1rem;
-  flex-wrap: wrap;             
 
   label {
     display: flex;
@@ -88,7 +86,6 @@ export const Controls = styled.div`
   }
 `;
 
-
 /**
  * 검색어 입력 필드
  * 포커스 시 배경 강조, 테두리와 그림자로 시각적 효과 추가
@@ -96,7 +93,7 @@ export const Controls = styled.div`
 export const SearchInput = styled.input`
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
   border-radius: 6px;
-  width: 400px;
+  width: 250px;
   font-size: 1rem;
   border: 1px solid #555;
   background-color: #1c1d23;
@@ -109,7 +106,7 @@ export const SearchInput = styled.input`
 
   &:focus {
     outline: none;
-    width: 450px;
+    width: 300px;
     border-color: #00eaff;
     background-color: #0e0f11;
     box-shadow: 0 0 8px #00eaff88;
