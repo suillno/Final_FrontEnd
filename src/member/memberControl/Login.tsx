@@ -68,6 +68,7 @@ export default function LoginPage() {
   const [timedErrors, setTimedErrors] = useState<{
     loginId?: string;
     loginPassword?: string;
+    username?: string;
   }>({});
 
   // 회원가입 폼 상태
@@ -135,6 +136,7 @@ export default function LoginPage() {
     watch: watchRegister,
   } = useForm<RegisterFormType>({
     resolver: zodResolver(registrationSchema),
+    mode: "onChange",
   });
 
   // OS 기반 deviceType 설정
@@ -361,8 +363,10 @@ export default function LoginPage() {
                 />
                 <label htmlFor="registerId">아이디</label>
                 <IoIdCardOutline />
-                {registerErrors.username && (
-                  <ErrorMessage>{registerErrors.username.message}</ErrorMessage>
+                {(registerErrors.username || timedErrors.username) && (
+                  <ErrorMessage>
+                    {registerErrors.username?.message || timedErrors.username}
+                  </ErrorMessage>
                 )}
                 <CheckButton type="button" onClick={checkUsername}>
                   중복확인
