@@ -365,7 +365,7 @@ export const apiUpdateInquiryStatus = async (
 /**
  * 방문자 기록 API
  * - 로그인한 사용자가 메인 페이지에 진입할 때 호출
- * - VISITOR_LOG 테이블에 하루 한 번 기록(MERGE 쿼리)
+ * - VISITOR_LOG 테이블에 하루 한 번 기록(MERGE 쿼리) 1
  */
 export const apiLogVisitor = async (): Promise<string> => {
   try {
@@ -378,7 +378,7 @@ export const apiLogVisitor = async (): Promise<string> => {
   }
 };
 
-// 최근 7일 방문자 수 + 누적 방문자 수 API 호출
+// 최근 7일 방문자 수 + 누적 방문자 수 API 호출 1
 export const apiGetWeeklyVisitors = async (): Promise<
   { label: string; value: number }[]
 > => {
@@ -412,6 +412,7 @@ export const apiVerifyAuthCode = async (userId: number, code: string) => {
  *  - label : 'YYYY-MM-DD' 날짜 문자열
  *  - value : 해당 날짜의 가입자 수
  *  - 차트(BarChart) 등에 그대로 바인딩해서 사용
+ * 11
  */
 export const apiGetWeeklySignups = async (): Promise<
   { label: string; value: number }[]
@@ -425,6 +426,30 @@ export const apiGetWeeklySignups = async (): Promise<
     throw error;
   }
 };
+// 오늘 매출 총합 조회 (단일 숫자) 
+export const apiGetTodayRevenue = async (): Promise<number> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/revenue/today");
+    return res.data.todayRevenue;
+  } catch (error) {
+    console.error("오늘 매출 조회 실패:", error);
+    throw error;
+  }
+};
+
+// 최근 7일 일별 매출 조회 (배열 반환) 1
+export const apiGetWeeklyRevenue = async (): Promise<
+  { label: string; value: number }[]
+> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/revenue/weekly");
+    return res.data;
+  } catch (error) {
+    console.error("최근 7일 매출 통계 조회 실패:", error);
+    throw error;
+  }
+};
+
 // 지갑충전 기능
 export const apiChargeWallet = async (
   userId: number,

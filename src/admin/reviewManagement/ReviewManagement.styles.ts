@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
 
-// 페이지 요소가 아래에서 위로 서서히 올라오며 나타나는 애니메이션
+// 페이지 요소가 아래에서 위로 서서히 나타나는 애니메이션
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -12,27 +12,26 @@ const fadeIn = keyframes`
   }
 `;
 
-/** 
+/**
  * 전체 페이지를 감싸는 최상위 컨테이너
  * 사이드바가 열렸는지 여부에 따라 좌측 여백을 조정하며,
  * 파티클 애니메이션이 배경에 깔리도록 설정됨
- * DOM에 전달되지 않도록 $prop은 withConfig로 차단
  */
 export const Container = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== "$isSidebarOpen", // $isSidebarOpen DOM 전달 차단
+  shouldForwardProp: (prop) => prop !== "$isSidebarOpen", // $isSidebarOpen DOM 전달 방지
 })<{ $isSidebarOpen: boolean }>`
-  position: relative;                  // 파티클 배치 및 내부 요소 제어를 위한 기준 위치
-  z-index: 0;                          // 파티클이 배경으로 가도록 낮은 레이어 설정
-  overflow: hidden;                   // 내부 요소가 넘칠 경우 숨김 처리
-  animation: ${fadeIn} 0.5s ease;     // 페이드 인 애니메이션 적용
-  padding: 2rem;                      // 내부 여백
-  min-height: 100vh;                  // 화면 최소 높이 설정
-  margin-left: ${(props) => (props.$isSidebarOpen ? "220px" : "0")}; // 사이드바 열림 여부에 따라 좌측 마진 조절
-  transition: margin-left 0.3s ease;  // 사이드바 토글 시 부드러운 마진 전환
-  background-color: #0e0f11;          // 다크 테마 배경색
-  color: white;                       // 기본 텍스트 색상
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  animation: ${fadeIn} 0.5s ease;
+  padding: 2rem;
+  min-height: 100vh;
+  margin-left: ${(props) => (props.$isSidebarOpen ? "220px" : "0")};
+  transition: margin-left 0.3s ease;
+  background-color: #0e0f11;
+  color: white;
+  font-size: 1rem;
 
-  // tsparticles를 페이지 배경에 전체 적용
   #tsparticles {
     position: absolute;
     z-index: -1;
@@ -41,44 +40,52 @@ export const Container = styled.div.withConfig({
     width: 100%;
     height: 100%;
   }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    font-size: 0.875rem; /* 모바일에서는 기본 폰트 크기 축소 */
+  }
 `;
 
 /**
- * 모든 콘텐츠를 가운데 정렬하고 수직 배치
- * max-width로 내용 폭을 제한하여 레이아웃 균형 유지
+ * 콘텐츠를 감싸는 래퍼
+ * 최대 너비를 제한하고 가운데 정렬
  */
 export const InnerWrapper = styled.div`
   max-width: 1000px;
-  margin: 0 auto;                   // 수평 중앙 정렬
+  margin: 0 auto;
   display: flex;
-  flex-direction: column;          // 세로로 정렬
+  flex-direction: column;
 `;
 
 /**
- * 페이지 상단 타이틀 스타일
- * 가운데 정렬, 네온 효과, 페이드 인 애니메이션 적용
+ * 페이지 제목
+ * 가운데 정렬 + 네온 효과
  */
 export const Title = styled.h2`
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: #00eaff;                   // 하늘색 계열 강조
-  text-shadow: 0 0 10px #00eaff99; // 네온 느낌의 그림자 효과
+  color: #00eaff;
+  text-shadow: 0 0 10px #00eaff99;
   animation: ${fadeIn} 0.8s ease-out;
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
 `;
 
 /**
- * 검색창, 필터, 정렬 버튼 등 제어 요소들을 담는 상단 영역
- * 수평 정렬 및 라벨 스타일 포함
+ * 검색창과 정렬 버튼이 포함된 상단 컨트롤 영역
  */
 export const Controls = styled.div`
   display: flex;
-  justify-content: center;     
+  justify-content: center;
   align-items: center;
   margin-bottom: 20px;
   gap: 1rem;
-  flex-wrap: wrap;             
+  flex-wrap: wrap;
 
   label {
     display: flex;
@@ -88,10 +95,9 @@ export const Controls = styled.div`
   }
 `;
 
-
 /**
- * 검색어 입력 필드
- * 포커스 시 배경 강조, 테두리와 그림자로 시각적 효과 추가
+ * 검색 입력 필드
+ * 포커스 시 배경 강조 + 그림자 처리
  */
 export const SearchInput = styled.input`
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
@@ -114,11 +120,19 @@ export const SearchInput = styled.input`
     background-color: #0e0f11;
     box-shadow: 0 0 8px #00eaff88;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 0.9rem;
+
+    &:focus {
+      width: 100%;
+    }
+  }
 `;
 
 /**
- * 정렬 기능 버튼
- * 기본적으로 파란색 배경이며, hover 시 색상 변경
+ * 정렬용 버튼
  */
 export const SortButton = styled.button`
   background: #00eaff;
@@ -133,11 +147,16 @@ export const SortButton = styled.button`
   &:hover {
     background: #12f1ff;
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+    padding: 0.4rem 0.6rem;
+  }
 `;
 
 /**
- * 리뷰 데이터를 출력하는 테이블
- * 짙은 배경, 행 hover 시 배경 강조, 페이드 인 애니메이션 포함
+ * 테이블 기본 스타일
+ * 다크 배경, 애니메이션 포함
  */
 export const ReviewTable = styled.table`
   width: 100%;
@@ -147,34 +166,66 @@ export const ReviewTable = styled.table`
   box-shadow: 0 0 20px #00eaff22;
   animation: ${fadeIn} 0.6s ease;
 
-  th, td {
+  th,
+  td {
     padding: 1rem;
     border-bottom: 1px solid #333;
     text-align: center;
+    word-break: break-word;
   }
 
   th {
     background-color: #2c2f36;
     color: #00eaff;
     font-weight: 600;
+    font-size: 1rem;
   }
 
   td {
     color: #ddd;
+    font-size: 0.95rem;
   }
 
   tbody tr:hover {
     background-color: #2a2d38;
     transition: background-color 0.3s ease;
   }
+
+  @media (max-width: 768px) {
+    th,
+    td {
+      font-size: 0.8rem;
+      padding: 0.75rem;
+    }
+  }
 `;
 
 /**
- * 리뷰가 길어서 잘려보이는 경우 사용되는 '+' 버튼
- * 버튼은 오른쪽에 붙고 밝은 파란 계열로 표시됨
+ * 긴 리뷰 내용을 한 줄로 자르고, + 버튼을 오른쪽에 고정한 셀
+ */
+export const ContentCell = styled.td`
+  position: relative;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 30px;
+  vertical-align: middle;
+
+  @media (max-width: 768px) {
+    max-width: 200px;
+  }
+`;
+
+/**
+ * '+' 버튼 (모달 열기용)
+ * 항상 셀 오른쪽에 고정됨
  */
 export const MoreButton = styled.button`
-  margin-left: 8px;
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
   padding: 2px 8px;
   background-color: #4b7bec;
   border: none;
@@ -182,16 +233,22 @@ export const MoreButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 0.9rem;
   box-shadow: 0 0 6px #4b7bec88;
 
   &:hover {
     background-color: #5d8bf4;
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
 `;
 
 /**
- * 리뷰 삭제 버튼
- * 붉은 계열의 경고 스타일이며, hover 시 색이 더 밝아짐
+ * 삭제 버튼 스타일
+ * 빨간 계열 강조, hover 시 밝아짐
  */
 export const DeleteButton = styled.button`
   background: #eb3b5a;
@@ -207,11 +264,16 @@ export const DeleteButton = styled.button`
   &:hover {
     background: #ff6b81;
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+  }
 `;
 
 /**
- * 테이블 하단에 위치한 페이지네이션 영역
- * 가운데 정렬 및 현재 페이지 버튼 강조 스타일
+ * 페이지네이션 버튼 그룹
+ * 현재 페이지는 강조 처리
  */
 export const Pagination = styled.div`
   margin-top: 2rem;
@@ -236,6 +298,11 @@ export const Pagination = styled.div`
 
     &:hover {
       background-color: #12f1ff;
+    }
+
+    @media (max-width: 768px) {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
     }
   }
 `;

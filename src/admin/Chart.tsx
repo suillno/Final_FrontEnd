@@ -20,6 +20,7 @@ import {
   SignupData,
   SignupCount,
 } from "./chart/Chart.types";
+// API 함수들 
 import {
   apiGetWeeklyVisitors,
   apiGetWeeklySignups,

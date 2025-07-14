@@ -25,6 +25,12 @@ export interface SignupCount {
 
 /* 일별 신규 가입자 차트용 데이터 */
 export interface SignupData {
-  day: string;
-  signups: number;
+  day: string; // 요일
+  signups: number; // 가입자 수
+}
+
+/* 매출 차트용 데이터 11*/
+export interface RevenueData {
+  day: string; // 요일
+  amount: number; // 매출액
 }
