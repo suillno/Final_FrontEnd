@@ -1,3 +1,4 @@
+// src/pages/admin/Chart.tsx
 import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
@@ -14,7 +15,10 @@ import {
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 
+// 스타일 컴포넌트
 import * as Styled from "./chart/Chart.styles";
+
+// 타입 정의
 import {
   LayoutContext,
   DailyData,
@@ -93,6 +97,7 @@ const Chart: React.FC = () => {
   return (
     <Styled.Container $isSidebarOpen={isSidebarOpen}>
       {/* ===== 배경 파티클 ===== */}
+
       <Styled.ParticleWrapper>
         <Particles
           id="tsparticles"
@@ -129,16 +134,17 @@ const Chart: React.FC = () => {
       </Styled.Title>
 
       {/* ===== 방문자 정보 요약 카드 ===== */}
+
       <Styled.VisitorInfo>
         🧑‍💻 오늘 방문자 수: <strong>{visitors.today}</strong>명<br />총 방문자
         수: <strong>{visitors.total.toLocaleString()}</strong>명<br />
         최근 7일 총 방문: <strong>{totalDailyVisitors.toLocaleString()}</strong>
         명
       </Styled.VisitorInfo>
-
       {/* ===== 차트 영역 (2x2 Grid) ===== */}
       <Styled.Grid>
         {/* 일일 방문자 수 막대 그래프 */}
+
         <Styled.Card>
           <Styled.ChartTitle>📈 일일 방문자 수 (7일)</Styled.ChartTitle>
           <Styled.ChartWrapper>
@@ -192,6 +198,7 @@ const Chart: React.FC = () => {
         </Styled.Card>
 
         {/* 신규 가입자 수 막대 그래프 */}
+
         <Styled.Card>
           <Styled.ChartTitle>👤 신규 가입자 수 (7일)</Styled.ChartTitle>
           <Styled.ChartWrapper>
@@ -202,6 +209,44 @@ const Chart: React.FC = () => {
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="count" fill="#ff9800" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Styled.ChartWrapper>
+        </Styled.Card>
+
+        {/* 일일 매출 차트 */}
+        <Styled.Card>
+          <Styled.ChartTitle>일일 매출액 (최근 7일)</Styled.ChartTitle>
+          <Styled.ChartWrapper>
+            <ResponsiveContainer>
+              <BarChart data={dailyRevenue}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip
+                  formatter={(value: number) => `${value.toLocaleString()}원`}
+                />
+                <Bar dataKey="amount" fill="#ffe600" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </Styled.ChartWrapper>
+        </Styled.Card>
+
+        {/* 최근 7일 총 매출 차트 */}
+        <Styled.Card>
+          <Styled.ChartTitle>최근 7일 총 매출액</Styled.ChartTitle>
+          <Styled.ChartWrapper>
+            <ResponsiveContainer>
+              <BarChart
+                data={[{ name: "최근 7일", amount: totalWeeklyRevenue }]}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip
+                  formatter={(value: number) => `${value.toLocaleString()}원`}
+                />
+                <Bar dataKey="amount" fill="#ff7f50" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Styled.ChartWrapper>

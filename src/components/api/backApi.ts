@@ -306,3 +306,82 @@ export const apiUpdateProfile = async (data: {
     throw error;
   }
 };
+
+
+// 이메일 인증코드 전송
+export const apiSendWalletAuthCode = async (userId: number) => {
+  return await instanceBack
+    .post("/wallet/sendAuthCode", null, {
+      params: { userId },
+    })
+    .then((res) => res.data);
+};
+// 이메일 인증코드 체크확인 기능
+export const apiVerifyAuthCode = async (userId: number, code: string) => {
+  return await instanceBack
+    .post("/wallet/verifyAuthCode", null, {
+      params: { userId, code },
+    })
+    .then((res) => res.data as boolean); // 인증 성공 여부 true/false
+};
+/**
+ * 최근 7일 신규 가입자 수 조회
+ *  - label : 'YYYY-MM-DD' 날짜 문자열
+ *  - value : 해당 날짜의 가입자 수
+ *  - 차트(BarChart) 등에 그대로 바인딩해서 사용
+ */
+export const apiGetWeeklySignups = async (): Promise<
+  { label: string; value: number }[]
+> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/signups");
+    return res.data; // [{ label: '2025-07-05', value: 12 }, …]
+  } catch (error) {
+    console.error("신규 가입자 통계 조회 실패:", error);
+    throw error;
+  }
+};
+
+// 오늘 매출 총합 조회 (단일 숫자)
+export const apiGetTodayRevenue = async (): Promise<number> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/revenue/today");
+    return res.data.todayRevenue;
+  } catch (error) {
+    console.error("오늘 매출 조회 실패:", error);
+    throw error;
+  }
+};
+
+// 최근 7일 일별 매출 조회 (배열 반환)
+export const apiGetWeeklyRevenue = async (): Promise<
+  { label: string; value: number }[]
+> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/revenue/weekly");
+    return res.data;
+  } catch (error) {
+    console.error("최근 7일 매출 통계 조회 실패:", error);
+    throw error;
+  }
+};
+
+// 지갑충전 기능
+export const apiChargeWallet = async (
+  userId: number,
+  amount: number,
+  userName: string,
+  logType: number
+) => {
+  return await instanceBack
+    .post("/wallet/charge", null, {
+      params: { userId, amount, userName, logType },
+    })
+    .then((res) => res.data);
+};
+
+// 지갑 로그 기능
+export const apiWalletLog = async (userId: number) => {
+  const res = await instanceBack.get(`wallet/logs/${userId}`);
+  return res.data;
+};

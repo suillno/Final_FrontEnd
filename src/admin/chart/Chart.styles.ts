@@ -1,21 +1,21 @@
 import styled, { keyframes } from "styled-components";
 
-// 애니메이션
+/* 페이드 인 애니메이션 */
 const fadeIn = keyframes`
   0% { opacity: 0; transform: translateY(-10px); }
   100% { opacity: 1; transform: translateY(0); }
 `;
 
-// 파티클 Wrapper
+/* 파티클 효과 Wrapper (배경용) */
 export const ParticleWrapper = styled.div`
   position: absolute;
   inset: 0;
   z-index: 0;
 `;
 
-// 전체 컨테이너
+/* 전체 컨테이너 (사이드바 상태에 따라 여백 조절) */
 export const Container = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== "$isSidebarOpen", // DOM 전달 차단
+  shouldForwardProp: (prop) => prop !== "$isSidebarOpen", // DOM에 전달 방지
 })<{ $isSidebarOpen: boolean }>`
   margin-left: ${(props) => (props.$isSidebarOpen ? "220px" : "0")};
   padding: 2rem 2rem 4rem;
@@ -25,9 +25,8 @@ export const Container = styled.div.withConfig({
   position: relative;
   z-index: 1;
 `;
-
-
 // 타이틀
+
 export const Title = styled.h2`
   font-size: 2.5rem;
   font-weight: 800;
@@ -40,7 +39,7 @@ export const Title = styled.h2`
   position: relative;
 `;
 
-// 방문자 박스
+/* 방문자 요약 박스 */
 export const VisitorInfo = styled.div`
   font-size: 1.1rem;
   background: #1c1d23;
@@ -69,7 +68,7 @@ export const Grid = styled.div`
   }
 `;
 
-// 카드 박스
+/* 카드 스타일 (차트, 데이터 박스용) */
 export const Card = styled.div`
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(0, 255, 255, 0.15);
@@ -85,14 +84,14 @@ export const Card = styled.div`
   }
 `;
 
-// 차트 제목
+/* 차트 타이틀 */
 export const ChartTitle = styled.h3`
   font-size: 1.05rem;
   margin-bottom: 1rem;
   color: #ffffffcc;
 `;
 
-// 차트 영역
+/* 차트 그리는 영역 */
 export const ChartWrapper = styled.div`
   width: 100%;
   height: 260px;
