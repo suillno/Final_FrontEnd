@@ -16,10 +16,10 @@ import {
   apiAddGameLike,
   apiAddGameReviews,
   apiCheckAll,
-  apiDeleteGameReviews,
   apiGetGameReviews,
 } from "../components/api/backApi";
 import { selectUserInfo } from "../components/auth/store/userInfo";
+import { getCurrentUser } from "../components/auth/helper/storage";
 import { ContentContainer } from "../style/GameDetail.styles";
 
 // 분리된 하위 컴포넌트
@@ -96,24 +96,6 @@ const GameDetail = () => {
       setDiscountActive(Boolean(checkAll.discount));
     } catch (error) {
       console.error("찜/장바구니 상태 확인 오류", error);
-    }
-  };
-
-  // 리뷰 삭제
-  const handleDeleteReview = async () => {
-    try {
-      if (!userInfo.username || !gameDetail.id) return;
-
-      const response = await apiDeleteGameReviews(
-        userInfo.username,
-        gameDetail.id
-      );
-      alert(response); // "리뷰를 삭제하였습니다." 등
-      await fetchReviewList(); // 리뷰 목록 갱신
-      setRating(0);
-      setReviewText("");
-    } catch (error) {
-      alert("리뷰 삭제 오류");
     }
   };
 
@@ -216,7 +198,6 @@ const GameDetail = () => {
                   const reviewData = {
                     userName: userInfo.username,
                     gameId: gameDetail.id,
-                    title: gameDetail.name,
                     rating,
                     content,
                   };
@@ -228,7 +209,6 @@ const GameDetail = () => {
                     alert("리뷰 등록 오류");
                   }
                 }}
-                onDelete={handleDeleteReview}
                 initialRating={rating}
                 initialContent={reviewText}
               />

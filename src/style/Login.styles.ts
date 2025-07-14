@@ -8,6 +8,7 @@ export const Section = styled.section`
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+
   &::before {
     content: "";
     position: absolute;

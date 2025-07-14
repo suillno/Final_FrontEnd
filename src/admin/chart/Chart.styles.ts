@@ -25,8 +25,8 @@ export const Container = styled.div.withConfig({
   position: relative;
   z-index: 1;
 `;
+// 타이틀
 
-/* 대시보드 타이틀 */
 export const Title = styled.h2`
   font-size: 2.5rem;
   font-weight: 800;
@@ -54,37 +54,7 @@ export const VisitorInfo = styled.div`
   z-index: 2;
 `;
 
-/* 가입자 요약 박스 */
-export const SignupInfo = styled.div`
-  font-size: 1.1rem;
-  background: #1c1d23;
-  padding: 1.2rem;
-  border-radius: 10px;
-  max-width: 720px;
-  margin: 0 auto 2rem;
-  text-align: center;
-  box-shadow: 0 0 20px #00eaff33;
-  animation: ${fadeIn} 1.1s ease-out;
-  position: relative;
-  z-index: 2;
-`;
-
-/* 매출 요약 박스 */
-export const RevenueInfo = styled.div`
-  font-size: 1.1rem;
-  background: #1c1d23;
-  padding: 1.2rem;
-  border-radius: 10px;
-  max-width: 720px;
-  margin: 0 auto 2rem;
-  text-align: center;
-  box-shadow: 0 0 20px #ffd70033;
-  animation: ${fadeIn} 1.1s ease-out;
-  position: relative;
-  z-index: 2;
-`;
-
-/* 2열 레이아웃 차트 그리드 */
+// 차트 그리드
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));

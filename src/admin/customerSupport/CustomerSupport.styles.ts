@@ -48,7 +48,6 @@ export const Title = styled.h2`
 // 필터 체크박스를 묶는 영역 (상태별 필터링)
 export const FilterBox = styled.div`
   display: flex;
-  justify-content: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
 
@@ -61,49 +60,53 @@ export const FilterBox = styled.div`
   }
 
   input {
-    accent-color: #00eaff;
+    accent-color: #00eaff; // 체크박스 테마 색상
   }
 `;
 
-
-// 검색창과 아이콘 감싸는 wrapper (입력창과 아이콘을 같이 제어)
+// 검색창과 돋보기를 감싸는 wrapper
 export const SearchBar = styled.div`
+  position: relative;
   display: flex;
-  justify-content: center;  
   align-items: center;
   margin-bottom: 2rem;
-  position: relative;
-
-  // hover 시 왼쪽 아이콘 표시
-  &:hover .search-icon-left {
-    opacity: 1;
-    transform: translateX(0);
-  }
 `;
-
 
 // 검색 입력창 스타일. 포커스 시 확장되고 강조됨
 export const SearchInput = styled.input`
-  padding: 0.75rem 2.75rem 0.75rem 1rem;  // 전체적으로 넉넉한 패딩
-  border-radius: 8px;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  border-radius: 6px;
   border: 1px solid #555;
-  width: 400px;                           // 기본 너비 확대
-  font-size: 1rem;
+  width: 180px;
   background-color: #2c2f36;
   color: white;
-  justify-content: center;
-  transition: all 0.3s ease;
+  font-size: 1rem;
+  transition: width 0.3s ease, background-color 0.3s ease;
 
   &:focus {
-    outline: none;
-    width: 450px;                         // 포커스 시 더 넓어짐
+    width: 300px;
     border-color: #00eaff;
     background-color: #1f2127;
     box-shadow: 0 0 8px #00eaff88;
   }
 
   &::placeholder {
-    color: #aaa;
+    color: #bbb;
+  }
+`;
+
+// 검색창 오른쪽에 위치한 돋보기 아이콘 버튼
+export const SearchIcon = styled.button`
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #00eaff;
+  cursor: pointer;
+
+  &:hover {
+    color: #5ef1ff;
   }
 `;
 

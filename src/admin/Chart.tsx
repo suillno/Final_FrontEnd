@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
+  LineChart,
+  Line,
   BarChart,
   Bar,
   XAxis,
@@ -20,151 +22,102 @@ import * as Styled from "./chart/Chart.styles";
 import {
   LayoutContext,
   DailyData,
+  MonthlyData,
   VisitorCount,
-  SignupData,
-  SignupCount,
-  RevenueData,
 } from "./chart/Chart.types";
 
-// API 함수들
-import {
-  apiGetWeeklyVisitors,
-  apiGetWeeklySignups,
-  apiGetTodayRevenue,
-  apiGetWeeklyRevenue,
-} from "../components/api/backApi";
+// ==============================
+// 차트용 더미 데이터 생성 함수
+// ==============================
+
+// 요일 및 월 텍스트 리스트
+const days = ["월", "화", "수", "목", "금", "토", "일"];
+const months = ["1월", "2월", "3월", "4월", "5월", "6월"];
+
+// 7일간 매출 데이터 생성 (0~999 + 300 보정)
+const generateWeekSales = (): DailyData[] =>
+  days.map((day) => ({ day, sales: Math.floor(Math.random() * 1000) + 300 }));
+
+// 6개월 매출 데이터 생성
+const generateMonthSales = (): MonthlyData[] =>
+  months.map((month) => ({
+    month,
+    sales: Math.floor(Math.random() * 10000) + 10000,
+  }));
+
+// 7일간 신규 가입자 수
+const generateNewUsers = (): DailyData[] =>
+  days.map((day) => ({ day, count: Math.floor(Math.random() * 10) + 5 }));
+
+// 7일간 방문자 수
+const generateVisitorsPerDay = (): DailyData[] =>
+  days.map((day) => ({ day, visitors: Math.floor(Math.random() * 300) + 100 }));
+
+// 오늘 및 전체 방문자 수
+const generateVisitorCount = (): VisitorCount => ({
+  today: Math.floor(Math.random() * 300) + 100,
+  total: Math.floor(Math.random() * 10000) + 10000,
+});
 
 const Chart: React.FC = () => {
-  const { isSidebarOpen } = useOutletContext<LayoutContext>();
+  const { isSidebarOpen } = useOutletContext<LayoutContext>(); // 사이드바 열림 여부 context
 
-  // 방문자 수 상태
-  const [dailyVisitors, setDailyVisitors] = useState<DailyData[]>([]);
-  const [visitorSummary, setVisitorSummary] = useState<VisitorCount>({
-    today: 0,
-    total: 0,
-  });
+  // ==============================
+  // 상태 정의 (각 데이터 저장용)
+  // ==============================
+  const [weekSales, setWeekSales] = useState(generateWeekSales());
+  const [monthSales, setMonthSales] = useState(generateMonthSales());
+  const [newUsers, setNewUsers] = useState(generateNewUsers());
+  const [visitors, setVisitors] = useState(generateVisitorCount());
+  const [dailyVisitors, setDailyVisitors] = useState(generateVisitorsPerDay());
 
-  // 가입자 수 상태
-  const [signupData, setSignupData] = useState<SignupData[]>([]);
-  const [signupSummary, setSignupSummary] = useState<SignupCount>({
-    today: 0,
-    total: 0,
-  });
-
-  // 매출 상태
-  const [dailyRevenue, setDailyRevenue] = useState<RevenueData[]>([]);
-  const [todayRevenue, setTodayRevenue] = useState<number>(0);
-
-  // 주간 총 매출 계산
-  const totalWeeklyRevenue = dailyRevenue.reduce(
-    (sum, d) => sum + (d.amount ?? 0),
+  // 최근 7일간 총 방문자 수 계산
+  const totalDailyVisitors = dailyVisitors.reduce(
+    (sum, v) => sum + (v.visitors || 0),
     0
   );
 
-  // 방문자 수 API 호출
+  // 5초마다 데이터 자동 새로고침
   useEffect(() => {
-    const fetchVisitors = async () => {
-      try {
-        const result = await apiGetWeeklyVisitors();
-        const days = ["일", "월", "화", "수", "목", "금", "토"];
-        const mapped: DailyData[] = result.map((row) => {
-          const date = new Date(row.label);
-          return {
-            day: days[date.getDay()],
-            visitors: row.value,
-            isToday: date.toDateString() === new Date().toDateString(),
-          };
-        });
-        const total = mapped.reduce((sum, d) => sum + (d.visitors ?? 0), 0);
-        setDailyVisitors(mapped);
-        setVisitorSummary({
-          today: mapped[mapped.length - 1]?.visitors ?? 0,
-          total,
-        });
-      } catch (err) {
-        console.error("방문자 수 데이터 로드 실패", err);
-      }
-    };
-    fetchVisitors();
+    const interval = setInterval(() => {
+      setWeekSales(generateWeekSales());
+      setMonthSales(generateMonthSales());
+      setNewUsers(generateNewUsers());
+      setVisitors(generateVisitorCount());
+      setDailyVisitors(generateVisitorsPerDay());
+    }, 5000);
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 해제
   }, []);
 
-  // 신규 가입자 수 API 호출
-  useEffect(() => {
-    const fetchSignups = async () => {
-      try {
-        const result = await apiGetWeeklySignups();
-        const days = ["일", "월", "화", "수", "목", "금", "토"];
-        const mapped: SignupData[] = result.map((row) => {
-          const date = new Date(row.label);
-          return {
-            day: days[date.getDay()],
-            signups: row.value,
-          };
-        });
-        const total = mapped.reduce((sum, d) => sum + d.signups, 0);
-        setSignupData(mapped);
-        setSignupSummary({
-          today: mapped[mapped.length - 1]?.signups ?? 0,
-          total,
-        });
-      } catch (err) {
-        console.error("신규 가입자 데이터 로드 실패", err);
-      }
-    };
-    fetchSignups();
-  }, []);
-
-  // 매출 관련 API 호출
-  useEffect(() => {
-    const fetchRevenue = async () => {
-      try {
-        const [today, weekly] = await Promise.all([
-          apiGetTodayRevenue(),
-          apiGetWeeklyRevenue(),
-        ]);
-
-        const days = ["일", "월", "화", "수", "목", "금", "토"];
-        const mapped: RevenueData[] = weekly.map((row) => {
-          const date = new Date(row.label);
-          return {
-            day: days[date.getDay()],
-            amount: row.value,
-          };
-        });
-
-        setTodayRevenue(today);
-        setDailyRevenue(mapped);
-      } catch (err) {
-        console.error("매출 데이터 로드 실패", err);
-      }
-    };
-    fetchRevenue();
-  }, []);
-
-  // 파티클 엔진 초기화
+  // 파티클 초기화 함수
   const particlesInit = async (engine: any) => {
     await loadSlim(engine);
   };
 
   return (
     <Styled.Container $isSidebarOpen={isSidebarOpen}>
-      {/* 배경 파티클 */}
+      {/* ===== 배경 파티클 ===== */}
+
       <Styled.ParticleWrapper>
         <Particles
           id="tsparticles"
           init={particlesInit}
           options={{
-            background: { color: "#0e0f11" },
+            background: { color: "#0e0f11" }, // 배경 색상
             fpsLimit: 60,
             interactivity: {
               events: {
-                onHover: { enable: true, mode: "repulse" },
+                onHover: { enable: true, mode: "repulse" }, // 마우스 호버 반응
                 resize: true,
               },
             },
             particles: {
               color: { value: "#00eaff" },
-              links: { enable: true, color: "#00eaff", distance: 120 },
+              links: {
+                enable: true,
+                color: "#00eaff",
+                distance: 120,
+              },
               move: { enable: true, speed: 1.5 },
               number: { value: 45 },
               opacity: { value: 0.3 },
@@ -175,29 +128,25 @@ const Chart: React.FC = () => {
         />
       </Styled.ParticleWrapper>
 
-      {/* 제목 및 요약 정보 */}
+      {/* ===== 상단 타이틀 ===== */}
       <Styled.Title style={{ marginTop: "100px" }}>
         PickGame 관리자 대시보드
       </Styled.Title>
-      <Styled.VisitorInfo>
-        오늘 방문자 수: <strong>{visitorSummary.today}</strong>명<br />
-        최근 7일 총 방문:{" "}
-        <strong>{visitorSummary.total.toLocaleString()}</strong>명
-      </Styled.VisitorInfo>
-      <Styled.SignupInfo>
-        오늘 가입자 수: <strong>{signupSummary.today}</strong>명<br />
-        최근 7일 총 가입:{" "}
-        <strong>{signupSummary.total.toLocaleString()}</strong>명
-      </Styled.SignupInfo>
-      <Styled.RevenueInfo>
-        오늘 매출액: <strong>{todayRevenue.toLocaleString()}원</strong>
-      </Styled.RevenueInfo>
 
-      {/* 차트 영역 */}
+      {/* ===== 방문자 정보 요약 카드 ===== */}
+
+      <Styled.VisitorInfo>
+        🧑‍💻 오늘 방문자 수: <strong>{visitors.today}</strong>명<br />총 방문자
+        수: <strong>{visitors.total.toLocaleString()}</strong>명<br />
+        최근 7일 총 방문: <strong>{totalDailyVisitors.toLocaleString()}</strong>
+        명
+      </Styled.VisitorInfo>
+      {/* ===== 차트 영역 (2x2 Grid) ===== */}
       <Styled.Grid>
-        {/* 일일 방문자 수 차트 */}
+        {/* 일일 방문자 수 막대 그래프 */}
+
         <Styled.Card>
-          <Styled.ChartTitle>일일 방문자 수 (최근 7일)</Styled.ChartTitle>
+          <Styled.ChartTitle>📈 일일 방문자 수 (7일)</Styled.ChartTitle>
           <Styled.ChartWrapper>
             <ResponsiveContainer>
               <BarChart data={dailyVisitors}>
@@ -205,23 +154,61 @@ const Chart: React.FC = () => {
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="visitors" fill="#00eaff" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="visitors" fill="#00eaff" />
               </BarChart>
             </ResponsiveContainer>
           </Styled.ChartWrapper>
         </Styled.Card>
 
-        {/* 신규 가입자 수 차트 */}
+        {/* 주간 매출 막대 그래프 */}
         <Styled.Card>
-          <Styled.ChartTitle>신규 가입자 수 (최근 7일)</Styled.ChartTitle>
+          <Styled.ChartTitle>💰 1주일간의 매출</Styled.ChartTitle>
           <Styled.ChartWrapper>
             <ResponsiveContainer>
-              <BarChart data={signupData}>
+              <BarChart data={weekSales}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="signups" fill="#e87dff" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="sales" fill="#4caf50" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Styled.ChartWrapper>
+        </Styled.Card>
+
+        {/* 6개월 매출 추이 선형 그래프 */}
+        <Styled.Card>
+          <Styled.ChartTitle>📆 최근 6개월 매출</Styled.ChartTitle>
+          <Styled.ChartWrapper>
+            <ResponsiveContainer>
+              <LineChart data={monthSales}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="sales"
+                  stroke="#8884d8"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Styled.ChartWrapper>
+        </Styled.Card>
+
+        {/* 신규 가입자 수 막대 그래프 */}
+
+        <Styled.Card>
+          <Styled.ChartTitle>👤 신규 가입자 수 (7일)</Styled.ChartTitle>
+          <Styled.ChartWrapper>
+            <ResponsiveContainer>
+              <BarChart data={newUsers}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#ff9800" />
               </BarChart>
             </ResponsiveContainer>
           </Styled.ChartWrapper>

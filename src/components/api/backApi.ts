@@ -1,5 +1,4 @@
 import { instanceBack, instanceAuth } from "./instance";
-import { Inquiry } from "../../admin/customerSupport/CustomerSupport.types";
 
 // 🔸 장바구니 아이템 타입 정의 (이 파일 또는 공용 types.ts로 분리 가능)
 export interface CartItem {
@@ -29,7 +28,6 @@ export const apiGetGameReviews = async (gameId: string) => {
 export const apiAddGameReviews = async (reviewData: {
   userName: string;
   gameId: number;
-  title: string;
   rating: number;
   content: string;
 }) => {
@@ -38,22 +36,6 @@ export const apiAddGameReviews = async (reviewData: {
     return res.data;
   } catch (error) {
     console.error("리뷰 등록 실패", error);
-    throw error;
-  }
-};
-
-// 리뷰 삭제
-export const apiDeleteGameReviews = async (
-  userName: string,
-  gameId: number
-) => {
-  try {
-    const res = await instanceBack.delete("/member/review", {
-      params: { userName, gameId },
-    });
-    return res.data;
-  } catch (error) {
-    console.error("리뷰 삭제 실패", error);
     throw error;
   }
 };
@@ -83,14 +65,7 @@ export const apiAddGameCart = async (cartData: {
   backgroundImage: string;
   price: number;
   salePrice: number;
-  released: string;
-  esrbRating: string;
-  actionType?: number; // 0: 삭제, 1: 구매
-  purchase?: boolean;
 }) => {
-  const { actionType = 0 } = cartData; // 기본값 0 설정
-  const { purchase = false } = cartData;
-
   try {
     const res = await instanceBack.post("/member/cart/save", cartData);
     return res.data;
@@ -296,7 +271,6 @@ export const apiGetWishlist = async (username: string): Promise<CartItem[]> => {
     throw error;
   }
 };
-
 /**
  * 고객 문의 등록 API 호출
  * @param inquiryData userId, category, content 포함
@@ -308,88 +282,31 @@ export const apiSubmitInquiry = async (inquiryData: {
   content: string;
 }) => {
   try {
-    const res = await instanceBack.post("/member/inquiry/submit", inquiryData);
-    return res.data;
+    const response = await instanceBack.post(
+      "/member/inquiry/submit",
+      inquiryData
+    );
+    return response.data;
   } catch (error) {
     console.error("문의 등록 실패:", error);
     throw error;
   }
 };
-/**
- * 고객 문의 전체 목록 조회 (관리자용)
- */
-export const apiGetAllInquiries = async (): Promise<Inquiry[]> => {
+
+// 내 정보 수정 (이메일, 사진 등)
+export const apiUpdateProfile = async (data: {
+  email: string;
+  profileImg: string;
+}) => {
   try {
-    const res = await instanceBack.get("/admin/inquiry");
-
-    if (!Array.isArray(res.data)) {
-      console.error("응답 데이터가 배열이 아닙니다.");
-      return [];
-    }
-
-    return res.data.map((item: any) => ({
-      id: item.inquiryId,
-      userId: item.userId ?? null,
-      username: item.username ?? "-",
-      category: item.category,
-      content: item.content,
-      status: item.status,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    }));
-  } catch (error) {
-    console.error(" 문의 목록 조회 실패:", error);
-    return [];
-  }
-};
-
-// 문의 상태 변경 API
-export const apiUpdateInquiryStatus = async (
-  inquiryId: number,
-  status: string
-): Promise<string> => {
-  try {
-    const response = await instanceBack.put(
-      `/admin/inquiry/${inquiryId}/status`,
-      {
-        status,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("문의 상태 변경 실패:", error);
-    throw error;
-  }
-};
-
-/**
- * 방문자 기록 API
- * - 로그인한 사용자가 메인 페이지에 진입할 때 호출
- * - VISITOR_LOG 테이블에 하루 한 번 기록(MERGE 쿼리)
- */
-export const apiLogVisitor = async (): Promise<string> => {
-  try {
-    // instanceBack은 토큰이 자동 헤더 삽입되므로 그대로 사용
-    const res = await instanceBack.post("/member/log/visit");
-    return res.data; // "방문 기록 완료"
-  } catch (error) {
-    console.error("방문 기록 실패", error);
-    throw error;
-  }
-};
-
-// 최근 7일 방문자 수 + 누적 방문자 수 API 호출
-export const apiGetWeeklyVisitors = async (): Promise<
-  { label: string; value: number }[]
-> => {
-  try {
-    const res = await instanceBack.get("/admin/chart/visitors");
+    const res = await instanceAuth.put("/member/profile", data);
     return res.data;
   } catch (error) {
-    console.error("방문자 통계 조회 실패:", error);
+    console.error("프로필 수정 실패:", error);
     throw error;
   }
 };
+
 
 // 이메일 인증코드 전송
 export const apiSendWalletAuthCode = async (userId: number) => {

@@ -199,7 +199,7 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
               할인가: {item.salePrice.toLocaleString()}원
             </div>
             <div>
-              {isActive ? (
+              {showGroupPurchaseButton ? (
                 <button
                   className="flex items-center"
                   type="button"
