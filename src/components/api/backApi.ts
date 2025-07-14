@@ -417,7 +417,6 @@ export const apiGetWeeklySignups = async (): Promise<
   { label: string; value: number }[]
 > => {
   try {
-    // 백엔드 ChartController → /game/admin/chart/signups
     const res = await instanceBack.get("/admin/chart/signups");
     return res.data; // [{ label: '2025-07-05', value: 12 }, …]
   } catch (error) {
@@ -425,6 +424,31 @@ export const apiGetWeeklySignups = async (): Promise<
     throw error;
   }
 };
+
+// 오늘 매출 총합 조회 (단일 숫자)
+export const apiGetTodayRevenue = async (): Promise<number> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/revenue/today");
+    return res.data.todayRevenue;
+  } catch (error) {
+    console.error("오늘 매출 조회 실패:", error);
+    throw error;
+  }
+};
+
+// 최근 7일 일별 매출 조회 (배열 반환)
+export const apiGetWeeklyRevenue = async (): Promise<
+  { label: string; value: number }[]
+> => {
+  try {
+    const res = await instanceBack.get("/admin/chart/revenue/weekly");
+    return res.data;
+  } catch (error) {
+    console.error("최근 7일 매출 통계 조회 실패:", error);
+    throw error;
+  }
+};
+
 // 지갑충전 기능
 export const apiChargeWallet = async (
   userId: number,
