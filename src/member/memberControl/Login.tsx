@@ -64,12 +64,6 @@ export default function LoginPage() {
     loginId: "",
     loginPassword: "",
   });
-  // 에러 5초후 삭제
-  const [timedErrors, setTimedErrors] = useState<{
-    loginId?: string;
-    loginPassword?: string;
-    username?: string;
-  }>({});
 
   // 회원가입 폼 상태
   const [registerForm, setRegisterForm] = useState({
@@ -160,21 +154,6 @@ export default function LoginPage() {
     }
     setDeviceInfo((prev) => ({ ...prev, deviceType: device }));
   }, []);
-  // 에러 시간 초 후 삭제
-  useEffect(() => {
-    if (errors.loginId || errors.loginPassword) {
-      setTimedErrors({
-        loginId: errors.loginId?.message,
-        loginPassword: errors.loginPassword?.message,
-      });
-
-      const timer = setTimeout(() => {
-        setTimedErrors({});
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [errors]);
 
   // 로그인/회원가입 전환
   const toggleMode = () => setIsSignIn(!isSignIn);
@@ -363,10 +342,8 @@ export default function LoginPage() {
                 />
                 <label htmlFor="registerId">아이디</label>
                 <IoIdCardOutline />
-                {(registerErrors.username || timedErrors.username) && (
-                  <ErrorMessage>
-                    {registerErrors.username?.message || timedErrors.username}
-                  </ErrorMessage>
+                {registerErrors.username && (
+                  <ErrorMessage>{registerErrors.username.message}</ErrorMessage>
                 )}
                 <CheckButton type="button" onClick={checkUsername}>
                   중복확인
@@ -491,8 +468,8 @@ export default function LoginPage() {
               />
               <label htmlFor="loginId">아이디</label>
               <IoIdCardOutline />
-              {timedErrors.loginId && (
-                <ErrorMessage>{timedErrors.loginId}</ErrorMessage>
+              {errors.loginId && (
+                <ErrorMessage>{errors.loginId.message}</ErrorMessage>
               )}
             </InputBox>
             <InputBox>
@@ -504,8 +481,8 @@ export default function LoginPage() {
               />
               <label htmlFor="loginPassword">비밀번호</label>
               <IoLockClosedOutline />
-              {timedErrors.loginPassword && (
-                <ErrorMessage>{timedErrors.loginPassword}</ErrorMessage>
+              {errors.loginPassword && (
+                <ErrorMessage>{errors.loginPassword.message}</ErrorMessage>
               )}
             </InputBox>
 
