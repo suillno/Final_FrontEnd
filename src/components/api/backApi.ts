@@ -83,9 +83,13 @@ export const apiAddGameCart = async (cartData: {
   backgroundImage: string;
   price: number;
   salePrice: number;
+  released: string;
+  esrbRating: string;
   actionType?: number; // 0: 삭제, 1: 구매
+  purchase?: boolean;
 }) => {
   const { actionType = 0 } = cartData; // 기본값 0 설정
+  const { purchase = false } = cartData;
 
   try {
     const res = await instanceBack.post("/member/cart/save", cartData);

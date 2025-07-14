@@ -56,6 +56,9 @@ const CartPage: React.FC = () => {
   const username = userInfo?.username;
   const userId = userInfo?.id;
 
+  // 구매버틍시 알림표시
+  const [showPurchaseConfirm, setShowPurchaseConfirm] = useState(false);
+
   const fetchCartItems = async () => {
     if (!username) {
       setError("로그인이 필요합니다.");
@@ -95,6 +98,8 @@ const CartPage: React.FC = () => {
         backgroundImage: targetItem.backgroundImage,
         price: targetItem.price,
         salePrice: targetItem.salePrice,
+        released: targetItem.released,
+        esrbRating: targetItem.esrbRating,
       });
 
       if (result.includes("취소")) {
@@ -139,18 +144,23 @@ const CartPage: React.FC = () => {
   );
 
   // 결제버튼 동작
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (selectedItems.length === 0) {
       toast.warn("결제할 항목을 선택해주세요.");
       return;
     }
+    setShowPurchaseConfirm(true); // ✅ 모달 열기
+  };
+
+  // ✅ [🔽 여기에 추가하세요] 모달에서 '확인' 버튼 누를 때 실행될 함수
+  const confirmPurchase = async () => {
+    setShowPurchaseConfirm(false); // 모달 닫기
 
     const totalAmount = selectedItems.reduce((sum, item) => {
       return sum + (item.salePrice >= 1 ? item.salePrice : item.price);
     }, 0);
 
     try {
-      // 1. 지갑 차감 처리
       const result = await apiChargeWallet(
         userId,
         totalAmount,
@@ -158,7 +168,6 @@ const CartPage: React.FC = () => {
         1
       );
 
-      // 응답 SUCCESS 기준 분리후 사용
       if (result.startsWith("SUCCESS")) {
         const successMessage = result.replace("SUCCESS: ", "").trim();
 
@@ -170,11 +179,14 @@ const CartPage: React.FC = () => {
             backgroundImage: item.backgroundImage,
             price: item.price,
             salePrice: item.salePrice,
+            released: item.released,
+            esrbRating: item.esrbRating,
             actionType: 1,
+            purchase: true,
           });
         }
 
-        alert(successMessage);
+        toast.success(successMessage);
         await fetchCartItems();
       } else {
         const errorMessage = result.replace("ERROR: ", "").trim();
@@ -215,7 +227,6 @@ const CartPage: React.FC = () => {
     <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <SectionBox>
         <Title>장바구니</Title>
-
         <List>
           {cart.map((item) => (
             <ItemCard key={item.gameId}>
@@ -274,6 +285,7 @@ const CartPage: React.FC = () => {
         </CheckoutButton>
       </SectionBox>
 
+      {/* 장바구니 삭제 알림 */}
       {showConfirm && targetItem && (
         <ModalOverlay>
           <ModalBox>
@@ -285,6 +297,36 @@ const CartPage: React.FC = () => {
                 취소
               </ModalButton>
               <ModalButton $variant="confirm" onClick={confirmDelete}>
+                확인
+              </ModalButton>
+            </ModalButtonGroup>
+          </ModalBox>
+        </ModalOverlay>
+      )}
+
+      {/* 구매버튼 클릭시 알림 */}
+      {showPurchaseConfirm && (
+        <ModalOverlay>
+          <ModalBox>
+            <ModalText>
+              {selectedItems.length}개의 게임을 총 ₩{" "}
+              {selectedItems
+                .reduce(
+                  (sum, item) =>
+                    sum + (item.salePrice >= 1 ? item.salePrice : item.price),
+                  0
+                )
+                .toLocaleString()}
+              에 결제하시겠습니까?
+            </ModalText>
+            <ModalButtonGroup>
+              <ModalButton
+                $variant="cancel"
+                onClick={() => setShowPurchaseConfirm(false)}
+              >
+                취소
+              </ModalButton>
+              <ModalButton $variant="confirm" onClick={confirmPurchase}>
                 확인
               </ModalButton>
             </ModalButtonGroup>
