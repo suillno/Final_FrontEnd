@@ -426,7 +426,7 @@ export const apiGetWeeklySignups = async (): Promise<
     throw error;
   }
 };
-// 오늘 매출 총합 조회 (단일 숫자) 
+// 오늘 매출 총합 조회 (단일 숫자)
 export const apiGetTodayRevenue = async (): Promise<number> => {
   try {
     const res = await instanceBack.get("/admin/chart/revenue/today");
@@ -467,5 +467,19 @@ export const apiChargeWallet = async (
 // 지갑 로그 기능
 export const apiWalletLog = async (userId: number) => {
   const res = await instanceBack.get(`wallet/logs/${userId}`);
+  return res.data;
+};
+
+// 회원탈퇴 기능 추가
+export const apiLeave = async (
+  userPw: string,
+  username: string,
+  email: string
+) => {
+  const res = await instanceBack.post("/leave", {
+    password: userPw,
+    username,
+    email,
+  });
   return res.data;
 };
