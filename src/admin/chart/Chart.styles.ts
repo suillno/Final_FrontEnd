@@ -84,7 +84,7 @@ export const RevenueInfo = styled.div`
   z-index: 2;
 `;
 
-/* 2열 레이아웃 차트 그리드 */
+/* 2열 레이아웃 차트 그리드 111*/
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));

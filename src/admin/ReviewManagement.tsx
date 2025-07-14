@@ -135,11 +135,10 @@ const ReviewManagement: React.FC = () => {
                 <td>{review.reviewId}</td>
                 <td>{review.userName}</td>
                 <td>{review.gameTitle}</td>
-                <td>
-                  {/* 30자 넘으면 줄이고 + 버튼 */}
+                <Styled.ContentCell>
                   {review.content.length > 30 ? (
                     <>
-                      {review.content.slice(0, 30)}...
+                      {review.content}
                       <Styled.MoreButton
                         onClick={() => setSelectedReview(review)}
                       >
@@ -149,7 +148,8 @@ const ReviewManagement: React.FC = () => {
                   ) : (
                     review.content
                   )}
-                </td>
+                </Styled.ContentCell>
+
                 <td>
                   <Styled.DeleteButton
                     onClick={() => handleDelete(review.reviewId)}

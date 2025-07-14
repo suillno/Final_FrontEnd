@@ -26,7 +26,7 @@ import {
   RevenueData,
 } from "./chart/Chart.types";
 
-// API 함수들
+// API 함수들 11
 import {
   apiGetWeeklyVisitors,
   apiGetWeeklySignups,
