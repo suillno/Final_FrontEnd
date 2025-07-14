@@ -418,6 +418,7 @@ export const apiGetWeeklySignups = async (): Promise<
   { label: string; value: number }[]
 > => {
   try {
+    // 백엔드 ChartController → /game/admin/chart/signups
     const res = await instanceBack.get("/admin/chart/signups");
     return res.data; // [{ label: '2025-07-05', value: 12 }, …]
   } catch (error) {
@@ -425,8 +426,7 @@ export const apiGetWeeklySignups = async (): Promise<
     throw error;
   }
 };
-
-// 오늘 매출 총합 조회 (단일 숫자) 1
+// 오늘 매출 총합 조회 (단일 숫자) 
 export const apiGetTodayRevenue = async (): Promise<number> => {
   try {
     const res = await instanceBack.get("/admin/chart/revenue/today");
