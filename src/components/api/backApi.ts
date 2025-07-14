@@ -441,7 +441,7 @@ export const apiWalletLog = async (userId: number) => {
   return res.data;
 };
 
-// 회원탈퇴 기능
+// 회원탈퇴 기능 추가
 export const apiLeave = async (
   userPw: string,
   username: string,

@@ -44,7 +44,7 @@ function Router() {
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
 
-        {/* 사용자 정보 조회 */}
+        {/* 사용자 정보 조회1 */}
         <Route
           path="member"
           element={<Auth allowedRoles={[ROLES.ROLE_USER]} />}

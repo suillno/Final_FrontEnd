@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 import { apiLeave } from "../../components/api/backApi";
 import { removeUserInfo } from "../../components/auth/store/userInfo"; // ← 이거 정확한 위치 맞는지 확인
+import customSwal from "../../style/customSwal.styles";
 
 // 🔷 사이드바 상태 context 타입
 interface LayoutContext {
@@ -126,9 +127,20 @@ const Leave: React.FC = () => {
         userInfo.username,
         userInfo.email
       );
-      window.alert(result.message); // 서버 메시지 출력 (예: "회원탈퇴가 완료되었습니다.")
-      // 로그아웃처리
-      logout();
+      //   window.alert(result.message); // 서버 메시지 출력 (예: "회원탈퇴가 완료되었습니다.")
+
+      customSwal
+        .fire({
+          text: String(result.message),
+          icon: undefined,
+          confirmButtonText: "확인",
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            // 로그아웃처리
+            logout();
+          }
+        });
     } catch (error: any) {
       const msg =
         error.response?.data?.message || "알 수 없는 오류가 발생했습니다.";
