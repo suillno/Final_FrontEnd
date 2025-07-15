@@ -18,6 +18,9 @@ import {
   ImageSelectGrid,
   Checkbox,
 } from "../member.style/Profile.style";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../../components/auth/store/userInfo";
+import { apiChangePassword } from "../../components/api/backApi";
 
 // 🔷 사용자 정보 타입
 interface UserProfile {
@@ -68,6 +71,7 @@ const Profile: React.FC = () => {
 
     fetchUser();
   }, []);
+  const userInfo = useSelector(selectUserInfo);
 
   // 🔹 이메일 변경 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +113,7 @@ const Profile: React.FC = () => {
   };
 
   // 🔹 비밀번호 변경 처리
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert("모든 입력란을 채워주세요.");
       return;
@@ -122,10 +126,22 @@ const Profile: React.FC = () => {
       alert("비밀번호는 최소 6자 이상이어야 합니다.");
       return;
     }
-    alert("비밀번호가 변경되었습니다.");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+
+    try {
+      const result = await apiChangePassword({
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+
+      alert(result.message || "비밀번호가 변경되었습니다.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTab("profile");
+    } catch (error: any) {
+      alert(error.response?.data || "비밀번호 변경에 실패했습니다.");
+    }
   };
 
   return (

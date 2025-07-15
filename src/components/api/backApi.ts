@@ -526,3 +526,25 @@ export const apiUserDashboard = async (userName: string) => {
     return false;
   }
 };
+
+export const apiChangePassword = async ({
+  currentPassword,
+  newPassword,
+  confirmPassword,
+}: {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}) => {
+  console.log({
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  });
+  const res = await instanceAuth.post("/auth/changePassword", {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  });
+  return res.data;
+};
