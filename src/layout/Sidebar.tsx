@@ -105,16 +105,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         </MenuItem>
       </Section>
 
-      {/* 고객문의 - 로그인 사용자만 표시 */}
-      {isLoggedIn && (
-        <Section>
-          <SectionTitle>Service</SectionTitle>
-          <MenuItem>
-            <Link to="/member/memberService">PickGameSupport</Link>
-          </MenuItem>
-        </Section>
-      )}
-
       {/* 관리자 메뉴 - ROLE_ADMIN 또는 ROLE_SYSTEM 유저만 노출 */}
       {isAdmin && (
         <Section>

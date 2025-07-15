@@ -98,6 +98,11 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
             <Link to="/member/wallet">Wallet</Link>
             <Link to="/member/cartpage">CartPage</Link>
             <Link to="/member/wishlist">WishList</Link>
+            {/* ROLE_USER 권한이 있는 경우만 표시 */}
+            {Array.isArray(userInfo?.roles) &&
+              (userInfo.roles as { role: string }[]).some((r) =>
+                r.role.includes("USER")
+              ) && <Link to="/member/memberService">Q&N</Link>}
             <Link to="/member/Leave">Leave</Link>
           </Dropdown>
         )}
