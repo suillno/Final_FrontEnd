@@ -42,12 +42,22 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
 const LibraryBox = styled.div`
   width: 100%;
   max-width: 800px;
+  min-width: 200px;
   background-color: #1f1f1f;
   border-radius: 12px;
   padding: 40px;
   color: #fff;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   margin-top: 150px;
+
+  @media (max-width: 768px) {
+    padding: 30px;
+    margin-top: 90px;
+  }
+  @media (max-width: 460px) {
+    padding: 20px;
+    margin-top: 50px;
+  }
 `;
 
 // 페이지 타이틀
@@ -55,6 +65,12 @@ const Title = styled.h2`
   font-size: 28px;
   margin-bottom: 30px;
   font-weight: bold;
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+  @media (max-width: 460px) {
+    font-size: 1.2rem;
+  }
 `;
 
 // 게임 카드 목록을 세로로 정렬
@@ -87,6 +103,15 @@ const Image = styled.img`
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  @media (max-width: 768px) {
+    width: 110px;
+    height: 70px;
+  }
+  @media (max-width: 460px) {
+    width: 90px;
+    height: 60px;
+  }
 `;
 
 // 카드 오른쪽 텍스트 영역
@@ -98,6 +123,13 @@ const Info = styled.div`
 const GameTitle = styled.h3`
   font-size: 20px;
   margin: 0 0 10px 0;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+  @media (max-width: 460px) {
+    font-size: 0.8rem;
+  }
 `;
 
 // 구매일 표시
@@ -105,22 +137,12 @@ const Date = styled.p`
   font-size: 13px;
   color: #bbb;
   margin-bottom: 12px;
-`;
 
-// 설치 버튼
-const Button = styled.button`
-  padding: 10px 16px;
-  background: linear-gradient(135deg, #00bfff, #009acd);
-  border: none;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #0080b0;
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
+  @media (max-width: 460px) {
+    font-size: 0.6rem;
   }
 `;
 
@@ -139,6 +161,15 @@ const MoreButton = styled.button`
 
   &:hover {
     background-color: #5a5a5a;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    padding: 10px 20px;
+  }
+  @media (max-width: 460px) {
+    font-size: 0.6rem;
+    padding: 8px 18px;
   }
 `;
 
@@ -179,7 +210,6 @@ const Library: React.FC = () => {
                   <Info>
                     <GameTitle>{game.title}</GameTitle>
                     <Date>구매일: {game.purchasedAt}</Date>
-                    <Button>설치 / 실행</Button>
                   </Info>
                 </Card>
               ))}
