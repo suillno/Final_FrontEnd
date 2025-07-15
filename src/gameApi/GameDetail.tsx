@@ -205,8 +205,10 @@ const GameDetail = () => {
                 cartActive={cartActive}
                 likeActive={likeActive}
                 discountActive={discountActive}
-                discountPrice={location.state?.priceDiscountInfo ?? 0}
-                price={location.state?.priceInfo ?? 0}
+                discountPrice={
+                  location.state?.priceDiscountInfo.toLocaleString() ?? 0
+                }
+                price={location.state?.priceInfo.toLocaleString() ?? 0}
                 discountPercent={location.state?.discountPercent ?? 0}
                 showCartButton={location.state?.showCartButton ?? true}
               />
