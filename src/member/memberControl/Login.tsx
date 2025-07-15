@@ -259,7 +259,6 @@ export default function LoginPage() {
 
   // 로그인 처리
   const onSubmitLogin = async (data: LoginFormType) => {
-    console.log("로그인 제출 데이터:", data);
     try {
       const loginData = {
         username: data.loginId,
@@ -279,7 +278,6 @@ export default function LoginPage() {
       // 방문자 기록 호출
       await apiLogVisitor();
       navigate("/");
-      console.log("로그인 요청 바디:", loginData);
     } catch (err) {
       alert("로그인 실패. 아이디 또는 비밀번호를 확인하세요.");
     }

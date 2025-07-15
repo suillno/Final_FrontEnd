@@ -17,7 +17,6 @@ import {
   CartItem,
 } from "../../components/api/backApi";
 import { useSelector } from "react-redux";
-import { userInfo } from "os";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 
 // 🔷 Layout Context 타입
@@ -40,7 +39,7 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   padding: 5rem 2.5rem 2.5rem;
   min-height: 100vh;
   background-color: #111218;
-  margin-left: ${(props) => (props.$isSidebarOpen ? "300px" : "0")};
+  margin-left: ${(props) => (props.$isSidebarOpen ? "240px" : "0")};
   transition: margin-left 0.3s ease;
 `;
 
@@ -128,6 +127,7 @@ const OriginalPrice = styled.div<{ $strike?: boolean }>`
   font-size: 0.9rem;
   color: #aaa;
   ${(props) => props.$strike && "text-decoration: line-through;"}
+  margin-bottom: 5%;
 `;
 
 const DiscountPrice = styled.div`
@@ -173,6 +173,7 @@ const WishlistPage: React.FC = () => {
   const [sortType, setSortType] = useState<SortType>("default");
   // 유저정보
   const userInfo = useSelector(selectUserInfo);
+  const username = userInfo.username;
 
   // 💾 위시리스트 + 할인 정보 불러오기
   useEffect(() => {
@@ -205,8 +206,6 @@ const WishlistPage: React.FC = () => {
   };
 
   const handleRemove = async (item: CartItem) => {
-    const username = JSON.parse(localStorage.getItem("currentUser")!).username;
-
     try {
       const result = await apiAddGameLike({ ...item, userName: username });
       if (result.startsWith("SUCCESS")) {
@@ -220,7 +219,7 @@ const WishlistPage: React.FC = () => {
     }
   };
 
-  const goToGroupBuy = () => navigate("/member/groupbuy");
+  const goToGroupBuy = () => navigate("/");
 
   const getDiscountRate = (original: number, sale: number) =>
     Math.floor(((original - sale) / original) * 100);
@@ -289,14 +288,17 @@ const WishlistPage: React.FC = () => {
 
                     <PriceWrap>
                       <OriginalPrice $strike={isDiscounted}>
-                        ₩ {item.price.toLocaleString()}
+                        정상가 : ₩ {item.price.toLocaleString()}
                       </OriginalPrice>
                       {isDiscounted && (
                         <DiscountPrice>
-                          ₩ {item.discountSalePrice!.toLocaleString()}{" "}
-                          <FaTags /> -
-                          {getDiscountRate(item.price, item.discountSalePrice!)}
-                          %
+                          <div>
+                            ₩ {item.discountSalePrice!.toLocaleString()}
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <FaTags className="mr-1" />
+                            -60%
+                          </div>
                         </DiscountPrice>
                       )}
                     </PriceWrap>

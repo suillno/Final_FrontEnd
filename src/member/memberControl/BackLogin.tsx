@@ -233,12 +233,10 @@ export default function Login() {
 
   const onSubmitLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("로그인 폼 제출:", loginForm);
   };
 
   const onSubmitSignup = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("회원가입 폼 제출:", signupForm);
   };
 
   return (

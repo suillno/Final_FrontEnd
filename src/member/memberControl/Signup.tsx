@@ -158,8 +158,6 @@ export default function Signup() {
       alert("비밀번호가 일치하지 않습니다!");
       return;
     }
-
-    console.log("회원가입 정보:", form);
   };
 
   return (
