@@ -103,6 +103,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
               (userInfo.roles as { role: string }[]).some((r) =>
                 r.role.includes("USER")
               ) && <Link to="/member/memberService">Q&N</Link>}
+            <Link to="/member/Leave">Leave</Link>
           </Dropdown>
         )}
       </HeaderRight>

@@ -63,6 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const isAdmin = roles.some(
     (r: any) => r.role === "ROLE_ADMIN" || r.role === "ROLE_SYSTEM"
   );
+  const isLoggedIn = !!userInfo && !!userInfo.username; // 로그인 여부
 
   return (
     <SidebarContainer $isOpen={isOpen}>

@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-  apiChargeWallet,
-  apiSendWalletAuthCode,
-  apiVerifyAuthCode,
-  apiWalletLog,
-} from "../../components/api/backApi";
+import { apiChargeWallet, apiWalletLog } from "../../components/api/backApi";
 import { selectUserInfo } from "../../components/auth/store/userInfo";
 import customSwal from "../../style/customSwal.styles";
+import ExcelButton, {
+  ExcelDownload,
+} from "../../components/utils/ExcelDownload";
 
 // 💳 거래 타입 정의
 interface Transaction {
@@ -176,6 +174,14 @@ const ListItem = styled.li<{ type: any }>`
   }
 `;
 
+// 내역다운로드 버튼
+const DownloadButton = styled.button`
+  color: darkgray;
+  &:hover {
+    color: #ccc;
+  }
+`;
+
 const Wallet: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
   const userInfo = useSelector(selectUserInfo); // userId 호출
@@ -302,7 +308,11 @@ const Wallet: React.FC = () => {
         </PresetButtons>
 
         <History>
-          <h3>거래 내역 (최근 10건만 조회)</h3>
+          <div className="flex justify-between">
+            <h3>거래 내역 (최근 10건만 조회)</h3>
+            <DownloadButton>{ExcelButton(userId)}</DownloadButton>
+          </div>
+
           {history.length === 0 ? (
             <p style={{ color: "#ccc" }}>거래 내역이 없습니다.</p>
           ) : (

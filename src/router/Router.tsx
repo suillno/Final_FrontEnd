@@ -28,7 +28,7 @@ import GameNsList from "../gameApi/GameNsList";
 import GamePcList from "../gameApi/GamePcList";
 import GamePsList from "../gameApi/GamePsList";
 import GameXboxList from "../gameApi/GameXboxList";
-import ExcelTmp from "../components/utils/ExcelTmp";
+import Leave from "../member/memberDetail/Leave";
 // DB에있는 권한 확인
 const ROLES = {
   ROLE_SYSTEM: 1,
@@ -54,6 +54,7 @@ function Router() {
           <Route path="wallet" element={<Wallet />} />
           <Route path="CartPage" element={<CartPage />} />
           <Route path="WishList" element={<WishList />} />
+          <Route path="Leave" element={<Leave />} />
         </Route>
 
         {/* 게임기능 */}
@@ -84,7 +85,6 @@ function Router() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route path="find" element={<Find />} />
-        <Route path="excel" element={<ExcelTmp />} />
       </Route>
       {/* 경로 없을때 */}
       <Route path="*" element={<NotFound />} />
