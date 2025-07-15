@@ -536,11 +536,6 @@ export const apiChangePassword = async ({
   newPassword: string;
   confirmPassword: string;
 }) => {
-  console.log({
-    currentPassword,
-    newPassword,
-    confirmPassword,
-  });
   const res = await instanceAuth.post("/auth/changePassword", {
     currentPassword,
     newPassword,
