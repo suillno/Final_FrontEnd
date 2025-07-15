@@ -40,7 +40,12 @@ const PageWrapper = styled.div<{ $isSidebarOpen: boolean }>`
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
-    margin-left: 0; // 모바일에서는 사이드바 무시
+    margin-left: 0;
+    padding: 1.5em;
+  }
+
+  @media (max-width: 460px) {
+    padding: 1em;
   }
 `;
 
@@ -53,6 +58,13 @@ const DashboardBox = styled.div`
   padding: 40px;
   color: #fff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); // 그림자 효과
+  @media (max-width: 768px) {
+    padding: 30px 24px;
+  }
+
+  @media (max-width: 460px) {
+    padding: 20px 16px;
+  }
 `;
 
 // 🔷 상단 타이틀 스타일 - 그라데이션 텍스트
@@ -68,6 +80,12 @@ const Title = styled.h2`
   ); // 텍스트에 그라데이션 효과
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  @media (max-width: 768px) {
+    font-size: 30px;
+  }
+  @media (max-width: 460px) {
+    font-size: 20px;
+  }
 `;
 
 // 🔷 개별 정보 섹션 스타일 (게임 수 / 지갑 잔액 / 최근 구매 게임)
@@ -89,6 +107,13 @@ const Section = styled.div`
     margin: 0 0 10px 0;
     font-size: 18px;
     color: #00e5ff;
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
+
+    @media (max-width: 460px) {
+      font-size: 14px;
+    }
   }
 
   // 일반 텍스트와 리스트 항목 공통 스타일
@@ -98,6 +123,18 @@ const Section = styled.div`
     color: #ddd;
     display: flex; // 게임명 + 날짜 수평 정렬
     justify-content: space-between; // 좌우 양쪽 정렬
+    word-break: break-word;
+    flex-wrap: wrap;
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
+
+    @media (max-width: 460px) {
+      font-size: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
   }
 
   // 리스트 스타일 초기화
