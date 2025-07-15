@@ -362,6 +362,17 @@ export const apiUpdateInquiryStatus = async (
   }
 };
 
+// 문의 삭제 API (ID 기반)
+export const apiDeleteInquiryById = async (inquiryId: number) => {
+  try {
+    const res = await instanceBack.delete(`/member/inquiry/${inquiryId}`);
+    return res.data;
+  } catch (error) {
+    console.error("문의 삭제 실패:", error);
+    throw error;
+  }
+};
+
 /**
  * 방문자 기록 API
  * - 로그인한 사용자가 메인 페이지에 진입할 때 호출
