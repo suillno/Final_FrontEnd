@@ -6,6 +6,7 @@ import { selectUserInfo } from "../../components/auth/store/userInfo";
 import { apiLeave } from "../../components/api/backApi";
 import { removeUserInfo } from "../../components/auth/store/userInfo"; // ← 이거 정확한 위치 맞는지 확인
 import customSwal from "../../style/customSwal.styles";
+import { removeCurrentUser } from "../../components/auth/helper/storage";
 
 // 🔷 사이드바 상태 context 타입
 interface LayoutContext {
@@ -104,7 +105,7 @@ const Leave: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const logout = () => {
-    localStorage.removeItem("currentUser"); // ✅ localStorage에서 사용자 정보 제거
+    removeCurrentUser(); // localStorage 초기화
     dispatch(removeUserInfo()); // ✅ Redux 스토어 초기화
     navigate("/member/login", { replace: true }); // ✅ 로그인 페이지로 이동 (경로는 실제 경로에 맞게 수정)
   };
