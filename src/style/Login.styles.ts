@@ -99,7 +99,7 @@ export const SignPanel = styled.div<{ $active: boolean }>`
     pointer-events: ${(props) => (props.$active ? "auto" : "none")};
     width: 100%;
     height: 100%;
-    padding: 2rem;
+    padding: 1rem;
     box-sizing: border-box;
   }
 `;
@@ -118,6 +118,11 @@ export const FormBox = styled.div<{ $isLogin?: boolean }>`
   visibility: hidden;
   transition: all 1s;
   transition-delay: 1000ms;
+
+  @media (max-width: 768px) {
+    max-width: 365px;
+    font-size: 0.8rem;
+  }
 
   ${(props) =>
     props.$isLogin &&
@@ -154,6 +159,17 @@ export const Div = styled.div`
   &.active {
     opacity: 1;
     visibility: visible;
+
+    @media (max-width: 768px) {
+      padding: 2px;
+      max-height: 550px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    max-width: 375px;
+    font-size: 0.8rem;
+    padding: 20px;
   }
 `;
 
