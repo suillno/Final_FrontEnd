@@ -53,6 +53,7 @@ instanceBack.interceptors.response.use(
   async (error) => {
     const originalRequest: any = error.config;
 
+    console.log("retry");
     // 기본 재시도 횟수 초기화
     if (!originalRequest._retryCount) {
       originalRequest._retryCount = 0;
@@ -147,7 +148,7 @@ declare module "axios" {
 // 회원동작처리 저장
 export const instanceAuth = axios.create({
   baseURL: process.env.REACT_APP_API_HOST,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 instanceAuth.interceptors.request.use(
@@ -166,6 +167,112 @@ instanceAuth.interceptors.request.use(
   },
   (error) => {
     console.error("[백엔드 요청 오류]", error);
+    return Promise.reject(error);
+  }
+);
+
+// 응답 인터셉터
+instanceAuth.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    console.log(error.response);
+    const originalRequest = error.config;
+    if (
+      error.response &&
+      // eslint-disable-next-line no-underscore-dangle
+      !originalRequest._retry &&
+      (error.response.status === 406 || error.response.status === 401)
+    ) {
+      console.log(401);
+      // eslint-disable-next-line no-underscore-dangle
+      originalRequest._retry = true;
+      // const dispatch = useDispatch()
+      const userTokenInfo = getCurrentUser();
+      console.log(userTokenInfo);
+      const responseData = await axios
+        .post(`${process.env.REACT_APP_API_HOST}/auth/refresh`, {
+          refreshToken: `${userTokenInfo.refreshToken}`,
+        })
+        .then((res) => {
+          console.log(res.data);
+          return res.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            title: "Error!",
+            text: "토큰에 문제가 발생했습니다. 오류가 지속될 경우 관리자에게 문의하세요.",
+            icon: "error",
+            confirmButtonText: "확인",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              removeCurrentUser();
+              window.location.href = "/";
+            }
+          });
+        });
+      if (responseData) {
+        console.log(responseData);
+        const meResult = await axios
+          .get(`${process.env.REACT_APP_API_HOST}/user/me`, {
+            headers: {
+              Authorization: `${responseData.tokenType}${responseData.accessToken}`,
+            },
+          })
+          .then((res) => {
+            const { data } = res;
+            console.log(data);
+            setCurrentUser(responseData);
+            store.dispatch(setUserInfo(data));
+            instance.defaults.headers.common[
+              "Authorization"
+            ] = `${responseData.tokenType} ${responseData.accessToken}`;
+
+            return true;
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: "Error!",
+              text: error.response.data.data,
+              icon: "error",
+              confirmButtonText: "확인",
+            });
+          });
+        if (meResult) {
+          return instanceAuth(originalRequest);
+        }
+      } else {
+        // 토큰 갱신 실패
+        Swal.fire({
+          title: "Error!",
+          text: "토큰 갱신에 실패했습니다. 문제가 지속될 경우 관리자에게 문의하세요.",
+          icon: "error",
+          confirmButtonText: "확인",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            removeCurrentUser();
+            window.location.href = "/";
+          }
+        });
+      }
+    } else if (error.response.status === 403) {
+      // api exception
+      console.log("403 error", error);
+      Swal.fire({
+        title: "Error!",
+        text: "권한이 없습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    } else {
+      // api exception
+      console.log("instance error", error);
+      Swal.fire({
+        title: "Error!",
+        text: error.response.data.data,
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
     return Promise.reject(error);
   }
 );
