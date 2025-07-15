@@ -32,11 +32,12 @@ import { apiGetGameDetail, apiGetGameImg } from "../components/api/api";
 const GameDetail = () => {
   const userInfo = useSelector(selectUserInfo);
   const { id } = useParams();
+  const location2 = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult);
   const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault);
-  const [priceValue, setPriceValue] = useState(0);
+  const [priceValue, setPriceValue] = useState(location2.state?.priceInfo);
   const [priceText, setPriceText] = useState("로딩 중...");
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");

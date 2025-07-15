@@ -31,7 +31,6 @@ interface Props {
 const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
   // 카트 상태 확인
   const [cartActive, setCartActive] = useState(false);
-
   const userInfo = useSelector(selectUserInfo);
 
   // 카트 상태 조회
@@ -147,8 +146,8 @@ const DiscountPage: React.FC<Props> = ({ item, onUpdated }) => {
   const onGameClick = (item: any) => {
     navigate(`/game/${item.gameId}`, {
       state: {
-        priceDiscountInfo: item.salePrice.toLocaleString(),
-        priceInfo: item.price.toLocaleString(),
+        priceDiscountInfo: item.salePrice,
+        priceInfo: item.price,
         discountPercent: item.discountPercent?.toFixed(1),
         showCartButton,
       },

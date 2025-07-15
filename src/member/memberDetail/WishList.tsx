@@ -220,6 +220,7 @@ const WishlistPage: React.FC = () => {
   };
 
   const goToGroupBuy = () => navigate("/");
+  const goToGameDetail = (item: number) => navigate(`/game/${item}`);
 
   const getDiscountRate = (original: number, sale: number) =>
     Math.floor(((original - sale) / original) * 100);
@@ -296,8 +297,12 @@ const WishlistPage: React.FC = () => {
                             ₩ {item.discountSalePrice!.toLocaleString()}
                           </div>
                           <div className="flex items-center justify-center">
-                            <FaTags className="mr-1" />
-                            -60%
+                            <FaTags className="mr-1" />-
+                            {getDiscountRate(
+                              item.price,
+                              item.discountSalePrice!
+                            )}
+                            %
                           </div>
                         </DiscountPrice>
                       )}
@@ -306,9 +311,20 @@ const WishlistPage: React.FC = () => {
                     <Spacer />
                     <ButtonGroup>
                       <ActionBtn onClick={() => handleRemove(item)}>
-                        <FaHeart /> 찜 해제
+                        <div className="flex items-center justify-center">
+                          <FaHeart /> <span className="ml-2">찜 해제</span>
+                        </div>
                       </ActionBtn>
-                      <ActionBtn onClick={goToGroupBuy}>🤝 공동 구매</ActionBtn>
+                      {isDiscounted && (
+                        <ActionBtn onClick={goToGroupBuy}>
+                          🤝 공동 구매
+                        </ActionBtn>
+                      )}
+                      {!isDiscounted && (
+                        <ActionBtn onClick={() => goToGameDetail(item.gameId)}>
+                          🤝 게임 정보
+                        </ActionBtn>
+                      )}
                     </ButtonGroup>
                   </GameInfo>
                 </GameCard>
