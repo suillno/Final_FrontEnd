@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
+
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../../components/auth/store/userInfo";
+import { fetchUserLibrary } from "../../components/api/backApi";
 
 // 게임 데이터 타입 정의
 interface Game {
@@ -140,52 +144,24 @@ const MoreButton = styled.button`
 
 const Library: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
-
-  // 더미 게임 데이터 (향후 API로 대체 가능)
-  const [games] = useState<Game[]>([
-    {
-      id: 1,
-      title: "엘든 링",
-      coverImage: "/games/eldenring.jpg",
-      purchasedAt: "2024-11-03",
-    },
-    {
-      id: 2,
-      title: "스타듀 밸리",
-      coverImage: "/games/stardew.jpg",
-      purchasedAt: "2024-09-17",
-    },
-    {
-      id: 3,
-      title: "디아블로 4",
-      coverImage: "/games/diablo4.jpg",
-      purchasedAt: "2024-06-21",
-    },
-    {
-      id: 4,
-      title: "발더스 게이트 3",
-      coverImage: "/games/bg3.jpg",
-      purchasedAt: "2024-04-12",
-    },
-    {
-      id: 5,
-      title: "사이버펑크 2077",
-      coverImage: "/games/cyberpunk.jpg",
-      purchasedAt: "2024-01-18",
-    },
-  ]);
-
+  const userInfo = useSelector(selectUserInfo);
+  const [games, setGames] = useState<Game[]>([]);
   const INITIAL_COUNT = 2;
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+
   const isAllVisible = visibleCount >= games.length;
 
   const handleToggle = () => {
-    if (isAllVisible) {
-      setVisibleCount(INITIAL_COUNT);
-    } else {
-      setVisibleCount(games.length);
-    }
+    setVisibleCount(isAllVisible ? INITIAL_COUNT : games.length);
   };
+  useEffect(() => {
+    const loadGames = async () => {
+      if (!userInfo?.username) return;
+      const data = await fetchUserLibrary(userInfo.username);
+      setGames(data);
+    };
+    loadGames();
+  }, [userInfo]);
 
   return (
     <PageWrapper $isSidebarOpen={isSidebarOpen}>

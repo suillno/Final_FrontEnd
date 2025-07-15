@@ -483,3 +483,24 @@ export const apiLeave = async (
   });
   return res.data;
 };
+
+// 라이브러리 조회
+export const fetchUserLibrary = async (userName: string) => {
+  try {
+    const res = await instanceBack.get(`/member/cart/library/all/${userName}`);
+
+    // 데이터 확인 후 id 필드 없으면 인덱스로 대체
+    const mappedData = res.data.map((item: any, index: number) => ({
+      id: item.id ?? index,
+      title: item.title,
+      purchasedAt: item.createdAt, // 실제 필드명 확인 필요
+      coverImage: item.backgroundImage, // 실제 이미지 경로 맞춰서
+      // ... 필요한 다른 필드들
+    }));
+
+    return mappedData;
+  } catch (error) {
+    console.error("라이브러리 여부 확인 실패", error);
+    return [];
+  }
+};
