@@ -487,7 +487,7 @@ export const apiLeave = async (
 // 라이브러리 조회
 export const fetchUserLibrary = async (userName: string) => {
   try {
-    const res = await instanceBack.get(`/member/cart/library/all/${userName}`);
+    const res = await instanceBack.get(`/member/library/all/${userName}`);
 
     // 데이터 확인 후 id 필드 없으면 인덱스로 대체
     const mappedData = res.data.map((item: any, index: number) => ({
@@ -502,5 +502,16 @@ export const fetchUserLibrary = async (userName: string) => {
   } catch (error) {
     console.error("라이브러리 여부 확인 실패", error);
     return [];
+  }
+};
+
+// 대시보드 조회
+export const apiUserDashboard = async (userName: string) => {
+  try {
+    const res = await instanceBack.get(`/member/dashboard/${userName}`);
+    return res.data;
+  } catch (error) {
+    console.error("장바구니 여부 확인 실패", error);
+    return false;
   }
 };

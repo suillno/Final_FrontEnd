@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "../../components/auth/store/userInfo";
+import { apiUserDashboard } from "../../components/api/backApi";
+import Wallet from "./Wallet";
 
 // 🔷 Layout에서 전달받는 Context 타입 (사이드바 열림 여부)
 interface LayoutContext {
@@ -11,6 +15,13 @@ interface LayoutContext {
 interface GamePurchase {
   name: string;
   date: string;
+}
+// 🔷 대시보드 API 응답 타입
+interface DashBoardItem {
+  title: string;
+  createdAt: string;
+  balance: number;
+  gameCount: number;
 }
 
 // 🔷 전체 페이지를 감싸는 wrapper - 사이드바 상태에 따라 왼쪽 여백 조절
@@ -100,16 +111,26 @@ const Section = styled.div`
 const Dashboard: React.FC = () => {
   // 👉 Layout.tsx에서 전달받은 사이드바 열림 상태
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
+  const userInfo = useSelector(selectUserInfo);
+  const [dashboardData, setDashboardData] = useState<DashBoardItem[]>([]);
+  const balance = dashboardData[0]?.balance ?? 0;
+  const libraryCount = dashboardData[0]?.gameCount ?? 0;
 
-  // ✅ 더미 데이터 (향후 서버에서 받아올 수 있음)
-  const recentGames: GamePurchase[] = [
-    { name: "엘든 링", date: "2025-06-10" },
-    { name: "스타듀 밸리", date: "2025-06-05" },
-    { name: "디아블로 4", date: "2025-06-01" },
-  ];
+  // 최근 구매한 3개만 추출
+  const recentGames: GamePurchase[] = dashboardData.map((item) => ({
+    name: item.title,
+    date: item.createdAt.replace("T", " ").slice(0, 19),
+  }));
 
-  const wallet = 15300; // 지갑 잔액 (₩ 단위)
-  const libraryCount = 12; // 보유 중인 게임 수
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      if (!userInfo?.username) return;
+      const data = await apiUserDashboard(userInfo.username);
+      console.log("대시보드 데이터:", data);
+      setDashboardData(data);
+    };
+    fetchDashboard();
+  }, [userInfo]);
 
   return (
     <PageWrapper $isSidebarOpen={isSidebarOpen}>
@@ -125,7 +146,7 @@ const Dashboard: React.FC = () => {
         {/* 📌 지갑 잔액 표시 */}
         <Section>
           <h3>지갑 잔액</h3>
-          <p>₩ {wallet.toLocaleString()}</p>
+          <p>₩ {balance.toLocaleString()}</p>
         </Section>
 
         {/* 📌 최근 구매한 게임 목록 (게임명 + 날짜) */}
