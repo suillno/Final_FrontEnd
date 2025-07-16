@@ -10,54 +10,79 @@ import styled, { keyframes } from "styled-components";
 
 const USERS_PER_PAGE = 10;
 
-// 카드 등장 애니메이션 효과
+/* 아래에서 위로 부드럽게 올라오는 카드 애니메이션 */
 const fadeSlideIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 `;
 
-// 전체 감싸는 wrapper (스크롤 기준 상위)
-const Wrapper = styled.div`
+/* 전체 페이지 wrapper */
+export const Wrapper = styled.div`
   color: white;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 320px) {
+    padding: 0.75rem;
+  }
 `;
 
-// 최대 너비를 제한하고 중앙 정렬하는 내부 래퍼
-const ContentInner = styled.div`
-  max-width: 800px; // 최대 너비 설정
-  margin: 0 auto; // 가운데 정렬
-  width: 100%; // 반응형 유지를 위한 100%
-  padding: 0 1rem; // 좌우 여백 추가
+/* 최대 너비 고정 + 가운데 정렬 */
+export const ContentInner = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 1rem;
 `;
 
-// 타이틀 및 검색창을 감싸는 영역
-const HeaderWrapper = styled.div`
+/* 타이틀과 검색창 감싸는 헤더 */
+export const HeaderWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 `;
 
-// 타이틀 텍스트 스타일
-const Title = styled.h2`
+/* 상단 타이틀 스타일 */
+export const Title = styled.h2`
   font-size: 2.2rem;
   font-weight: bold;
   color: #00eaff;
   text-align: center;
   text-shadow: 0 0 10px #00eaff88;
+
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 1.4rem;
+  }
 `;
 
-// 검색창 wrapper
-const SearchBar = styled.div`
+/* 검색창 wrapper */
+export const SearchBar = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
 `;
 
-// 검색 입력창 스타일
-const SearchInput = styled.input`
+/* 검색 입력창 */
+export const SearchInput = styled.input`
   width: 250px;
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
   font-size: 1rem;
@@ -78,17 +103,30 @@ const SearchInput = styled.input`
     background-color: #0e0f11;
     box-shadow: 0 0 8px #00eaff88;
   }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    font-size: 0.9rem;
+
+    &:focus {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.85rem;
+  }
 `;
 
-// 카드 리스트 전체 영역
-const CardList = styled.div`
+/* 카드 리스트 영역 */
+export const CardList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 `;
 
-// 개별 유저 카드 스타일
-const UserCard = styled.div`
+/* 개별 사용자 카드 */
+export const UserCard = styled.div`
   background-color: #2b2e33;
   padding: 1.5rem;
   border-radius: 1rem;
@@ -111,47 +149,76 @@ const UserCard = styled.div`
   }
 `;
 
-// 유저 정보 영역 (아이콘, 이름, 이메일)
-const UserInfo = styled.div`
+/* 유저 아이콘, 이름, 이메일 감싸는 영역 */
+export const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+
+  @media (max-width: 480px) {
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 320px) {
+    gap: 0.5rem;
+  }
 `;
 
-// 상태 및 권한 뱃지 스타일
-const Badge = styled.span<{ color: string }>`
-  background-color: ${(props: { color: any }) => props.color};
+/* 역할/상태 뱃지 */
+export const Badge = styled.span<{ color: string }>`
+  background-color: ${(props) => props.color};
   padding: 0.4rem 1rem;
   border-radius: 9999px;
   font-weight: bold;
+  font-size: 0.85rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.8rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+  }
 `;
 
-// 버튼 묶음 영역
-const ButtonGroup = styled.div`
+/* 카드 내 버튼 그룹 */
+export const ButtonGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: flex-end;
 `;
 
-// 각 버튼 스타일 정의
-const Button = styled.button<{ $bg: string; $hover: string }>`
+/* 공통 버튼 스타일 */
+export const Button = styled.button<{ $bg: string; $hover: string }>`
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
   border: none;
   font-size: 0.875rem;
   cursor: pointer;
   color: white;
-  background-color: ${(props: { $bg: any }) => props.$bg};
-  transition: 0.2s;
+  background-color: ${(props) => props.$bg};
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: ${(props: { $hover: any }) => props.$hover};
+    background-color: ${(props) => props.$hover};
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.7rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.65rem;
   }
 `;
 
-// 페이지네이션 스타일
-const Pagination = styled.div`
+/* 페이지네이션 영역 */
+export const Pagination = styled.div`
   display: flex;
   justify-content: center;
   gap: 0.5rem;
@@ -165,6 +232,7 @@ const Pagination = styled.div`
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
+    font-size: 0.9rem;
 
     &.active {
       background-color: #00eaff;
@@ -172,6 +240,16 @@ const Pagination = styled.div`
 
     &:hover {
       background-color: #555;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 320px) {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
     }
   }
 `;

@@ -58,9 +58,6 @@ const MemberServicePage: React.FC = () => {
   // 문의 제출 처리
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log("제출 정보:", form);
-    console.log("유저 ID:", userInfo?.id);
     if (!form.category.trim() || !form.content.trim()) {
       alert("문의 유형과 내용을 모두 입력해주세요.");
       return;

@@ -6,13 +6,13 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-/* 축소된 상태에서 커지며 나타나는 팝업용 애니메이션 */
+/* 팝업 등장 시 커지며 나타나는 효과 */
 const popIn = keyframes`
   0% { opacity: 0; transform: scale(0.8); }
   100% { opacity: 1; transform: scale(1); }
 `;
 
-/* 좌측 사이드바 열림 여부에 따라 여백 조정되는 메인 컨테이너 */
+/* 좌측 사이드바 여부에 따라 마진 조절되는 메인 컨테이너 */
 export const Container = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "$isSidebarOpen",
 })<{ $isSidebarOpen: boolean }>`
@@ -24,9 +24,30 @@ export const Container = styled.div.withConfig({
   min-height: 100vh;
   color: white;
   overflow: hidden;
+  font-size: 1rem;
+
+  @media (max-width: 1024px) {
+    padding: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.2rem;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 320px) {
+    padding: 0.8rem;
+    font-size: 0.75rem;
+  }
 `;
 
-/* 내부 내용 중앙 정렬 및 페이드 인 애니메이션 */
+/* 내부 중앙 정렬 래퍼 + 애니메이션 */
 export const InnerWrapper = styled.div`
   position: relative;
   z-index: 1;
@@ -35,7 +56,7 @@ export const InnerWrapper = styled.div`
   animation: ${fadeIn} 0.6s ease;
 `;
 
-/* 페이지 타이틀 스타일 */
+/* 페이지 타이틀 */
 export const Title = styled.h2`
   font-size: 2rem;
   font-weight: bold;
@@ -43,14 +64,27 @@ export const Title = styled.h2`
   color: #00eaff;
   text-shadow: 0 0 10px #00eaff99;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.4rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 1.2rem;
+  }
 `;
 
-/* 상태 필터링 체크박스 영역 */
+/* 상태 필터 박스 */
 export const FilterBox = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 
   label {
     display: flex;
@@ -58,23 +92,34 @@ export const FilterBox = styled.div`
     gap: 0.4rem;
     font-size: 0.95rem;
     cursor: pointer;
+
+    @media (max-width: 480px) {
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 0.8rem;
+    }
   }
 
   input {
     accent-color: #00eaff;
+    transform: scale(1.1);
   }
 `;
 
+/* 검색창 영역 */
 export const SearchBar = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 2rem;
   position: relative;
-  gap: 1rem;
 `;
 
-/* 검색 입력창 스타일 */
+/* 검색 입력창 */
 export const SearchInput = styled.input`
   padding: 0.75rem 2.75rem 0.75rem 1rem;
   border-radius: 8px;
@@ -96,8 +141,27 @@ export const SearchInput = styled.input`
   &::placeholder {
     color: #aaa;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 0.9rem;
+
+    &:focus {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.8rem;
+    padding: 0.65rem 2rem 0.65rem 0.75rem;
+  }
 `;
 
+/* 선택 삭제 버튼 */
 export const DeleteSelectedButton = styled.button`
   padding: 0.7rem 1.2rem;
   background-color: #e74c3c;
@@ -117,6 +181,16 @@ export const DeleteSelectedButton = styled.button`
     background-color: #aaa;
     cursor: not-allowed;
   }
+
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.9rem;
+  }
 `;
 
 /* 문의 목록 테이블 */
@@ -131,6 +205,22 @@ export const Table = styled.table`
     padding: 1rem;
     border-bottom: 1px solid #444;
     text-align: center;
+    font-size: 1rem;
+
+    @media (max-width: 768px) {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 320px) {
+      padding: 0.5rem;
+      font-size: 0.8rem;
+    }
   }
 
   th {
@@ -154,7 +244,7 @@ export const Table = styled.table`
   }
 `;
 
-/* 문의 상세보기 버튼 */
+/* 상세보기 버튼 */
 export const ViewButton = styled.button`
   padding: 0.4rem 0.8rem;
   background: #4b7bec;
@@ -169,7 +259,7 @@ export const ViewButton = styled.button`
   }
 `;
 
-/* 문의 상태 변경 버튼 */
+/* 상태 변경 버튼 */
 export const ChangeButton = styled.button`
   padding: 0.4rem 0.8rem;
   background: #20bf6b;
@@ -184,7 +274,7 @@ export const ChangeButton = styled.button`
   }
 `;
 
-// 답변 등록 버튼
+/* 답변 등록 버튼 */
 export const AnswerRegisterButton = styled.button`
   background-color: #34495e;
   color: #fff;
@@ -199,7 +289,7 @@ export const AnswerRegisterButton = styled.button`
   }
 `;
 
-// 답변 수정 버튼
+/* 답변 수정 버튼 */
 export const AnswerEditButton = styled.button`
   background-color: #6c5b7b;
   color: #fff;
@@ -214,7 +304,7 @@ export const AnswerEditButton = styled.button`
   }
 `;
 
-// 삭제 확인 전용 팝업 박스
+/* 삭제 확인 팝업 박스 */
 export const ConfirmBox = styled.div`
   background: #2c2f36;
   padding: 2rem;
@@ -270,7 +360,7 @@ export const ConfirmBox = styled.div`
   }
 `;
 
-/* 하단 페이지네이션 버튼 영역 */
+/* 페이지네이션 버튼 영역 */
 export const Pagination = styled.div`
   margin-top: 2rem;
   display: flex;
@@ -294,6 +384,16 @@ export const Pagination = styled.div`
     &:hover {
       background-color: #5ef1ff;
     }
+
+    @media (max-width: 480px) {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+    }
   }
 `;
 
@@ -311,7 +411,7 @@ export const ModalOverlay = styled.div`
   z-index: 999;
 `;
 
-/* 모달 내용 박스 */
+/* 모달 박스 */
 export const ModalBox = styled.div`
   background: #2c2f36;
   padding: 2rem;
@@ -348,7 +448,7 @@ export const CloseButton = styled.button`
   }
 `;
 
-/* 모달 내부 상태 버튼 묶음 */
+/* 상태 버튼 묶음 */
 export const StatusBox = styled.div`
   display: flex;
   justify-content: center;
@@ -356,7 +456,7 @@ export const StatusBox = styled.div`
   margin-top: 1rem;
 `;
 
-/* 개별 상태 버튼 */
+/* 상태 버튼 */
 export const StatusButton = styled.button`
   padding: 0.5rem 1rem;
   border: none;
@@ -375,7 +475,7 @@ export const StatusButton = styled.button`
   }
 `;
 
-// 답변등록 텍스트 에어리어
+/* 텍스트 입력창 */
 export const TextArea = styled.textarea`
   width: 100%;
   padding: 1rem;
@@ -397,7 +497,7 @@ export const TextArea = styled.textarea`
   }
 `;
 
-// 모달 저장버튼
+/* 저장 버튼 */
 export const SaveButton = styled.button`
   margin-top: 1.5rem;
   background: #f4f4f4;

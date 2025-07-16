@@ -1,27 +1,25 @@
 import styled, { keyframes } from "styled-components";
 
 /* ========================== 공통 애니메이션 ========================== */
+/* 아래에서 위로 올라오며 등장하는 fade-in 효과 */
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0);   }
 `;
 
 /* ========================== 파티클 배경 래퍼 ========================== */
-/** 화면 전체를 fixed로 덮어 두고 z-index:-1 로 뒤로 보냄 */
+/* 파티클 효과를 전체 배경에 고정시키고, z-index로 뒤로 숨김 */
 export const ParticleWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-
   height: 100vh;
   min-height: 100%;
-
   z-index: -9999;
   pointer-events: none;
   overflow: hidden;
 
-  /* 파티클 캔버스 정렬 */
   canvas {
     display: block !important;
     position: absolute;
@@ -31,6 +29,7 @@ export const ParticleWrapper = styled.div`
 `;
 
 /* ========================== 메인 컨테이너 ========================== */
+/* 전체 페이지 영역의 내부 콘텐츠 감싸는 컨테이너 */
 export const Container = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "$isSidebarOpen",
 })<{ $isSidebarOpen: boolean }>`
@@ -46,13 +45,26 @@ export const Container = styled.div.withConfig({
   animation: ${fadeIn} 0.5s ease;
   z-index: 1;
 
+  @media (max-width: 1024px) {
+    padding: 1.5rem;
+    font-size: 0.95rem;
+  }
+
   @media (max-width: 768px) {
     padding: 1rem;
     font-size: 0.875rem;
   }
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.75rem;
+  }
 `;
 
-/* ========================== 내부 래퍼 ========================== */
+/* ========================== 내부 콘텐츠 래퍼 ========================== */
 export const InnerWrapper = styled.div`
   max-width: 1000px;
   margin: 0 auto;
@@ -60,7 +72,7 @@ export const InnerWrapper = styled.div`
   flex-direction: column;
 `;
 
-/* ========================== 타이틀 ========================== */
+/* ========================== 페이지 제목 ========================== */
 export const Title = styled.h2`
   font-size: 2rem;
   font-weight: bold;
@@ -70,12 +82,24 @@ export const Title = styled.h2`
   text-shadow: 0 0 10px #00eaff99;
   animation: ${fadeIn} 0.8s ease-out;
 
+  @media (max-width: 1024px) {
+    font-size: 1.8rem;
+  }
+
   @media (max-width: 768px) {
     font-size: 1.4rem;
   }
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 1.1rem;
+  }
 `;
 
-/* ========================== 검색‧버튼 영역 ========================== */
+/* ========================== 상단 검색창 및 버튼 그룹 ========================== */
 export const Controls = styled.div`
   display: flex;
   justify-content: center;
@@ -85,7 +109,7 @@ export const Controls = styled.div`
   margin-bottom: 20px;
 `;
 
-/* 검색 입력창 */
+/* ========================== 검색 입력창 ========================== */
 export const SearchInput = styled.input`
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
   width: 400px;
@@ -107,16 +131,33 @@ export const SearchInput = styled.input`
     box-shadow: 0 0 8px #00eaff88;
   }
 
+  @media (max-width: 1024px) {
+    width: 350px;
+    font-size: 0.95rem;
+    &:focus {
+      width: 400px;
+    }
+  }
+
   @media (max-width: 768px) {
     width: 100%;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     &:focus {
       width: 100%;
     }
   }
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.75rem;
+    padding: 0.4rem 2rem 0.4rem 0.6rem;
+  }
 `;
 
-/* 선택 삭제 버튼 */
+/* ========================== 선택 삭제 버튼 ========================== */
 export const DeleteButton = styled.button`
   background: #eb3b5a;
   color: white;
@@ -150,6 +191,32 @@ export const ReviewTable = styled.table`
     padding: 1rem;
     border-bottom: 1px solid #333;
     text-align: center;
+    font-size: 1rem;
+
+    @media (max-width: 1024px) {
+      padding: 0.9rem;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      padding: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 360px) {
+      padding: 0.5rem;
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 320px) {
+      padding: 0.4rem;
+      font-size: 0.65rem;
+    }
   }
 
   th {
@@ -165,17 +232,9 @@ export const ReviewTable = styled.table`
   tbody tr:hover {
     background: #2a2d38;
   }
-
-  @media (max-width: 768px) {
-    th,
-    td {
-      font-size: 0.8rem;
-      padding: 0.75rem;
-    }
-  }
 `;
 
-/* 내용 셀(길이 제한) */
+/* ========================== 셀 내부 더보기 버튼 ========================== */
 export const ContentCell = styled.td`
   position: relative;
   max-width: 300px;
@@ -187,9 +246,12 @@ export const ContentCell = styled.td`
   @media (max-width: 768px) {
     max-width: 200px;
   }
+
+  @media (max-width: 320px) {
+    max-width: 150px;
+  }
 `;
 
-/* '더보기' 버튼 */
 export const MoreButton = styled.button`
   position: absolute;
   top: 50%;
@@ -211,6 +273,11 @@ export const MoreButton = styled.button`
   @media (max-width: 768px) {
     font-size: 0.75rem;
     padding: 2px 6px;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 0.7rem;
+    padding: 1px 5px;
   }
 `;
 
@@ -244,6 +311,11 @@ export const Pagination = styled.div`
       padding: 0.3rem 0.6rem;
       font-size: 0.8rem;
     }
+
+    @media (max-width: 320px) {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
   }
 `;
 
@@ -270,6 +342,19 @@ export const ConfirmBox = styled.div`
 
   p {
     margin-bottom: 1.5rem;
+    font-size: 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 0.75rem;
+    }
   }
 
   .actions {
@@ -285,6 +370,20 @@ export const ConfirmBox = styled.div`
     border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
+    font-size: 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 0.7rem;
+      padding: 0.4rem 0.8rem;
+    }
   }
 
   .cancel {
@@ -305,5 +404,11 @@ export const ConfirmBox = styled.div`
 
   @media (max-width: 480px) {
     width: 90%;
+    padding: 1.2rem;
+  }
+
+  @media (max-width: 320px) {
+    width: 95%;
+    padding: 1rem;
   }
 `;
