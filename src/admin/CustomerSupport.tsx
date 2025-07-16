@@ -1,12 +1,12 @@
+// src/pages/CustomerSupport.tsx
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import * as Styled from "./customerSupport/CustomerSupport.styles";
-import {
-  Inquiry,
-  LayoutContext,
-} from "./customerSupport/CustomerSupport.types";
+import { LayoutContext } from "./customerSupport/CustomerSupport.types";
+import { Inquiry } from "../types/types";
 import InquiryViewModal from "./customerSupport/InquiryViewModal";
 import InquiryStatusModal from "./customerSupport/InquiryStatusModal";
+import InquiryAnswerEditModal from "./customerSupport/InquiryAnswerEditModal";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import type { Engine } from "tsparticles-engine";
@@ -14,55 +14,52 @@ import {
   apiGetAllInquiries,
   apiUpdateInquiryStatus,
   apiDeleteInquiryById,
+  apiSaveInquiryAnswer, // 관리자 답변 저장 API
 } from "../components/api/backApi";
 
-const ITEMS_PER_PAGE = 10; // 한 페이지당 보여줄 문의 수
+const ITEMS_PER_PAGE = 10; // 한 페이지 당 목록 수
 
 const CustomerSupport: React.FC = () => {
-  /* ───────── 레이아웃 컨텍스트 (사이드바 상태) ───────── */
+  /* ────────────────────────────── 컨텍스트 및 전역 ────────────────────────────── */
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
 
-  /* ───────── 상태 정의 ───────── */
-  // 전체 문의 목록
+  /* ──────────────────────────────── 상태 정의 ──────────────────────────────── */
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  // 상태 필터(대기중, 처리중, 완료), null이면 전체
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  // 검색어
   const [search, setSearch] = useState("");
-  // 현재 페이지
   const [currentPage, setCurrentPage] = useState(1);
-  // 상세 보기 모달용 본문
+
   const [viewContent, setViewContent] = useState<string | null>(null);
-  // 상태 변경 모달 대상
-  const [editTarget, setEditTarget] = useState<Inquiry | null>(null);
-  // 체크박스로 선택된 문의 ID 리스트
+  const [editTarget, setEditTarget] = useState<Inquiry | null>(null); // 상태 변경용
+  const [answerTarget, setAnswerTarget] = useState<Inquiry | null>(null); // 답변 등록용
+
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  // 삭제 확인 모달
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  // 삭제 완료 모달
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false); // 기존 showSuccessModal의 이름을 변경하여 삭제 성공 모달로 명확히 함
+  const [showAnswerSaveSuccessModal, setShowAnswerSaveSuccessModal] =
+    useState(false); // <--- 새로 추가된 상태: 답변 저장 성공 모달 표시 여부
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  /* ───────── 최초 데이터 로드 ───────── */
+  /* ─────────────────────────────── 데이터 로드 ─────────────────────────────── */
   useEffect(() => {
-    const fetchInquiries = async () => {
+    const fetchData = async () => {
       try {
         const data = await apiGetAllInquiries();
         setInquiries(data);
-      } catch (error) {
-        console.error("문의 목록 불러오기 실패:", error);
+      } catch (e) {
+        console.error("문의 목록 불러오기 실패:", e);
       }
     };
-    fetchInquiries();
+    fetchData();
   }, []);
 
-  /* ───────── 배경 파티클 초기화 ───────── */
+  /* ───────────────────────────── 파티클 초기화 ───────────────────────────── */
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine);
   }, []);
 
-  /* ───────── 필터 및 검색 로직 ───────── */
+  /* ───────────────────────────── 필터 / 검색 ───────────────────────────── */
   const handleStatusSelect = (status: string) => {
     setSelectedStatus((prev) => (prev === status ? null : status));
     setCurrentPage(1);
@@ -76,14 +73,14 @@ const CustomerSupport: React.FC = () => {
       (item.username?.includes(search) || item.content.includes(search))
   );
 
-  /* ───────── 페이지네이션 계산 ───────── */
+  /* ───────────────────────────── 페이지네이션 ───────────────────────────── */
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  /* ───────── 체크박스 처리 ───────── */
+  /* ───────────────────────────── 체크박스 ───────────────────────────── */
   const handleSelectOne = (checked: boolean, id: number) => {
     setSelectedIds((prev) =>
       checked ? [...prev, id] : prev.filter((itemId) => itemId !== id)
@@ -91,44 +88,45 @@ const CustomerSupport: React.FC = () => {
   };
 
   const handleSelectAll = (checked: boolean) => {
-    const pageIds = currentData.map((item) => item.id);
+    const pageIds = currentData.map((item) => item.inquiryId);
     if (checked) {
-      const merged = Array.from(new Set([...selectedIds, ...pageIds]));
-      setSelectedIds(merged);
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...pageIds])));
     } else {
       setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
     }
   };
 
   const isAllSelected = currentData.every((item) =>
-    selectedIds.includes(item.id)
+    selectedIds.includes(item.inquiryId)
   );
 
-  /* ───────── 삭제 실행 ───────── */
+  /* ───────────────────────────── 삭제 기능 ───────────────────────────── */
   const handleDeleteSelected = async () => {
     try {
       for (const id of selectedIds) {
         await apiDeleteInquiryById(id);
       }
       setInquiries((prev) =>
-        prev.filter((item) => !selectedIds.includes(item.id))
+        prev.filter((item) => !selectedIds.includes(item.inquiryId))
       );
       setSelectedIds([]);
       setShowConfirmModal(false);
-      setShowSuccessModal(true);
+      setShowDeleteSuccessModal(true); // 삭제 성공 모달 표시
     } catch {
       alert("선택 삭제 중 오류가 발생했습니다.");
     }
   };
 
-  /* ───────── 상태 변경 실행 ───────── */
+  /* ───────────────────────────── 상태 변경 ───────────────────────────── */
   const handleStatusChange = async (newStatus: Inquiry["status"]) => {
     if (!editTarget) return;
     try {
-      await apiUpdateInquiryStatus(editTarget.id, newStatus);
+      await apiUpdateInquiryStatus(editTarget.inquiryId, newStatus);
       setInquiries((prev) =>
         prev.map((item) =>
-          item.id === editTarget.id ? { ...item, status: newStatus } : item
+          item.inquiryId === editTarget.inquiryId
+            ? { ...item, status: newStatus }
+            : item
         )
       );
       setEditTarget(null);
@@ -137,9 +135,29 @@ const CustomerSupport: React.FC = () => {
     }
   };
 
-  /* ───────── 렌더링 ───────── */
+  /* ───────────────────────────── 답변 저장 ───────────────────────────── */
+  const handleAnswerSave = async (answer: string) => {
+    if (!answerTarget) return;
+    try {
+      await apiSaveInquiryAnswer(answerTarget.inquiryId, answer);
+      setInquiries((prev) =>
+        prev.map((item) =>
+          item.inquiryId === answerTarget.inquiryId
+            ? { ...item, answer } // 로컬 상태도 갱신
+            : item
+        )
+      );
+      setAnswerTarget(null); // 답변 모달 닫기
+      setShowAnswerSaveSuccessModal(true); // <--- 답변 저장 성공 모달을 띄웁니다.
+    } catch {
+      alert("답변 저장 실패");
+    }
+  };
+
+  /* ───────────────────────────── 렌더링 ───────────────────────────── */
   return (
     <Styled.Container $isSidebarOpen={isSidebarOpen}>
+      {/* 배경 파티클 */}
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -190,11 +208,10 @@ const CustomerSupport: React.FC = () => {
           ))}
         </Styled.FilterBox>
 
-        {/* 검색창과 선택 삭제 버튼 */}
+        {/* 검색창 및 선택 삭제 */}
         <Styled.SearchBar>
           <Styled.SearchInput
             ref={inputRef}
-            type="text"
             placeholder="검색"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -227,16 +244,19 @@ const CustomerSupport: React.FC = () => {
               <th>등록일</th>
               <th>상세</th>
               <th>상태변경</th>
+              <th>답변</th>
             </tr>
           </thead>
           <tbody>
             {currentData.map((item) => (
-              <tr key={item.id}>
+              <tr key={item.inquiryId}>
                 <td>
                   <input
                     type="checkbox"
-                    checked={selectedIds.includes(item.id)}
-                    onChange={(e) => handleSelectOne(e.target.checked, item.id)}
+                    checked={selectedIds.includes(item.inquiryId)}
+                    onChange={(e) =>
+                      handleSelectOne(e.target.checked, item.inquiryId)
+                    }
                   />
                 </td>
                 <td>{item.status}</td>
@@ -254,6 +274,21 @@ const CustomerSupport: React.FC = () => {
                   <Styled.ChangeButton onClick={() => setEditTarget(item)}>
                     변경
                   </Styled.ChangeButton>
+                </td>
+                <td>
+                  {item.answer ? (
+                    <Styled.AnswerEditButton
+                      onClick={() => setAnswerTarget(item)}
+                    >
+                      수정
+                    </Styled.AnswerEditButton>
+                  ) : (
+                    <Styled.AnswerRegisterButton
+                      onClick={() => setAnswerTarget(item)}
+                    >
+                      등록
+                    </Styled.AnswerRegisterButton>
+                  )}
                 </td>
               </tr>
             ))}
@@ -291,6 +326,15 @@ const CustomerSupport: React.FC = () => {
         />
       )}
 
+      {/* 답변 등록/수정 모달 */}
+      {answerTarget && (
+        <InquiryAnswerEditModal
+          target={answerTarget}
+          onSubmit={handleAnswerSave}
+          onClose={() => setAnswerTarget(null)}
+        />
+      )}
+
       {/* 삭제 확인 모달 */}
       {showConfirmModal && (
         <Styled.ModalOverlay onClick={() => setShowConfirmModal(false)}>
@@ -313,12 +357,31 @@ const CustomerSupport: React.FC = () => {
       )}
 
       {/* 삭제 완료 모달 */}
-      {showSuccessModal && (
-        <Styled.ModalOverlay onClick={() => setShowSuccessModal(false)}>
+      {showDeleteSuccessModal && ( // 이름 변경된 상태 사용
+        <Styled.ModalOverlay onClick={() => setShowDeleteSuccessModal(false)}>
           <Styled.ModalBox onClick={(e) => e.stopPropagation()}>
             <h3>삭제 완료</h3>
             <p>선택하신 문의가 성공적으로 삭제되었습니다.</p>
-            <Styled.CloseButton onClick={() => setShowSuccessModal(false)}>
+            <Styled.CloseButton
+              onClick={() => setShowDeleteSuccessModal(false)}
+            >
+              확인
+            </Styled.CloseButton>
+          </Styled.ModalBox>
+        </Styled.ModalOverlay>
+      )}
+
+      {/* 답변 저장 완료 모달 (새로 추가) */}
+      {showAnswerSaveSuccessModal && ( // <--- 이 부분이 새로 추가되어 답변 저장 완료 모달을 표시합니다.
+        <Styled.ModalOverlay
+          onClick={() => setShowAnswerSaveSuccessModal(false)}
+        >
+          <Styled.ModalBox onClick={(e) => e.stopPropagation()}>
+            <h3>저장 완료</h3>
+            <p>답변이 성공적으로 저장되었습니다.</p>
+            <Styled.CloseButton
+              onClick={() => setShowAnswerSaveSuccessModal(false)}
+            >
               확인
             </Styled.CloseButton>
           </Styled.ModalBox>

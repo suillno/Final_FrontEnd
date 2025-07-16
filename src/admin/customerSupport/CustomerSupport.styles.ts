@@ -184,6 +184,36 @@ export const ChangeButton = styled.button`
   }
 `;
 
+// 답변 등록 버튼
+export const AnswerRegisterButton = styled.button`
+  background-color: #34495e;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+
+  &:hover {
+    background-color: #2c3e50;
+  }
+`;
+
+// 답변 수정 버튼
+export const AnswerEditButton = styled.button`
+  background-color: #6c5b7b;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+
+  &:hover {
+    background-color: #732d91;
+  }
+`;
+
 // 삭제 확인 전용 팝업 박스
 export const ConfirmBox = styled.div`
   background: #2c2f36;
@@ -342,5 +372,43 @@ export const StatusButton = styled.button`
 
   &:hover {
     background-color: #888;
+  }
+`;
+
+// 답변등록 텍스트 에어리어
+export const TextArea = styled.textarea`
+  width: 100%;
+  padding: 1rem;
+  resize: none;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background-color: #1f2127;
+  color: white;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 6px #00eaff88;
+  }
+
+  &::placeholder {
+    color: #aaa;
+  }
+`;
+
+// 모달 저장버튼
+export const SaveButton = styled.button`
+  margin-top: 1.5rem;
+  background: #f4f4f4;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: #444;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+
+  &:hover {
+    background: rgb(203, 208, 220);
   }
 `;

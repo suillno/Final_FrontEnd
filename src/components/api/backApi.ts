@@ -1,6 +1,5 @@
 import { instanceBack, instanceAuth } from "./instance";
-import { Inquiry } from "../../admin/customerSupport/CustomerSupport.types";
-
+import { Inquiry } from "../../types/types";
 // 🔸 장바구니 아이템 타입 정의 (이 파일 또는 공용 types.ts로 분리 가능)
 export interface CartItem {
   gameId: number;
@@ -328,7 +327,7 @@ export const apiGetAllInquiries = async (): Promise<Inquiry[]> => {
     }
 
     return res.data.map((item: any) => ({
-      id: item.inquiryId,
+      inquiryId: item.inquiryId ?? item.id, // inquiryId 필드로 맞춤
       userId: item.userId ?? null,
       username: item.username ?? "-",
       category: item.category,
@@ -336,6 +335,7 @@ export const apiGetAllInquiries = async (): Promise<Inquiry[]> => {
       status: item.status,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
+      answer: item.answer ?? null, // 선택사항이므로 추가해도 무방
     }));
   } catch (error) {
     console.error(" 문의 목록 조회 실패:", error);
@@ -358,6 +358,43 @@ export const apiUpdateInquiryStatus = async (
     return response.data;
   } catch (error) {
     console.error("문의 상태 변경 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 유저의 문의 목록 조회
+ * (프론트 필터링 대신 서버에서 userId 기반 조회 권장)
+ * @param userId 로그인한 사용자 ID
+ */
+export const apiGetMyInquiries = async (userId: number): Promise<Inquiry[]> => {
+  try {
+    const res = await instanceBack.get(`/member/inquiry/user/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.error("나의 문의 내역 조회 실패:", error);
+    return [];
+  }
+};
+
+/**
+ * 특정 문의에 대한 답변 저장 (관리자용)
+ */
+export const apiSaveInquiryAnswer = async (
+  inquiryId: number,
+  answer: string
+) => {
+  try {
+    const res = await instanceBack.post(
+      `/member/inquiry/${inquiryId}/answer`,
+      answer,
+      {
+        headers: { "Content-Type": "text/plain" },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("답변 저장 실패:", error);
     throw error;
   }
 };

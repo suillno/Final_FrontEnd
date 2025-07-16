@@ -54,8 +54,6 @@ const particlesOptions = {
   detectRetina: true,
 };
 
-
-
 // 전체 컨테이너
 const Container = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "$isSidebarOpen", // DOM 전달 차단
@@ -67,7 +65,6 @@ const Container = styled.div.withConfig({
   overflow-x: hidden;
   padding-bottom: 5rem;
 `;
-
 
 // 콘텐츠 wrapper: 파티클 위에 표시되도록 z-index 적용
 const ContentWrapper = styled.div`
@@ -98,7 +95,11 @@ const UserManagement: React.FC = () => {
   return (
     <Container $isSidebarOpen={isSidebarOpen}>
       {/* 전역 전체 고정 파티클 (별도 Wrapper 없이!) */}
-      <Particles id="userParticles" init={particlesInit} options={particlesOptions} />
+      <Particles
+        id="userParticles"
+        init={particlesInit}
+        options={particlesOptions}
+      />
 
       {/* 메인 콘텐츠 */}
       <ContentWrapper>

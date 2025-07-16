@@ -1,16 +1,36 @@
-/**
- * 리뷰 관리 페이지 전용 styled-components
- * 반응형 대응 + 삭제 확인 모달 + 애니메이션 포함
- */
 import styled, { keyframes } from "styled-components";
 
-/* ───── 등장 애니메이션 (아래에서 위로) ───── */
+/* ========================== 공통 애니메이션 ========================== */
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0);   }
 `;
 
-/* ───── 전체 레이아웃 컨테이너 ───── */
+/* ========================== 파티클 배경 래퍼 ========================== */
+/** 화면 전체를 fixed로 덮어 두고 z-index:-1 로 뒤로 보냄 */
+export const ParticleWrapper = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+
+  height: 100vh;
+  min-height: 100%;
+
+  z-index: -9999;
+  pointer-events: none;
+  overflow: hidden;
+
+  /* 파티클 캔버스 정렬 */
+  canvas {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+`;
+
+/* ========================== 메인 컨테이너 ========================== */
 export const Container = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "$isSidebarOpen",
 })<{ $isSidebarOpen: boolean }>`
@@ -20,16 +40,11 @@ export const Container = styled.div.withConfig({
   min-height: 100vh;
   margin-left: ${(p) => (p.$isSidebarOpen ? "220px" : "0")};
   transition: margin-left 0.3s ease;
-  background: #0e0f11;
+  background: transparent;
   color: white;
   font-size: 1rem;
   animation: ${fadeIn} 0.5s ease;
-
-  #tsparticles {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-  }
+  z-index: 1;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -37,7 +52,7 @@ export const Container = styled.div.withConfig({
   }
 `;
 
-/* ───── 내부 콘텐츠 정렬용 래퍼 ───── */
+/* ========================== 내부 래퍼 ========================== */
 export const InnerWrapper = styled.div`
   max-width: 1000px;
   margin: 0 auto;
@@ -45,7 +60,7 @@ export const InnerWrapper = styled.div`
   flex-direction: column;
 `;
 
-/* ───── 타이틀 ───── */
+/* ========================== 타이틀 ========================== */
 export const Title = styled.h2`
   font-size: 2rem;
   font-weight: bold;
@@ -60,7 +75,7 @@ export const Title = styled.h2`
   }
 `;
 
-/* ───── 검색창 + 정렬 버튼 영역 ───── */
+/* ========================== 검색‧버튼 영역 ========================== */
 export const Controls = styled.div`
   display: flex;
   justify-content: center;
@@ -70,7 +85,7 @@ export const Controls = styled.div`
   margin-bottom: 20px;
 `;
 
-/* ───── 검색 입력창 ───── */
+/* 검색 입력창 */
 export const SearchInput = styled.input`
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
   width: 400px;
@@ -101,34 +116,33 @@ export const SearchInput = styled.input`
   }
 `;
 
-/* ───── 정렬 버튼 ───── */
-export const SortButton = styled.button`
-  background: #00eaff;
-  color: #0e0f11;
+/* 선택 삭제 버튼 */
+export const DeleteButton = styled.button`
+  background: #eb3b5a;
+  color: white;
   border: none;
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s ease;
 
   &:hover {
-    background: #12f1ff;
+    background: #ff6b81;
   }
 
   @media (max-width: 768px) {
-    font-size: 0.875rem;
-    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
   }
 `;
 
-/* ───── 리뷰 테이블 ───── */
+/* ========================== 리뷰 테이블 ========================== */
 export const ReviewTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   background: #1c1d23;
   border: 1px solid #2a2b30;
-  box-shadow: 0 0 20px #00eaff22;
   animation: ${fadeIn} 0.6s ease;
 
   th,
@@ -161,7 +175,7 @@ export const ReviewTable = styled.table`
   }
 `;
 
-/* ───── 내용이 긴 셀 처리 ───── */
+/* 내용 셀(길이 제한) */
 export const ContentCell = styled.td`
   position: relative;
   max-width: 300px;
@@ -175,7 +189,7 @@ export const ContentCell = styled.td`
   }
 `;
 
-/* ───── '더보기' 버튼 ───── */
+/* '더보기' 버튼 */
 export const MoreButton = styled.button`
   position: absolute;
   top: 50%;
@@ -200,28 +214,7 @@ export const MoreButton = styled.button`
   }
 `;
 
-/* ───── 삭제 버튼 (개별) ───── */
-export const DeleteButton = styled.button`
-  background: #eb3b5a;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.7rem;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
-
-  &:hover {
-    background: #ff6b81;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.6rem;
-  }
-`;
-
-/* ───── 페이지네이션 ───── */
+/* ========================== 페이지네이션 ========================== */
 export const Pagination = styled.div`
   margin-top: 2rem;
   display: flex;
@@ -254,7 +247,7 @@ export const Pagination = styled.div`
   }
 `;
 
-/* ───── 삭제 확인용 오버레이 ───── */
+/* ========================== 삭제 확인 모달 ========================== */
 export const Overlay = styled.div`
   position: fixed;
   inset: 0;
@@ -265,7 +258,6 @@ export const Overlay = styled.div`
   z-index: 1000;
 `;
 
-/* ───── 삭제 확인 모달 박스 ───── */
 export const ConfirmBox = styled.div`
   background: #2c2f36;
   padding: 2rem;
@@ -274,6 +266,7 @@ export const ConfirmBox = styled.div`
   text-align: center;
   box-shadow: 0 0 20px rgba(21, 22, 22, 0.33);
   color: white;
+  animation: ${fadeIn} 0.3s ease-out;
 
   p {
     margin-bottom: 1.5rem;
