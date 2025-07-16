@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PortOne from "@portone/browser-sdk/v2";
 import styled from "styled-components";
 import { useOutletContext } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -182,6 +183,12 @@ const DownloadButton = styled.button`
   }
 `;
 
+declare global {
+  interface Window {
+    IMP?: any;
+  }
+}
+
 const Wallet: React.FC = () => {
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
   const userInfo = useSelector(selectUserInfo); // userId 호출
@@ -194,7 +201,16 @@ const Wallet: React.FC = () => {
   const [chargeAmount, setChargeAmount] = useState(""); // 입력 필드 값
   const [history, setHistory] = useState<Transaction[]>([]); // 거래 내역 배열
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // ✅ 충전 버튼 클릭 시 처리
+
+  useEffect(() => {
+    if (!window.IMP) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.iamport.kr/js/iamport.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+  // 충전 버튼 클릭 시 처리
   useEffect(() => {
     const fetchHistory = async () => {
       if (!userId) return;
@@ -220,55 +236,88 @@ const Wallet: React.FC = () => {
     fetchHistory();
   }, [userId]);
 
+  // 결제 시스템
   const handleCharge = async () => {
     const amount = parseInt(chargeAmount, 10);
     if (isNaN(amount) || amount <= 0) {
       alert("유효한 금액을 입력하세요.");
       return;
     }
-    if (!userId) {
+
+    if (!userId || !userName) {
       alert("사용자 정보가 없습니다.");
       return;
     }
+
     setIsSubmitting(true);
+
     try {
-      const isVerified = await (window as any).promptSendAuthCode(userId);
-
-      if (!isVerified) {
-        alert("인증이 실패하거나 취소되었습니다.");
-        setIsSubmitting(false);
-        return;
-      }
-      await apiChargeWallet(userId, amount, userName, 0);
-
-      const newTransaction: Transaction = {
-        id: Date.now(),
-        type: "충전",
-        amount,
-        date: new Date().toLocaleString(),
-        logText: "충전",
-      };
-
-      setBalance((prev) => prev + amount);
-      setHistory((prev) => [newTransaction, ...prev]);
-      setChargeAmount("");
-      setIsSubmitting(false);
-
-      await customSwal.fire({
-        icon: "success",
-        title: "충전 완료",
-        text: `${amount.toLocaleString()}₩ 충전되었습니다.`,
-        confirmButtonText: "확인",
+      const response = await PortOne.requestPayment({
+        storeId: "store-e4038486-8d83-41a5-acf1-844a009e0d94",
+        channelKey: "channel-key-ebe7daa6-4fe4-41bd-b17d-3495264399b5",
+        paymentId: `wallet_${Date.now()}`,
+        orderName: userName,
+        totalAmount: amount,
+        currency: "CURRENCY_KRW",
+        payMethod: "CARD",
+        isTestChannel: true,
+        customer: {
+          fullName: "포트원",
+          phoneNumber: "010-0000-1234",
+          email: "test@portone.io",
+        },
+        bypass: {
+          kakaopay: {},
+          inicis_v2: {
+            logo_url: "https://portone.io/assets/portone.87061e94.avif",
+            logo_2nd: "https://admin.portone.io/assets/img/auth/lock.png",
+            parentemail: "parentemail",
+            Ini_SSGPAY_MDN: "01012341234",
+            acceptmethod: ["SKIN(#C1272C)", "below1000", "ocb", "paypopup"],
+            P_CARD_OPTION: "selcode=14",
+            P_MNAME: "포트원",
+            P_RESERVED: ["below1000=Y", "noeasypay=Y"],
+          },
+        },
       });
-    } catch (err) {
-      console.error("충전 오류:", err);
+      console.log("결제 응답:", response);
+      if (response?.paymentId && !response?.code) {
+        await apiChargeWallet(userId, amount, userName, 0);
+
+        const newTransaction: Transaction = {
+          id: Date.now(),
+          type: "충전",
+          amount,
+          date: new Date().toLocaleString(),
+          logText: "충전",
+        };
+
+        setBalance((prev) => prev + amount);
+        setHistory((prev) => [newTransaction, ...prev]);
+        setChargeAmount("");
+
+        await customSwal.fire({
+          icon: "success",
+          title: "결제 완료",
+          text: `${amount.toLocaleString()}₩ 충전되었습니다.`,
+          confirmButtonText: "확인",
+        });
+      } else {
+        await customSwal.fire({
+          icon: "error",
+          title: "결제 실패",
+          text: response?.message || "결제 중 오류가 발생했습니다.",
+        });
+      }
+    } catch (error: any) {
+      console.error("결제 오류:", error);
       await customSwal.fire({
         icon: "error",
-        title: "충전 실패",
-        text: "충전 중 오류가 발생했습니다. 다시 시도해주세요.",
+        title: "결제 실패",
+        text: error.message || "예상치 못한 오류가 발생했습니다.",
       });
     } finally {
-      setIsAuthStep(false);
+      setIsSubmitting(false);
     }
   };
 

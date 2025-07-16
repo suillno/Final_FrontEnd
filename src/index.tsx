@@ -21,9 +21,9 @@ root.render(
     {/* PersistGate로 저장된 상태 불러올 때까지 대기 (로딩 중 UI는 null 처리) */}
     <PersistGate loading={null} persistor={persistor}>
       {/* React의 엄격한 모드 활성화 (개발 중 경고, 문제 탐지 목적) */}
-      <React.StrictMode>
-        <App /> {/* 실제 앱의 루트 컴포넌트 */}
-      </React.StrictMode>
+      {/* <React.StrictMode> */}
+      <App /> {/* 실제 앱의 루트 컴포넌트 */}
+      {/* </React.StrictMode> */}
     </PersistGate>
   </Provider>
 );

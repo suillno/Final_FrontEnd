@@ -28,9 +28,12 @@ const ExcelButton = (userId: number) => {
   };
 
   return (
-    <button type="button" onClick={handleDownload} disabled={isDownloading}>
+    <span
+      onClick={handleDownload}
+      style={{ cursor: "pointer", color: "darkgray" }}
+    >
       {isDownloading ? "다운로드 중..." : "전체내역 다운로드"}
-    </button>
+    </span>
   );
 };
 

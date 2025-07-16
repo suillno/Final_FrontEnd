@@ -5,7 +5,7 @@ import GameDetail from "../gameApi/GameDetail";
 import Library from "../member/memberDetail/Library";
 import Dashboard from "../member/memberDetail/Dashboard";
 import Profile from "../member/memberDetail/Profile";
-import Wallet from "../member/memberDetail/Wallet";
+// import Wallet from "../member/memberDetail/Wallet";
 import { Route, Routes } from "react-router-dom";
 import Login from "../member/memberControl/Login";
 import Signup from "../member/memberControl/Signup";
@@ -20,7 +20,6 @@ import Genres from "../gameApi/Genres";
 import GameYearList from "../gameApi/GameYearList";
 import GameLongPlayList from "../gameApi/GameLongPlayList";
 import MemberServicePage from "../member/memberService/MemberServicePage";
-
 import Auth from "../components/auth/helper/Auth";
 import { NotFound } from "../components/error/NotFound";
 import Find from "../member/memberControl/Find";
@@ -29,6 +28,7 @@ import GamePcList from "../gameApi/GamePcList";
 import GamePsList from "../gameApi/GamePsList";
 import GameXboxList from "../gameApi/GameXboxList";
 import Leave from "../member/memberDetail/Leave";
+import Wallet from "../member/memberDetail/Wallet";
 // DB에있는 권한 확인
 const ROLES = {
   ROLE_SYSTEM: 1,
