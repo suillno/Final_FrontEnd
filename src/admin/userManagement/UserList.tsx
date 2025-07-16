@@ -1,4 +1,3 @@
-// userManagement/UserList.tsx
 import React, { useEffect, useState } from "react";
 import {
   User,
@@ -9,16 +8,15 @@ import {
 import UserDetailModal from "./UserDetailModal";
 import styled, { keyframes } from "styled-components";
 
-// 한 페이지당 보여줄 사용자 수
 const USERS_PER_PAGE = 10;
 
-// 등장 애니메이션 효과
+// 카드 등장 애니메이션 효과
 const fadeSlideIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 `;
 
-// 전체 wrapper
+// 전체 감싸는 wrapper (스크롤 기준 상위)
 const Wrapper = styled.div`
   color: white;
   display: flex;
@@ -26,7 +24,15 @@ const Wrapper = styled.div`
   gap: 2rem;
 `;
 
-// 타이틀 + 검색창 wrapper
+// 최대 너비를 제한하고 중앙 정렬하는 내부 래퍼
+const ContentInner = styled.div`
+  max-width: 800px; // 최대 너비 설정
+  margin: 0 auto; // 가운데 정렬
+  width: 100%; // 반응형 유지를 위한 100%
+  padding: 0 1rem; // 좌우 여백 추가
+`;
+
+// 타이틀 및 검색창을 감싸는 영역
 const HeaderWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -34,7 +40,7 @@ const HeaderWrapper = styled.div`
   gap: 1rem;
 `;
 
-// 타이틀 스타일
+// 타이틀 텍스트 스타일
 const Title = styled.h2`
   font-size: 2.2rem;
   font-weight: bold;
@@ -74,14 +80,14 @@ const SearchInput = styled.input`
   }
 `;
 
-// 카드 리스트 wrapper
+// 카드 리스트 전체 영역
 const CardList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 `;
 
-// 유저 카드 스타일
+// 개별 유저 카드 스타일
 const UserCard = styled.div`
   background-color: #2b2e33;
   padding: 1.5rem;
@@ -105,14 +111,14 @@ const UserCard = styled.div`
   }
 `;
 
-// 유저 정보 영역
+// 유저 정보 영역 (아이콘, 이름, 이메일)
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
 `;
 
-// 뱃지 스타일
+// 상태 및 권한 뱃지 스타일
 const Badge = styled.span<{ color: string }>`
   background-color: ${(props: { color: any }) => props.color};
   padding: 0.4rem 1rem;
@@ -120,7 +126,7 @@ const Badge = styled.span<{ color: string }>`
   font-weight: bold;
 `;
 
-// 버튼 그룹
+// 버튼 묶음 영역
 const ButtonGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -128,7 +134,7 @@ const ButtonGroup = styled.div`
   justify-content: flex-end;
 `;
 
-// 버튼 스타일
+// 각 버튼 스타일 정의
 const Button = styled.button<{ $bg: string; $hover: string }>`
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -144,7 +150,7 @@ const Button = styled.button<{ $bg: string; $hover: string }>`
   }
 `;
 
-// 페이지네이션
+// 페이지네이션 스타일
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
@@ -177,6 +183,7 @@ const UserList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  // 초기 사용자 데이터 로드
   useEffect(() => {
     getUsers().then((data) => {
       const uniqueUsers = Array.from(
@@ -187,7 +194,7 @@ const UserList: React.FC = () => {
     });
   }, []);
 
-  // 검색어 변경 시 필터링
+  // 검색어가 변경될 때마다 사용자 목록 필터링
   useEffect(() => {
     const filtered = users.filter(
       (user) =>
@@ -195,7 +202,7 @@ const UserList: React.FC = () => {
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
-    setCurrentPage(1); // 검색 시 첫 페이지로 초기화
+    setCurrentPage(1);
   }, [searchTerm, users]);
 
   const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
@@ -228,94 +235,95 @@ const UserList: React.FC = () => {
 
   return (
     <Wrapper>
-      {/* 타이틀 + 검색창 */}
-      <HeaderWrapper>
-        <Title>회원 관리</Title>
-        <SearchBar>
-          <SearchInput
-            type="text"
-            placeholder="이름 또는 이메일 검색"
-            value={searchTerm}
-            onChange={(e: {
-              target: { value: React.SetStateAction<string> };
-            }) => setSearchTerm(e.target.value)}
-          />
-        </SearchBar>
-      </HeaderWrapper>
+      <ContentInner>
+        {/* 타이틀과 검색창 영역 */}
+        <HeaderWrapper>
+          <Title>회원 관리</Title>
+          <SearchBar>
+            <SearchInput
+              type="text"
+              placeholder="이름 또는 이메일 검색"
+              style={{ marginBottom: "25px" }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchBar>
+        </HeaderWrapper>
 
-      {/* 사용자 카드 리스트 */}
-      <CardList>
-        {currentUsers.map((user) => (
-          <UserCard key={`user-${user.id}`}>
-            <UserInfo>
-              <div style={{ fontSize: "2rem" }}>👤</div>
-              <div>
-                <strong>{user.username}</strong>
-                <div style={{ fontSize: "0.85rem", color: "#ccc" }}>
-                  {user.email}
+        {/* 사용자 카드 리스트 */}
+        <CardList>
+          {currentUsers.map((user) => (
+            <UserCard key={`user-${user.id}`}>
+              <UserInfo>
+                <div style={{ fontSize: "2rem" }}>👤</div>
+                <div>
+                  <strong>{user.username}</strong>
+                  <div style={{ fontSize: "0.85rem", color: "#ccc" }}>
+                    {user.email}
+                  </div>
                 </div>
+              </UserInfo>
+
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <Badge color={user.role === "ADMIN" ? "#3b82f6" : "#6b7280"}>
+                  🛡 {user.role}
+                </Badge>
+                <Badge color={user.status === "ACTIVE" ? "#10b981" : "#ef4444"}>
+                  {user.status === "ACTIVE" ? "✅ 활성" : "⛔ 정지"}
+                </Badge>
               </div>
-            </UserInfo>
 
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <Badge color={user.role === "ADMIN" ? "#3b82f6" : "#6b7280"}>
-                🛡 {user.role}
-              </Badge>
-              <Badge color={user.status === "ACTIVE" ? "#10b981" : "#ef4444"}>
-                {user.status === "ACTIVE" ? "✅ 활성" : "⛔ 정지"}
-              </Badge>
-            </div>
+              <ButtonGroup>
+                <Button
+                  $bg="#3b82f6"
+                  $hover="#2563eb"
+                  onClick={() =>
+                    handleRoleChange(
+                      user.id,
+                      user.role === "ADMIN" ? "USER" : "ADMIN"
+                    )
+                  }
+                >
+                  🔄 권한
+                </Button>
+                <Button
+                  $bg={user.status === "ACTIVE" ? "#ef4444" : "#10b981"}
+                  $hover={user.status === "ACTIVE" ? "#dc2626" : "#059669"}
+                  onClick={() => handleStatusToggle(user.id)}
+                >
+                  {user.status === "ACTIVE" ? "⛔ 정지" : "♻️ 복구"}
+                </Button>
+                <Button
+                  $bg="#6b7280"
+                  $hover="#4b5563"
+                  onClick={() => setSelectedUser(user)}
+                >
+                  🔍 상세
+                </Button>
+              </ButtonGroup>
+            </UserCard>
+          ))}
+        </CardList>
 
-            <ButtonGroup>
-              <Button
-                $bg="#3b82f6"
-                $hover="#2563eb"
-                onClick={() =>
-                  handleRoleChange(
-                    user.id,
-                    user.role === "ADMIN" ? "USER" : "ADMIN"
-                  )
-                }
-              >
-                🔄 권한
-              </Button>
-              <Button
-                $bg={user.status === "ACTIVE" ? "#ef4444" : "#10b981"}
-                $hover={user.status === "ACTIVE" ? "#dc2626" : "#059669"}
-                onClick={() => handleStatusToggle(user.id)}
-              >
-                {user.status === "ACTIVE" ? "⛔ 정지" : "♻️ 복구"}
-              </Button>
-              <Button
-                $bg="#6b7280"
-                $hover="#4b5563"
-                onClick={() => setSelectedUser(user)}
-              >
-                🔍 상세
-              </Button>
-            </ButtonGroup>
-          </UserCard>
-        ))}
-      </CardList>
+        {/* 페이지네이션 영역 */}
+        <Pagination>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={`page-${i + 1}`}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </Pagination>
 
-      {/* 페이지네이션 */}
-      <Pagination>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={`page-${i + 1}`}
-            className={currentPage === i + 1 ? "active" : ""}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </Pagination>
-
-      {/* 상세 모달 */}
-      <UserDetailModal
-        user={selectedUser}
-        onClose={() => setSelectedUser(null)}
-      />
+        {/* 상세 보기 모달 */}
+        <UserDetailModal
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+      </ContentInner>
     </Wrapper>
   );
 };

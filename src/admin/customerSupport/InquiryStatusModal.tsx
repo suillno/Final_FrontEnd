@@ -1,6 +1,6 @@
 import React from "react";
 import * as Styled from "./CustomerSupport.styles";
-import { Inquiry } from "./CustomerSupport.types";
+import { Inquiry } from "../../types/types";
 
 // props 타입 지정
 interface Props {
@@ -9,7 +9,11 @@ interface Props {
   onClose: () => void; // 모달 닫기 핸들러
 }
 
-const InquiryStatusModal: React.FC<Props> = ({ target, onChangeStatus, onClose }) => {
+const InquiryStatusModal: React.FC<Props> = ({
+  target,
+  onChangeStatus,
+  onClose,
+}) => {
   return (
     <Styled.ModalOverlay onClick={onClose}>
       <Styled.ModalBox onClick={(e) => e.stopPropagation()}>

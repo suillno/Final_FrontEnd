@@ -27,7 +27,6 @@ export const FormWrapper = styled.div`
   flex-direction: column;
 `;
 
-
 // "고객 문의" 타이틀 스타일
 export const Title = styled.h2`
   font-size: 2rem;
@@ -97,7 +96,7 @@ export const SubmitButton = styled.button`
   padding: 0.75rem;
   background-color: #4b6cb7;
   color: #fff;
-  border: none; 
+  border: none;
   border-radius: 8px;
   font-weight: bold;
   font-size: 1rem;
@@ -108,7 +107,6 @@ export const SubmitButton = styled.button`
     background-color: #00c2cc;
   }
 `;
-
 
 // 셀렉트 박스 커스텀 스타일
 export const Select = styled.select`
@@ -145,9 +143,9 @@ export const Select = styled.select`
 export const SwitchButton = styled.button`
   margin-top: 0.5rem;
   align-self: flex-end;
-  background: none;             // 배경 제거
-  border: none;                 // 테두리 제거
-  color: #00eaff;               // 메인 포인트 색
+  background: none; // 배경 제거
+  border: none; // 테두리 제거
+  color: #00eaff; // 메인 포인트 색
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0;
@@ -156,11 +154,9 @@ export const SwitchButton = styled.button`
   text-decoration: none;
 
   &:hover {
-    color: #00c2cc;             // 호버 시 살짝 색 변화
+    color: #00c2cc; // 호버 시 살짝 색 변화
   }
 `;
-
-
 
 // 자동완성 결과 리스트 (ul)
 export const SuggestionList = styled.ul`

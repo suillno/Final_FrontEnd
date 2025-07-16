@@ -338,3 +338,15 @@ export const defaultSteamPriceResponse: SteamPriceResponse = {
     },
   },
 };
+
+export interface Inquiry {
+  inquiryId: number;
+  userId: number;
+  username?: string;
+  category: string;
+  content: string;
+  status: "대기중" | "처리중" | "완료";
+  createdAt: string;
+  updatedAt?: string;
+  answer?: string | null;
+}
