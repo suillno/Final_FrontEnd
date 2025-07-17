@@ -321,7 +321,7 @@ const Wallet: React.FC = () => {
     }
   };
 
-  // ✅ 프리셋 버튼 클릭 시 입력 값에 누적
+  // 프리셋 버튼 클릭 시 입력 값에 누적
   const handlePreset = (amount: number) => {
     setChargeAmount((prev) => {
       const current = parseInt(prev || "0", 10);
