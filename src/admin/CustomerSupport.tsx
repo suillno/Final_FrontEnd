@@ -250,7 +250,7 @@ const CustomerSupport: React.FC = () => {
           <tbody>
             {currentData.map((item) => (
               <tr key={item.inquiryId}>
-                <td>
+                <td data-label="선택">
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(item.inquiryId)}
@@ -259,23 +259,23 @@ const CustomerSupport: React.FC = () => {
                     }
                   />
                 </td>
-                <td>{item.status}</td>
-                <td>{item.username ?? "-"}</td>
-                <td>{item.category}</td>
-                <td>{item.createdAt}</td>
-                <td>
+                <td data-label="처리상태">{item.status}</td>
+                <td data-label="유저명">{item.username ?? "-"}</td>
+                <td data-label="문의유형">{item.category}</td>
+                <td data-label="등록일">{item.createdAt}</td>
+                <td data-label="상세">
                   <Styled.ViewButton
                     onClick={() => setViewContent(item.content)}
                   >
                     보기
                   </Styled.ViewButton>
                 </td>
-                <td>
+                <td data-label="상태변경">
                   <Styled.ChangeButton onClick={() => setEditTarget(item)}>
                     변경
                   </Styled.ChangeButton>
                 </td>
-                <td>
+                <td data-label="답변">
                   {item.answer ? (
                     <Styled.AnswerEditButton
                       onClick={() => setAnswerTarget(item)}
