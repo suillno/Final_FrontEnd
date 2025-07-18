@@ -199,26 +199,25 @@ export const Table = styled.table`
   border-collapse: collapse;
   background-color: #2c2f36;
   animation: ${fadeIn} 0.4s ease;
+  border-radius: 12px;
+  overflow: hidden;
 
   th,
   td {
-    padding: 1rem;
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid #444;
     text-align: center;
     font-size: 1rem;
 
     @media (max-width: 768px) {
-      padding: 0.75rem;
       font-size: 0.9rem;
     }
 
     @media (max-width: 480px) {
-      padding: 0.6rem;
       font-size: 0.85rem;
     }
 
     @media (max-width: 320px) {
-      padding: 0.5rem;
       font-size: 0.8rem;
     }
   }
@@ -241,6 +240,49 @@ export const Table = styled.table`
     transform: scale(1.2);
     accent-color: #00eaff;
     cursor: pointer;
+  }
+
+  /* 📱 모바일 카드형 UI */
+  @media (max-width: 768px) {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    tr {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      background-color: #2c2f36;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+      padding: 0.5rem 0;
+      border-bottom: none;
+      width: 100%;
+      gap: 1rem;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #00eaff;
+        flex: 1;
+        min-width: 100px;
+      }
+    }
   }
 `;
 
@@ -512,3 +554,4 @@ export const SaveButton = styled.button`
     background: rgb(203, 208, 220);
   }
 `;
+const mobile = "@media (max-width: 768px)";
