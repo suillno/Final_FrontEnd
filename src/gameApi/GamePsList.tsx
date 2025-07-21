@@ -78,7 +78,7 @@ const GamePsList: React.FC = () => {
     } else {
       setIsLoading(true);
     }
-    apiGetGamesByPlatform("187, 18, 16", pageCount)
+    apiGetGamesByPlatform("187,18,16", pageCount)
       .then((res) => {
         if (!res) return;
         // 기존 게임 결과에 새 결과 추가

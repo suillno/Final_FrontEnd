@@ -169,7 +169,7 @@ export const apiGetGamesByPlatform = async (
 };
 
 /**
- * 문의 등록 
+ * 문의 등록
  * @param inquiryData 사용자 ID, 게임 ID, 제목, 내용
  * @returns 등록 성공 메시지 or 예외 발생
  */
@@ -190,5 +190,3 @@ export const apiSubmitInquiry = async (inquiryData: {
     throw error;
   }
 };
-
-

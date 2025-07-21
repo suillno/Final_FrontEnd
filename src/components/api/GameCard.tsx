@@ -146,7 +146,7 @@ const GameCard: React.FC<Props> = ({ item }) => {
       <Overlay>
         <div>
           <div>장르: {item.genres.map((g) => g.name).join(", ")}</div>
-          <div>유저수: {item.added_by_status.yet}명</div>
+          <div>유저수: {item.added_by_status?.yet}명</div>
           <div>플레이타임 : {item.playtime}시간</div>
           <div>추천: {item.suggestions_count}</div>
           <div>
