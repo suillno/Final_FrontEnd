@@ -183,18 +183,15 @@ instanceAuth.interceptors.response.use(
       !originalRequest._retry &&
       (error.response.status === 406 || error.response.status === 401)
     ) {
-      console.log(401);
       // eslint-disable-next-line no-underscore-dangle
       originalRequest._retry = true;
       // const dispatch = useDispatch()
       const userTokenInfo = getCurrentUser();
-      console.log(userTokenInfo);
       const responseData = await axios
         .post(`${process.env.REACT_APP_API_HOST}/auth/refresh`, {
           refreshToken: `${userTokenInfo.refreshToken}`,
         })
         .then((res) => {
-          console.log(res.data);
           return res.data;
         })
         .catch((err) => {

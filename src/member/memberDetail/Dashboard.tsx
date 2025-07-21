@@ -163,7 +163,6 @@ const Dashboard: React.FC = () => {
     const fetchDashboard = async () => {
       if (!userInfo?.username) return;
       const data = await apiUserDashboard(userInfo.username);
-      console.log("대시보드 데이터:", data);
       setDashboardData(data);
     };
     fetchDashboard();

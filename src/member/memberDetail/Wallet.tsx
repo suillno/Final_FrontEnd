@@ -280,7 +280,6 @@ const Wallet: React.FC = () => {
           },
         },
       });
-      console.log("결제 응답:", response);
       if (response?.paymentId && !response?.code) {
         await apiChargeWallet(userId, amount, userName, 0);
 
