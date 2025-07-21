@@ -262,6 +262,19 @@ export const apiSendEmailVerification = async (emailData: {
   }
 };
 
+// 이메일 인증코드 검증
+export const apiVerifyEmailCode = async (verifyData: {
+  mailTo: string;
+  authCode: string;
+}) => {
+  try {
+    const res = await instanceAuth.post("/auth/mail/verify", verifyData);
+    return res.data;
+  } catch (err) {
+    throw new Error("인증번호 검증 실패");
+  }
+};
+
 // 장바구니 전체 리스트 불러오기
 export const apiGetCartList = async (username: string): Promise<CartItem[]> => {
   try {
@@ -579,4 +592,15 @@ export const apiChangePassword = async ({
     confirmPassword,
   });
   return res.data;
+};
+
+// 구글 로그인
+export const apiGoogleOAuthLogin = async (code: string) => {
+  try {
+    const res = await instanceAuth.post("/auth/oauth/google", { code });
+    return res.data; // { accessToken, tokenType, user } 또는 { needRegister: true, googleUser }
+  } catch (error) {
+    console.error("구글 OAuth 로그인 처리 실패", error);
+    throw error;
+  }
 };

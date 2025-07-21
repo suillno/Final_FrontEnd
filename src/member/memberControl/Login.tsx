@@ -8,7 +8,10 @@ import PGLogo from "../../img/PGLogo.png";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { apiLogVisitor } from "../../components/api/backApi";
+import {
+  apiLogVisitor,
+  apiVerifyEmailCode,
+} from "../../components/api/backApi";
 // 상태 저장 및 로컬 저장소 유틸
 import { setUserInfo } from "../../components/auth/store/userInfo";
 import { setCurrentUser } from "../../components/auth/helper/storage";
@@ -195,24 +198,7 @@ export default function LoginPage() {
     }
   };
 
-  // 이메일 인증번호 요청 버튼
-  const sendEmailAuthCode = async () => {
-    try {
-      const res = await axios.post("http://localhost:8080/api/auth/mail", {
-        params: {
-          mailTo: registerForm.registerEmail,
-          subject: "인증메일",
-          mailType: "emailAuth",
-          username: registerForm.registerName,
-        },
-      });
-      alert("인증 메일이 발송되었습니다!");
-    } catch (err) {
-      alert("이메일 발송 실패");
-    }
-  };
-
-  // 인증번호 검증
+  // 이메일 인증번호 검증
   const verifyEmailCode = async () => {
     const watchedEmail = watchRegister("email");
     const watchedCode = watchRegister("confirmCode");
@@ -223,14 +209,11 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/mail/verify",
-        {
-          mailTo: watchedEmail,
-          authCode: watchedCode,
-        }
-      );
-      alert(res.data); // 인증 성공
+      const res = await apiVerifyEmailCode({
+        mailTo: watchedEmail,
+        authCode: watchedCode,
+      });
+      alert(res); // 인증 성공 메시지
       setIsEmailVerified(true);
     } catch (err) {
       alert("인증 실패");
@@ -257,6 +240,9 @@ export default function LoginPage() {
     }
   };
 
+  // 경로가져오기
+  const UrlPass = process.env.REACT_APP_API_HOST;
+
   // 로그인 처리
   const onSubmitLogin = async (data: LoginFormType) => {
     try {
@@ -265,12 +251,9 @@ export default function LoginPage() {
         password: data.loginPassword,
         deviceInfo,
       };
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        loginData
-      );
+      const res = await axios.post(UrlPass + "/auth/login", loginData);
       const { accessToken, tokenType } = res.data;
-      const userRes = await axios.get("http://localhost:8080/api/user/me", {
+      const userRes = await axios.get(UrlPass + "/user/me", {
         headers: { Authorization: `${tokenType}${accessToken}` },
       });
       setCurrentUser(res.data);

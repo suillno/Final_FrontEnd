@@ -29,6 +29,7 @@ import GamePsList from "../gameApi/GamePsList";
 import GameXboxList from "../gameApi/GameXboxList";
 import Leave from "../member/memberDetail/Leave";
 import Wallet from "../member/memberDetail/Wallet";
+import GoogleOAuthCallback from "../components/utils/GoogleOAuthCallback";
 // DB에있는 권한 확인
 const ROLES = {
   ROLE_SYSTEM: 1,
@@ -79,6 +80,8 @@ function Router() {
         <Route path="admin/UserManagement" element={<UserManagement />} />
         <Route path="admin/Chart" element={<Chart />} />
       </Route>
+
+      <Route path="/oauth2/callback/google" element={<GoogleOAuthCallback />} />
 
       {/* 레이아웃 없이 호출 */}
       <Route path="/member" element={<PublicLayout />}>
