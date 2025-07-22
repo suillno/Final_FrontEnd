@@ -18,14 +18,17 @@ import {
   ImageSelectGrid,
   Checkbox,
 } from "../member.style/Profile.style";
-import { useSelector } from "react-redux";
-import { selectUserInfo } from "../../components/auth/store/userInfo";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectUserInfo,
+  setUserInfo,
+} from "../../components/auth/store/userInfo";
 import { apiChangePassword } from "../../components/api/backApi";
 
 // 🔷 사용자 정보 타입
 interface UserProfile {
   email: string;
-  profileImage: string; // 이미지 경로 또는 ""
+  profileImage: string;
 }
 
 // 🔷 레이아웃 컨텍스트 타입
@@ -34,51 +37,51 @@ interface LayoutContext {
 }
 
 const Profile: React.FC = () => {
-  const [newPassword, setNewPassword] = useState("");
-  const [editMode, setEditMode] = useState(false); // 수정모드 on/off
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false); // 2FA 상태
+  const dispatch = useDispatch(); // ✅ Redux 디스패치 훅
+  const userInfo = useSelector(selectUserInfo); // ✅ Redux 상태에서 유저 정보 조회
   const { isSidebarOpen } = useOutletContext<LayoutContext>();
-  const [tab, setTab] = useState<"profile" | "security">("profile"); // 탭 상태
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
 
   const [user, setUser] = useState<UserProfile>({
     email: "",
-    profileImage: "", // ❗ 이미지 기본값 없음
+    profileImage: "",
   });
 
-  // 🔹 정적 이미지 리스트 (1~15)
+  const [editMode, setEditMode] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [tab, setTab] = useState<"profile" | "security">("profile");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // 🔹 프로필 이미지 목록
   const profileImages = Array.from(
     { length: 15 },
     (_, i) => `/profiles/profile_${i + 1}.png`
   );
 
-  // 🔹 사용자 정보 로딩
+  // 🔹 사용자 정보 로드
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await instanceBack.get("/member/profile");
         const { email, profileImg } = res.data;
-
         setUser({
           email: email ?? "",
-          profileImage: profileImg || "", // ❗ 이미지가 없으면 공백
+          profileImage: profileImg || "",
         });
       } catch (err) {
         console.error("사용자 정보 로딩 실패", err);
       }
     };
-
     fetchUser();
   }, []);
-  const userInfo = useSelector(selectUserInfo);
 
-  // 🔹 이메일 변경 핸들러
+  // 🔹 이메일 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUser((prev) => ({ ...prev, email: e.target.value }));
   };
 
-  // 🔹 저장 요청
+  // 🔹 프로필 저장
   const handleSave = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(user.email)) {
@@ -96,6 +99,16 @@ const Profile: React.FC = () => {
         email: user.email,
         profileImg: user.profileImage,
       });
+
+      // ✅ Redux 상태 즉시 업데이트
+      dispatch(
+        setUserInfo({
+          ...userInfo,
+          email: user.email,
+          profileImage: user.profileImage,
+        })
+      );
+
       alert("프로필이 저장되었습니다.");
       setEditMode(false);
     } catch (err: any) {
@@ -104,7 +117,7 @@ const Profile: React.FC = () => {
     }
   };
 
-  // 🔹 2단계 인증 토글
+  // 🔐 2단계 인증 토글
   const toggleTwoFactor = () => {
     setTwoFactorEnabled(!twoFactorEnabled);
     alert(
@@ -112,7 +125,7 @@ const Profile: React.FC = () => {
     );
   };
 
-  // 🔹 비밀번호 변경 처리
+  // 🔑 비밀번호 변경
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert("모든 입력란을 채워주세요.");
@@ -147,7 +160,6 @@ const Profile: React.FC = () => {
   return (
     <PageWrapper $isSidebarOpen={isSidebarOpen}>
       <SectionBox>
-        {/* 📌 탭 메뉴 */}
         <TabMenu>
           <TabButton
             $active={tab === "profile"}
@@ -163,7 +175,6 @@ const Profile: React.FC = () => {
           </TabButton>
         </TabMenu>
 
-        {/* 👤 내 정보 탭 */}
         {tab === "profile" && (
           <>
             <Title>내 정보</Title>
@@ -206,6 +217,7 @@ const Profile: React.FC = () => {
                 disabled={!editMode}
               />
             </Field>
+
             {editMode ? (
               <Button color="#4caf50" onClick={handleSave}>
                 저장하기
@@ -216,7 +228,6 @@ const Profile: React.FC = () => {
           </>
         )}
 
-        {/* 🔐 보안 설정 탭 */}
         {tab === "security" && (
           <>
             <Title>보안 설정</Title>

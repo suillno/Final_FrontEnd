@@ -1,8 +1,9 @@
 import styled, { keyframes } from "styled-components";
+import { Link } from "react-router-dom";
 
-// ======================= 🔸 드롭다운 애니메이션 정의 =======================
+/* ======================= 🔸 드롭다운 애니메이션 정의 ======================= */
 
-// 열릴 때: 위에서 아래로 서서히 나타나는 효과
+// 드롭다운 열릴 때
 export const dropdownFadeIn = keyframes`
   0% {
     opacity: 0;
@@ -14,7 +15,7 @@ export const dropdownFadeIn = keyframes`
   }
 `;
 
-// 닫힐 때: 아래에서 위로 사라지는 효과
+// 드롭다운 닫힐 때
 export const dropdownFadeOut = keyframes`
   0% {
     opacity: 1;
@@ -26,9 +27,9 @@ export const dropdownFadeOut = keyframes`
   }
 `;
 
-// ======================= 🔸 스타일 컴포넌트 =======================
+/* ======================= 🔸 헤더 영역 ======================= */
 
-// 헤더 전체 영역 (고정 위치)
+// 전체 헤더 컨테이너
 export const HeaderWrapper = styled.header`
   position: fixed;
   background-color: #3b3e45;
@@ -40,11 +41,11 @@ export const HeaderWrapper = styled.header`
   z-index: 1000;
 `;
 
-// 사이드바 토글 아이콘 버튼
+// 사이드바 아이콘 (햄버거 버튼)
 export const SidebarIcon = styled.img`
   width: 30px;
   height: 30px;
-  filter: invert(1); // 흰색화 처리
+  filter: invert(1);
 
   &:hover {
     filter: invert(87%) sepia(3%) saturate(72%) hue-rotate(197deg)
@@ -59,7 +60,7 @@ export const Logo = styled.img`
   height: auto;
 
   &:hover {
-    filter: invert(1); // 반전 효과
+    filter: invert(1);
   }
 
   @media (max-width: 468px) {
@@ -67,7 +68,7 @@ export const Logo = styled.img`
   }
 `;
 
-// 로그인/닉네임 영역
+// 오른쪽 프로필/닉네임/버튼 그룹
 export const HeaderRight = styled.div`
   display: flex;
   align-items: center;
@@ -102,38 +103,76 @@ export const HideName = styled.a`
   }
 `;
 
-// 드롭다운 스타일 (애니메이션 포함)
+/* ======================= 🔸 드롭다운 영역 ======================= */
+
+// 드롭다운 컨테이너
 export const Dropdown = styled.div<{ $animateOut: boolean }>`
   position: absolute;
   top: 50px;
   right: 0;
-  background-color: #2a2a2e;
+  background: linear-gradient(145deg, #2a2a2e, #1f1f23);
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
   overflow: hidden;
-  min-width: 180px;
+  min-width: 200px;
   z-index: 2000;
 
-  // 열림/닫힘에 따라 애니메이션 선택
   animation: ${({ $animateOut }) =>
       $animateOut ? dropdownFadeOut : dropdownFadeIn}
     0.5s ease forwards;
+`;
 
-  a {
-    display: block;
-    padding: 12px 18px;
-    color: #ffffff;
-    font-size: 0.95rem;
-    text-decoration: none;
-    transition: background-color 0.25s ease, padding-left 0.25s ease;
+// 드롭다운 내부 링크 스타일
+export const DropdownLink = styled(Link)`
+  display: block;
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  color: #eee;
+  text-decoration: none;
+  transition: background-color 0.25s ease, transform 0.25s ease;
 
-    &:hover {
-      background-color: #3e3f47;
-      padding-left: 22px;
-    }
-
-    &:not(:last-child) {
-      border-bottom: 1px solid #444;
-    }
+  &:hover {
+    background-color: #00eaff22;
+    transform: translateX(6px);
   }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #444;
+  }
+`;
+
+// 🔹 작은 프로필 이미지 (헤더 우측)
+export const SmallProfileImage = styled.img`
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #888;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0 0 2px #00eaff;
+  }
+`;
+
+// 🔸 큰 프로필 이미지 (드롭다운 상단)
+export const LargeProfileImage = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #00eaff;
+  margin: 1rem auto 0.5rem;
+  display: block;
+`;
+
+// 드롭다운 내 닉네임 텍스트
+export const UserName = styled.p`
+  color: white;
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
 `;

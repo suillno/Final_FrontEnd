@@ -11,60 +11,63 @@ import {
   HideName,
   Logo,
   SidebarIcon,
+  LargeProfileImage,
+  UserName,
+  DropdownLink,
 } from "../style/Header.styles";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../components/auth/store/userInfo";
 
-// 🔸 props 타입 정의: Layout에서 사이드바 토글 버튼 클릭 시 동작할 함수 전달
+// 🔸 props 타입 정의
 interface HeaderProps {
   onSidebarToggle: () => void;
 }
 
-// 🔸 Header 컴포넌트 정의
 const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
-  // 🔹 로그인한 사용자 정보 가져오기 (Redux)
   const userInfo = useSelector(selectUserInfo);
 
-  const [isDropdownVisible, setDropdownVisible] = useState(false); // 드롭다운 보임 여부
-  const [isAnimatingOut, setAnimatingOut] = useState(false); // 닫히는 애니메이션 중인지 여부
-  const dropdownRef = useRef<HTMLDivElement>(null); // 외부 클릭 감지용 ref
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [isAnimatingOut, setAnimatingOut] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🔹 외부 클릭 시 드롭다운 닫기
+  // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        closeDropdown(); // 드롭다운 닫기 함수 호출
+        closeDropdown();
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🔹 닉네임 클릭 시 드롭다운 토글
+  // 드롭다운 토글
   const toggleDropdown = () => {
-    if (isDropdownVisible) {
-      closeDropdown();
-    } else {
-      setDropdownVisible(true);
-    }
+    isDropdownVisible ? closeDropdown() : setDropdownVisible(true);
   };
 
-  // 🔹 드롭다운 닫기 애니메이션 적용 후 제거
+  // 닫기 애니메이션 처리
   const closeDropdown = () => {
     setAnimatingOut(true);
     setTimeout(() => {
       setAnimatingOut(false);
       setDropdownVisible(false);
-    }, 500); // 0.5초 후 완전 제거
+    }, 300);
   };
+
+  // 🔸 프로필 이미지 처리 (캐시 방지 포함)
+  const rawImage = userInfo?.profileImage?.trim();
+  const profileImg =
+    rawImage && rawImage !== ""
+      ? `${rawImage}?v=${Date.now()}`
+      : "/img/default-profile.png";
 
   return (
     <HeaderWrapper className="flex justify-between items-center">
-      {/* 🔹 좌측: 사이드바 버튼 + 로고 */}
+      {/* 왼쪽: 사이드바 토글 + 로고 */}
       <div className="flex items-center gap-4 basis-1/4">
         <button onClick={onSidebarToggle}>
           <SidebarIcon src={sidebarIcon} />
@@ -74,13 +77,17 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
         </Link>
       </div>
 
-      {/* 🔹 중앙: 검색창 */}
+      {/* 중앙: 검색창 */}
       <div className="basis-2/4">
         <SearchBox />
       </div>
 
-      {/* 🔹 우측: 닉네임 + 로그인 상태 + 드롭다운 메뉴 */}
-      <HeaderRight className="basis-1/4 justify-end" ref={dropdownRef}>
+      {/* 오른쪽: 닉네임 + 로그아웃 + 드롭다운 */}
+      <HeaderRight
+        className="basis-1/4 justify-end items-center gap-2"
+        ref={dropdownRef}
+      >
+        {/* 닉네임 클릭 시 드롭다운 열림 */}
         <HideName
           className="text-white cursor-pointer hover:text-gray-400 transition-colors duration-200"
           onClick={toggleDropdown}
@@ -90,20 +97,26 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
 
         <LoginOut />
 
+        {/* 드롭다운 메뉴 */}
         {isDropdownVisible && (
           <Dropdown $animateOut={isAnimatingOut}>
-            <Link to="/member/profile">Profile</Link>
-            <Link to="/member/dashboard">Dashboard</Link>
-            <Link to="/member/library">Library</Link>
-            <Link to="/member/wallet">Wallet</Link>
-            <Link to="/member/cartpage">CartPage</Link>
-            <Link to="/member/wishlist">WishList</Link>
-            {/* ROLE_USER 권한이 있는 경우만 표시 */}
+            <LargeProfileImage src={profileImg} />
+            <UserName>{userInfo?.nickname || userInfo?.username}</UserName>
+
+            <DropdownLink to="/member/profile">Profile</DropdownLink>
+            <DropdownLink to="/member/dashboard">Dashboard</DropdownLink>
+            <DropdownLink to="/member/library">Library</DropdownLink>
+            <DropdownLink to="/member/wallet">Wallet</DropdownLink>
+            <DropdownLink to="/member/cartpage">CartPage</DropdownLink>
+            <DropdownLink to="/member/wishlist">WishList</DropdownLink>
+
+            {/* USER 권한이 있는 경우에만 Q&N 메뉴 표시 */}
             {Array.isArray(userInfo?.roles) &&
-              (userInfo.roles as { role: string }[]).some((r) =>
+              userInfo.roles.some((r: { role: string }) =>
                 r.role.includes("USER")
-              ) && <Link to="/member/memberService">Q&A</Link>}
-            <Link to="/member/Leave">Leave</Link>
+              ) && <DropdownLink to="/member/memberService">Q&N</DropdownLink>}
+
+            <DropdownLink to="/member/Leave">Leave</DropdownLink>
           </Dropdown>
         )}
       </HeaderRight>
