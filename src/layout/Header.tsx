@@ -18,7 +18,7 @@ import {
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "../components/auth/store/userInfo";
 
-// 🔸 props 타입 정의
+// props 타입 정의
 interface HeaderProps {
   onSidebarToggle: () => void;
 }

@@ -8,7 +8,7 @@ import {
   GameShortImgResponse,
   GameImgDefault,
 } from "../types/types";
-
+import PGLogoContents from "../img/PGLogoContents.png";
 import Loader from "../components/common/Loader";
 import {
   apiAddGameCart,
@@ -38,7 +38,6 @@ const GameDetail = () => {
   const [gameDetail, setGameDetail] = useState<GameResult>(defaultGameResult);
   const [gameImg, setGameImg] = useState<GameShortImgResponse>(GameImgDefault);
   const [priceValue, setPriceValue] = useState(location2.state?.priceInfo);
-  const [priceText, setPriceText] = useState("로딩 중...");
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [cartActive, setCartActive] = useState(false);
@@ -121,7 +120,6 @@ const GameDetail = () => {
   // 가격 정보 수신 핸들러
   const handlePriceFetch = (numeric: number, formatted: string) => {
     setPriceValue(numeric);
-    setPriceText(formatted);
   };
 
   const handleSave = async (
@@ -137,7 +135,7 @@ const GameDetail = () => {
       userName: userInfo.username,
       gameId: gameDetail.id,
       title: gameDetail.name,
-      backgroundImage: gameDetail.background_image,
+      backgroundImage: gameDetail?.background_image,
       price: priceValue,
       released: gameDetail.released,
       esrbRating: gameDetail.esrb_rating?.name || "정보 없음",
@@ -177,7 +175,7 @@ const GameDetail = () => {
   useEffect(() => {
     fetchGameDetail();
     fetchReviewList();
-  }, [id]);
+  }, [id, fetchGameDetail, fetchReviewList]);
 
   return (
     <>
@@ -188,10 +186,14 @@ const GameDetail = () => {
           <div className="max-w-[80%] mx-auto w-full">
             <div
               className="w-full h-[250px] bg-cover bg-center"
-              style={{ backgroundImage: `url(${gameDetail.background_image})` }}
+              style={{
+                backgroundImage: `url(${
+                  gameDetail?.background_image ?? PGLogoContents
+                })`,
+              }}
             >
               <div className="w-full h-full bg-black/40 flex items-center justify-center">
-                <h2 className="text-5xl font-bold">{gameDetail.name}</h2>
+                <h2 className="text-5xl font-bold">{gameDetail?.name}</h2>
               </div>
             </div>
             <ContentContainer>
@@ -206,9 +208,9 @@ const GameDetail = () => {
                 likeActive={likeActive}
                 discountActive={discountActive}
                 discountPrice={
-                  location.state?.priceDiscountInfo.toLocaleString() ?? 0
+                  location.state?.priceDiscountInfo?.toLocaleString() ?? 0
                 }
-                price={location.state?.priceInfo.toLocaleString() ?? 0}
+                price={location.state?.priceInfo?.toLocaleString() ?? 0}
                 discountPercent={location.state?.discountPercent ?? 0}
                 showCartButton={location.state?.showCartButton ?? true}
               />
@@ -219,7 +221,7 @@ const GameDetail = () => {
                   const reviewData = {
                     userName: userInfo.username,
                     gameId: gameDetail.id,
-                    title: gameDetail.name,
+                    title: gameDetail?.name,
                     rating,
                     content,
                   };

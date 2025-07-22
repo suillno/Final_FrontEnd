@@ -58,11 +58,9 @@ const GameInfo = ({
   ); // 관리자 여부 판별
 
   const [steamPrice, setSteamPrice] = useState(0);
-  const [priceText, setPriceText] = useState("");
 
   const handlePriceFetched = (numeric: number, formatted: string) => {
     setSteamPrice(numeric);
-    setPriceText(formatted);
     onPriceFetched(numeric, formatted);
   };
 
