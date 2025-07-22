@@ -220,6 +220,7 @@ export default function LoginPage() {
     }
   };
 
+  // 이메일
   const sendEmailVerification = async () => {
     const watchedEmail = watchRegister("email");
     const watchedName = watchRegister("name");
