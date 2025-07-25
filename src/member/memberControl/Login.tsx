@@ -82,6 +82,10 @@ export default function LoginPage() {
   // 이메일 인증코드
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
+  // 인증코드 전송중 중복방지
+  const [isEmailSending, setIsEmailSending] = useState(false); // 전송중
+  const [cooldown, setCooldown] = useState(0); // 남은 시간 표시
+
   // 디바이스 정보 상태
   const [deviceInfo, setDeviceInfo] = useState({
     deviceId: uuidv4(),
@@ -220,6 +224,17 @@ export default function LoginPage() {
     }
   };
 
+  // 타이머 감소 로직
+  useEffect(() => {
+    if (cooldown === 0) return;
+
+    const timer = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
   // 이메일
   const sendEmailVerification = async () => {
     const watchedEmail = watchRegister("email");
@@ -228,6 +243,12 @@ export default function LoginPage() {
       alert("이메일을 입력해주세요.");
       return;
     }
+
+    // 중복 전송 방지
+    if (isEmailSending || cooldown > 0) return; // 전송 중이거나 쿨타임이면 막기
+
+    setIsEmailSending(true);
+
     try {
       const emailData = {
         mailTo: watchedEmail,
@@ -236,8 +257,11 @@ export default function LoginPage() {
       };
       const res = await apiSendEmailVerification(emailData);
       alert(res.message || "인증코드가 전송되었습니다!");
+      setCooldown(180); // 쿨타임 3분(초단위)
     } catch (err) {
       alert("인증코드 발송 실패");
+    } finally {
+      setIsEmailSending(false);
     }
   };
 
@@ -395,8 +419,18 @@ export default function LoginPage() {
                 {/* <CheckButton type="button" onClick={checkEmail}>
                   중복확인
                 </CheckButton> */}
-                <CheckButton type="button" onClick={sendEmailVerification}>
-                  인증코드 전송
+                <CheckButton
+                  type="button"
+                  onClick={sendEmailVerification}
+                  disabled={isEmailSending || cooldown > 0}
+                >
+                  {isEmailSending
+                    ? "전송 중..."
+                    : cooldown > 0
+                    ? `재전송 (${Math.floor(cooldown / 60)}:${(cooldown % 60)
+                        .toString()
+                        .padStart(2, "0")})`
+                    : "인증코드 전송"}
                 </CheckButton>
                 <IoMailOutline />
                 {registerErrors.email && (
