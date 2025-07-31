@@ -175,7 +175,7 @@ const GameDetail = () => {
   useEffect(() => {
     fetchGameDetail();
     fetchReviewList();
-  }, [id, fetchGameDetail, fetchReviewList]);
+  }, [id]);
 
   return (
     <>
